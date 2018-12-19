@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ehcache>
+    <defaultCache eternal="true" maxElementsInMemory="100" overflowToDisk="false"/>
+    <cache name="pip.attribute" maxElementsInMemory="100" overflowToDisk="false" eternal="true"/>
+    <cache name="pdp.decision" maxElementsInMemory="100" overflowToDisk="false" eternal="true"/>
+
+
+    <cache name="aktoer" maxElementsInMemory="1000"
+           eternal="false"
+           timeToLiveSeconds="${CACHETID_SEKUNDER}"
+           diskPersistent="false"
+           overflowToDisk="false"/>
+
+    <cache name="tps" maxElementsInMemory="1000"
+           eternal="false"
+           timeToLiveSeconds="${CACHETID_SEKUNDER}"
+           diskPersistent="false"
+           overflowToDisk="false"/>
+
+    <cache name="ereg" maxElementsInMemory="1000"
+           eternal="false"
+           timeToLiveSeconds="${CACHETID_SEKUNDER}"
+           diskPersistent="false"
+           overflowToDisk="false"/>
+
+    <cache name="norg" maxElementsInMemory="1000"
+           eternal="false"
+           timeToLiveSeconds="${CACHETID_SEKUNDER}"
+           diskPersistent="false"
+           overflowToDisk="false"/>
+
+    <cache name="dkif" maxElementsInMemory="1000"
+           eternal="false"
+           timeToLiveSeconds="${CACHETID_SEKUNDER}"
+           diskPersistent="false"
+           overflowToDisk="false"/>
+
+    <cache name="syfo" maxElementsInMemory="1000"
+           eternal="false"
+           timeToLiveSeconds="${CACHETID_SEKUNDER}"
+           diskPersistent="false"
+           overflowToDisk="false"/>
+
+    <cache name="ldap" maxElementsInMemory="1000"
+           eternal="false"
+           timeToLiveSeconds="${CACHETID_SEKUNDER}"
+           diskPersistent="false"
+           overflowToDisk="false"/>
+
+    <cache name="tilgang" maxElementsInMemory="1000"
+           eternal="false"
+           timeToLiveSeconds="${CACHETID_SEKUNDER}"
+           diskPersistent="false"
+           overflowToDisk="false"/>
+
+    <cache name="egenansatt" maxElementsInMemory="1000"
+           eternal="false"
+           timeToLiveSeconds="${CACHETID_SEKUNDER}"
+           diskPersistent="false"
+           overflowToDisk="false"/>
+
+</ehcache>

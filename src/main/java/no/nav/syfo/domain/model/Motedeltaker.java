@@ -1,0 +1,24 @@
+package no.nav.syfo.domain.model;
+
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.experimental.Accessors;
+import no.nav.syfo.domain.interfaces.Varsel;
+
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+@Data
+@Accessors(fluent = true)
+@EqualsAndHashCode(of = "id")
+public class Motedeltaker implements Varsel {
+    public Long id;
+    public Mote mote;
+    public String uuid;
+    public String navn;
+    public String motedeltakertype;
+    public LocalDateTime svartTidspunkt;
+    public MotedeltakerStatus status;
+    public List<TidOgSted> tidOgStedAlternativer = new ArrayList<>();
+}
+

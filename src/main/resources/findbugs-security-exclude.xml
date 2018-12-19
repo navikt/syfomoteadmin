@@ -1,0 +1,12 @@
+<FindBugsFilter>
+    <Match>
+        <Bug pattern="JAXRS_ENDPOINT"/>
+    </Match>
+    <Match>
+        <Bug pattern="CRLF_INJECTION_LOGS"/>
+    </Match>
+    <Match>
+        <Class name="no.nav.syfo.util.XmlUtil"/>
+        <Bug pattern="MALICIOUS_XSLT,XPATH_INJECTION,XXE_DOCUMENT"/>
+    </Match>
+</FindBugsFilter>

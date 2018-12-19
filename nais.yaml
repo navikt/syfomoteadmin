@@ -1,0 +1,116 @@
+image: docker.adeo.no:5000/digisyfo/syfomoteadmin
+name: syfomoteadmin
+team: teamsykefravr
+replicas:
+  min: 1
+  max: 1
+  cpuThresholdPercentage: 80
+port: 8080
+webproxy: true
+healthcheck:
+  liveness:
+    path: syfomoteadmin/internal/isAlive
+    initialDelay: 60
+  readiness:
+    path: syfomoteadmin/internal/isAlive
+    initialDelay: 60
+prometheus:
+  enabled: true
+  path: syfomoteadmin/internal/metrics
+resources:
+  limits:
+    cpu: 3000m
+    memory: 2048Mi
+  requests:
+    cpu: 500m
+    memory: 1024Mi
+fasitResources:
+  exposed:
+  - alias: syfomoteadminapifss
+    resourceType: restservice
+    path: /syfomoteadmin/api
+  - alias: syfomoteadminfeedveilederoppgaver
+    resourceType: restservice
+    path: /syfomoteadmin/api/system/feed/moter
+  used:
+  - alias: appdynamics
+    resourceType: applicationproperties
+  - alias: srvsyfomoteadmin
+    resourceType: credential
+  - alias: loadbalancer:syfomoteadmin
+    resourceType: loadbalancerconfig
+  - alias: securityTokenService
+    resourceType: baseurl
+  - alias: modapp
+    resourceType: baseurl
+  - alias: tjenester
+    resourceType: baseurl
+  - alias: moteadmin.properties
+    resourceType: applicationproperties
+  - alias: motetoggles.properties
+    resourceType: applicationproperties
+  - alias: moteadminDB
+    resourceType: datasource
+  - alias: syfoveilederoppgaver.systemapi
+    resourceType: credential
+  - alias: smtpServer
+    resourceType: Smtpserver
+  - alias: Aktoer_v2
+    resourceType: webserviceendpoint
+  - alias: Sykefravaersoppfoelging_v1
+    resourceType: webserviceendpoint
+  - alias: virksomhet:BehandleArbeidOgAktivitetOppgave_v1
+    resourceType: webserviceendpoint
+  - alias: virksomhet:Brukerprofil_v3
+    resourceType: webserviceendpoint
+  - alias: virksomhet:DigitalKontakinformasjon_v1
+    resourceType: webserviceendpoint
+  - alias: virksomhet:EgenAnsatt_v1
+    resourceType: webserviceendpoint
+  - alias: virksomhet:Organisasjon_v4
+    resourceType: webserviceendpoint
+  - alias: virksomhet:OrganisasjonRessursEnhet_v1
+    resourceType: webserviceendpoint
+
+ # Queue
+  - alias: mqGateway03
+    resourceType: queuemanager
+  - alias: syfomoteadmin_channel
+    resourceType: channel
+  - alias: VARSELPRODUKSJON.VARSLINGER
+    resourceType: queue
+  - alias: VARSELPRODUKSJON.BEST_VARSEL_M_HANDLING
+    resourceType: queue
+  - alias: VARSELPRODUKSJON.STOPP_VARSEL_UTSENDING
+    resourceType: queue
+  - alias: henvendelse_OPPGAVE.HENVENDELSE
+    resourceType: queue
+
+  # OIDC med AzureAD B2C
+  - alias: aad_b2c_clientid
+    resourceType: credential
+  - alias: aad_b2c_discovery
+    resourceType: baseurl
+  - alias: isso-host
+    resourceType: baseurl
+  - alias: isso-jwks
+    resourceType: baseurl
+  - alias: isso-issuer
+    resourceType: baseurl
+  - alias: isso.isalive
+    resourceType: baseurl
+  - alias: isso-rp-user
+    resourceType: credential
+  - alias: veilarblogin.redirect-url
+    resourceType: restservice
+
+  - alias: tilgangskontrollapi
+    resourceType: restservice
+  - alias: syfoveilederoppgaver_system_v1
+    resourceType: restservice
+    path: /syfoveilederoppgaver/api/system/veilederoppgaver/v1
+  - alias: syfoveilederoppgaver_actions_system_v1
+    resourceType: restservice
+  - alias: ldap
+    resourceType: ldap
+
