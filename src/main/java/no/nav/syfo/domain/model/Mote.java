@@ -27,7 +27,6 @@ public class Mote {
     public MoteStatus status;
     public Veileder veileder;
 
-
     public MotedeltakerArbeidsgiver arbeidsgiver() {
         return motedeltakere.stream()
                 .filter(motedeltaker -> motedeltaker instanceof MotedeltakerArbeidsgiver)

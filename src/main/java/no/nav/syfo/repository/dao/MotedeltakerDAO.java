@@ -150,8 +150,8 @@ public class MotedeltakerDAO {
                 OPPRETTET.name(), FLERE_TIDSPUNKT.name()), p2Arbeidsgiver);
 
         return arbeidstakere.stream().filter(arbeidsgiver -> {
-            Mote mote = moteDAO.findMoteByMotedeltakerUuid(arbeidsgiver.uuid);
-            return mote.opprettetTidspunkt.isAfter(now().atStartOfDay().minusDays(1 + antallDagerBakoverEkstra)) && mote.opprettetTidspunkt.isBefore(now().atStartOfDay());
+            Mote Mote = moteDAO.findMoteByMotedeltakerUuid(arbeidsgiver.uuid);
+            return Mote.opprettetTidspunkt.isAfter(now().atStartOfDay().minusDays(1 + antallDagerBakoverEkstra)) && Mote.opprettetTidspunkt.isBefore(now().atStartOfDay());
         }).collect(toList());
     }
 

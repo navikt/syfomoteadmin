@@ -18,23 +18,23 @@ public class MoterUtil {
         return motedeltakere.stream().noneMatch(m -> m.svartTidspunkt == null);
     }
 
-    public static MotedeltakerAktorId finnAktoerFraMote(Mote mote) {
-        return mote.motedeltakere.stream()
+    public static MotedeltakerAktorId finnAktoerFraMote(Mote Mote) {
+        return Mote.motedeltakere.stream()
                 .filter(motedeltaker -> motedeltaker instanceof MotedeltakerAktorId)
                 .map(motedeltaker -> (MotedeltakerAktorId) motedeltaker)
                 .findFirst().orElseThrow(() -> new RuntimeException("Fant ikke Aktoer knyttet til møtet!"));
     }
 
-    public static Optional<LocalDateTime> hentSisteSvartidspunkt(Mote mote) {
-        return mote.motedeltakere.stream()
+    public static Optional<LocalDateTime> hentSisteSvartidspunkt(Mote Mote) {
+        return Mote.motedeltakere.stream()
                 .filter(motedeltaker -> motedeltaker.svartTidspunkt != null)
                 .map(motedeltaker -> motedeltaker.svartTidspunkt)
                 .sorted(reverseOrder()).findFirst();
     }
 
-    public static List<TidOgSted> filtrerBortAlternativerSomAlleredeErLagret(List<TidOgSted> nyeAlternativer, Mote mote) {
+    public static List<TidOgSted> filtrerBortAlternativerSomAlleredeErLagret(List<TidOgSted> nyeAlternativer, Mote Mote) {
         return nyeAlternativer.stream()
-                .filter(nyttAlternativ -> mote.alternativer.stream()
+                .filter(nyttAlternativ -> Mote.alternativer.stream()
                         .noneMatch(alternativ -> alternativ.tid.equals(nyttAlternativ.tid)))
                 .collect(toList());
     }

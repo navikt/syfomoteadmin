@@ -17,8 +17,8 @@ public class MotedeltakerService {
         return motedeltakerDAO.findMotedeltakereSomIkkeHarSvartSisteDognet(antallDagerBakoverEkstra);
     }
 
-    public static MotedeltakerAktorId finnAktoerIMote(Mote mote) {
-        return mote.motedeltakere.stream()
+    public static MotedeltakerAktorId finnAktoerIMote(Mote Mote) {
+        return Mote.motedeltakere.stream()
                 .filter(motedeltaker -> motedeltaker instanceof MotedeltakerAktorId)
                 .map(motedeltaker -> (MotedeltakerAktorId) motedeltaker)
                 .findAny().orElseThrow(() -> new RuntimeException("Fant ikke aktoeren i Møtet!"));

@@ -29,25 +29,25 @@ public class ArbeidsgiverVarselService {
     @Inject
     private SykefravaersoppfoelgingService sykefravaersoppfoelgingService;
 
-    public void sendVarsel(Varseltype varseltype, Mote mote) {
-        hendelseService.opprettHendelseVarselArbeidsgiver(varseltype, mote.arbeidsgiver());
-        epostService.klargjorForSending(varselinnhold(varseltype, mote));
+    public void sendVarsel(Varseltype varseltype, Mote Mote) {
+        hendelseService.opprettHendelseVarselArbeidsgiver(varseltype, Mote.arbeidsgiver());
+        epostService.klargjorForSending(varselinnhold(varseltype, Mote));
     }
 
-    public PEpost varselinnhold(Varseltype varseltype, Mote mote) {
+    public PEpost varselinnhold(Varseltype varseltype, Mote Mote) {
         if (varseltype == OPPRETTET) {
-            return arbeidsgiverNyttMote(mote.arbeidsgiver().navn, finnLenkeUrl(mote.sykmeldt().aktorId, mote.arbeidsgiver().orgnummer), veiledernavn()).mottaker(mote.arbeidsgiver().epost);
+            return arbeidsgiverNyttMote(Mote.arbeidsgiver().navn, finnLenkeUrl(Mote.sykmeldt().aktorId, Mote.arbeidsgiver().orgnummer), veiledernavn()).mottaker(Mote.arbeidsgiver().epost);
         } else if (varseltype == AVBRUTT_BEKREFTET) {
-            return arbeidsgiverAvbrytBekreftetMote(mote.arbeidsgiver().navn, veiledernavn(), mote).mottaker(mote.arbeidsgiver().epost);
+            return arbeidsgiverAvbrytBekreftetMote(Mote.arbeidsgiver().navn, veiledernavn(), Mote).mottaker(Mote.arbeidsgiver().epost);
         } else if (varseltype == AVBRUTT) {
-            return arbeidsgiverAvbrytMote(mote.arbeidsgiver().navn, veiledernavn(), mote).mottaker(mote.arbeidsgiver().epost);
+            return arbeidsgiverAvbrytMote(Mote.arbeidsgiver().navn, veiledernavn(), Mote).mottaker(Mote.arbeidsgiver().epost);
         } else if (varseltype == BEKREFTET) {
-            return bekreftelseEpost(mote.arbeidsgiver().navn, mote.arbeidsgiver().uuid, sted(mote.valgtTidOgSted), mote.valgtTidOgSted.tid, veiledernavn()).mottaker(mote.arbeidsgiver().epost);
+            return bekreftelseEpost(Mote.arbeidsgiver().navn, Mote.arbeidsgiver().uuid, sted(Mote.valgtTidOgSted), Mote.valgtTidOgSted.tid, veiledernavn()).mottaker(Mote.arbeidsgiver().epost);
         } else if (varseltype == NYE_TIDSPUNKT) {
-            return arbeidsgiverNyeTidspunkt(mote.arbeidsgiver().navn, finnLenkeUrl(mote.sykmeldt().aktorId, mote.arbeidsgiver().orgnummer), veiledernavn()).mottaker(mote.arbeidsgiver().epost);
+            return arbeidsgiverNyeTidspunkt(Mote.arbeidsgiver().navn, finnLenkeUrl(Mote.sykmeldt().aktorId, Mote.arbeidsgiver().orgnummer), veiledernavn()).mottaker(Mote.arbeidsgiver().epost);
         } else if (varseltype == PAAMINNELSE) {
-            return arbeidsgiverPaaminnelseMote(mote.arbeidsgiver().navn, "NAV", finnLenkeUrl(mote.sykmeldt().aktorId, mote.arbeidsgiver().orgnummer), opprettetTidspunkt(mote))
-                    .mottaker(mote.arbeidsgiver().epost);
+            return arbeidsgiverPaaminnelseMote(Mote.arbeidsgiver().navn, "NAV", finnLenkeUrl(Mote.sykmeldt().aktorId, Mote.arbeidsgiver().orgnummer), opprettetTidspunkt(Mote))
+                    .mottaker(Mote.arbeidsgiver().epost);
         }
         return null;
     }
@@ -60,8 +60,8 @@ public class ArbeidsgiverVarselService {
         return valgtTidOgSted.sted;
     }
 
-    private String opprettetTidspunkt(Mote mote) {
-        return tilKortDato(mote.opprettetTidspunkt);
+    private String opprettetTidspunkt(Mote Mote) {
+        return tilKortDato(Mote.opprettetTidspunkt);
     }
 
     private String finnLenkeUrl(String aktorId, String orgnummer) {

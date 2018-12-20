@@ -68,79 +68,79 @@ public class MoteService {
         return moteDAO.findMoteByMotedeltakerUuid(brukerUuid);
     }
 
-    public Mote opprettMote(Mote mote) {
-        return moteDAO.create(mote);
+    public Mote opprettMote(Mote Mote) {
+        return moteDAO.create(Mote);
     }
 
     @Transactional
     public void avbrytMote(String moteUuid, boolean varsle, String userId) {
-        Mote mote = moteDAO.findMoteByUUID(moteUuid);
-        mqStoppRevarslingService.stoppReVarsel(finnAktoerIMote(mote).uuid);
+        Mote Mote = moteDAO.findMoteByUUID(moteUuid);
+        mqStoppRevarslingService.stoppReVarsel(finnAktoerIMote(Mote).uuid);
         if (varsle) {
-            Veileder veileder = veilederService.hentVeileder(userId).mote(mote);
-            Varseltype varseltype = mote.status.equals(MoteStatus.BEKREFTET) ? Varseltype.AVBRUTT_BEKREFTET : Varseltype.AVBRUTT;
+            Veileder veileder = veilederService.hentVeileder(userId).mote(Mote);
+            Varseltype varseltype = Mote.status.equals(MoteStatus.BEKREFTET) ? Varseltype.AVBRUTT_BEKREFTET : Varseltype.AVBRUTT;
             veilederVarselService.sendVarsel(varseltype, veileder);
-            arbeidsgiverVarselService.sendVarsel(varseltype, mote);
-            sykmeldtVarselService.sendVarsel(varseltype, mote);
+            arbeidsgiverVarselService.sendVarsel(varseltype, Mote);
+            sykmeldtVarselService.sendVarsel(varseltype, Mote);
         }
-        moteDAO.setStatus(mote.id, AVBRUTT.name());
-        hendelseService.moteStatusEndret(mote.status(AVBRUTT));
-        if (feedService.skalOppretteFeedHendelse(mote, PFeedHendelse.FeedHendelseType.AVBRUTT)) {
-            opprettFeedHendelseAvTypen(PFeedHendelse.FeedHendelseType.AVBRUTT, mote);
+        moteDAO.setStatus(Mote.id, AVBRUTT.name());
+        hendelseService.moteStatusEndret(Mote.status(AVBRUTT));
+        if (feedService.skalOppretteFeedHendelse(Mote, PFeedHendelse.FeedHendelseType.AVBRUTT)) {
+            opprettFeedHendelseAvTypen(PFeedHendelse.FeedHendelseType.AVBRUTT, Mote);
         }
-        metricsService.reportAntallDagerSiden(hentSisteSvartidspunkt(mote).orElse(mote.opprettetTidspunkt), "antallDagerVeilederSvar");
+        metricsService.reportAntallDagerSiden(hentSisteSvartidspunkt(Mote).orElse(Mote.opprettetTidspunkt), "antallDagerVeilederSvar");
     }
 
     @Transactional
     public void bekreftMote(String moteUuid, Long tidOgStedId, String userId) {
-        Mote mote = moteDAO.findMoteByUUID(moteUuid);
+        Mote Mote = moteDAO.findMoteByUUID(moteUuid);
 
-        metricsService.reportAntallDagerSiden(mote.opprettetTidspunkt, "antallDagerForSvar");
-        metricsService.reportAntallDagerSiden(hentSisteSvartidspunkt(mote).orElse(mote.opprettetTidspunkt), "antallDagerVeilederSvar");
+        metricsService.reportAntallDagerSiden(Mote.opprettetTidspunkt, "antallDagerForSvar");
+        metricsService.reportAntallDagerSiden(hentSisteSvartidspunkt(Mote).orElse(Mote.opprettetTidspunkt), "antallDagerVeilederSvar");
 
-        moteDAO.bekreftMote(mote.id, tidOgStedId);
-        mote.valgtTidOgSted(mote.alternativer.stream().filter(tidOgSted -> tidOgSted.id.equals(tidOgStedId)).findFirst().orElseThrow(() -> new RuntimeException("Fant ikke tidspunktet!")));
+        moteDAO.bekreftMote(Mote.id, tidOgStedId);
+        Mote.valgtTidOgSted(Mote.alternativer.stream().filter(tidOgSted -> tidOgSted.id.equals(tidOgStedId)).findFirst().orElseThrow(() -> new RuntimeException("Fant ikke tidspunktet!")));
 
-        hendelseService.moteStatusEndret(mote.status(BEKREFTET));
+        hendelseService.moteStatusEndret(Mote.status(BEKREFTET));
         Veileder veileder = veilederService.hentVeileder(userId)
-                .mote(mote);
+                .mote(Mote);
 
-        mqStoppRevarslingService.stoppReVarsel(finnAktoerIMote(mote).uuid);
+        mqStoppRevarslingService.stoppReVarsel(finnAktoerIMote(Mote).uuid);
         veilederVarselService.sendVarsel(Varseltype.BEKREFTET, veileder);
-        arbeidsgiverVarselService.sendVarsel(Varseltype.BEKREFTET, mote);
-        sykmeldtVarselService.sendVarsel(Varseltype.BEKREFTET, mote);
-        if (feedService.skalOppretteFeedHendelse(mote, PFeedHendelse.FeedHendelseType.BEKREFTET)) {
-            opprettFeedHendelseAvTypen(PFeedHendelse.FeedHendelseType.BEKREFTET, mote);
+        arbeidsgiverVarselService.sendVarsel(Varseltype.BEKREFTET, Mote);
+        sykmeldtVarselService.sendVarsel(Varseltype.BEKREFTET, Mote);
+        if (feedService.skalOppretteFeedHendelse(Mote, PFeedHendelse.FeedHendelseType.BEKREFTET)) {
+            opprettFeedHendelseAvTypen(PFeedHendelse.FeedHendelseType.BEKREFTET, Mote);
         }
     }
 
     @Transactional
     public void nyeAlternativer(String moteUuid, List<TidOgSted> nyeAlternativer, String userId) {
-        Mote mote = moteDAO.findMoteByUUID(moteUuid);
+        Mote Mote = moteDAO.findMoteByUUID(moteUuid);
 
-        List<TidOgSted> filtrerBortAlternativerSomAlleredeErLagret = filtrerBortAlternativerSomAlleredeErLagret(nyeAlternativer, mote);
+        List<TidOgSted> filtrerBortAlternativerSomAlleredeErLagret = filtrerBortAlternativerSomAlleredeErLagret(nyeAlternativer, Mote);
         if (filtrerBortAlternativerSomAlleredeErLagret.isEmpty()) {
             return;
         }
 
-        hendelseService.moteStatusEndret(mote.status(FLERE_TIDSPUNKT));
-        nyeAlternativer.forEach(tidOgSted -> tidOgStedDAO.create(tidOgSted.moteId(mote.id)));
-        Veileder veileder = veilederService.hentVeileder(userId).mote(mote);
+        hendelseService.moteStatusEndret(Mote.status(FLERE_TIDSPUNKT));
+        nyeAlternativer.forEach(tidOgSted -> tidOgStedDAO.create(tidOgSted.moteId(Mote.id)));
+        Veileder veileder = veilederService.hentVeileder(userId).mote(Mote);
 
         veilederVarselService.sendVarsel(Varseltype.NYE_TIDSPUNKT, veileder);
-        arbeidsgiverVarselService.sendVarsel(Varseltype.NYE_TIDSPUNKT, mote);
-        sykmeldtVarselService.sendVarsel(Varseltype.NYE_TIDSPUNKT, mote);
-        if (feedService.skalOppretteFeedHendelse(mote, PFeedHendelse.FeedHendelseType.FLERE_TIDSPUNKT)) {
-            opprettFeedHendelseAvTypen(PFeedHendelse.FeedHendelseType.FLERE_TIDSPUNKT, mote);
+        arbeidsgiverVarselService.sendVarsel(Varseltype.NYE_TIDSPUNKT, Mote);
+        sykmeldtVarselService.sendVarsel(Varseltype.NYE_TIDSPUNKT, Mote);
+        if (feedService.skalOppretteFeedHendelse(Mote, PFeedHendelse.FeedHendelseType.FLERE_TIDSPUNKT)) {
+            opprettFeedHendelseAvTypen(PFeedHendelse.FeedHendelseType.FLERE_TIDSPUNKT, Mote);
         }
-        metricsService.reportAntallDagerSiden(hentSisteSvartidspunkt(mote).orElse(mote.opprettetTidspunkt), "antallDagerVeilederSvar");
+        metricsService.reportAntallDagerSiden(hentSisteSvartidspunkt(Mote).orElse(Mote.opprettetTidspunkt), "antallDagerVeilederSvar");
     }
 
     public void overforMoteTil(String moteUuid, String mottakerUserId) {
-        Mote mote = moteDAO.findMoteByUUID(moteUuid);
+        Mote Mote = moteDAO.findMoteByUUID(moteUuid);
         List<Enhet> mottakerEnheter = norgService.hentVeiledersNavEnheter(mottakerUserId);
 
-        boolean mottakerHarIkkeTilgangTilOppgittNavEnhet = mottakerEnheter.stream().noneMatch(enhet -> mote.navEnhet.equals(enhet.enhetId));
+        boolean mottakerHarIkkeTilgangTilOppgittNavEnhet = mottakerEnheter.stream().noneMatch(enhet -> Mote.navEnhet.equals(enhet.enhetId));
         if (mottakerHarIkkeTilgangTilOppgittNavEnhet) {
             throw new ForbiddenException();
         }
@@ -149,20 +149,20 @@ public class MoteService {
     }
 
 
-    public boolean harAlleSvartPaaSisteForespoersel(Mote mote) {
-        boolean skalSykmeldtHaVarsler = dkifService.hentKontaktinfoAktoerId(mote.sykmeldt().aktorId).skalHaVarsel;
-        LocalDateTime nyesteAlternativOpprettetTidspunkt = mote.alternativer.stream().sorted((o1, o2) -> o2.created.compareTo(o1.created)).findFirst().get().created;
+    public boolean harAlleSvartPaaSisteForespoersel(Mote Mote) {
+        boolean skalSykmeldtHaVarsler = dkifService.hentKontaktinfoAktoerId(Mote.sykmeldt().aktorId).skalHaVarsel;
+        LocalDateTime nyesteAlternativOpprettetTidspunkt = Mote.alternativer.stream().sorted((o1, o2) -> o2.created.compareTo(o1.created)).findFirst().get().created;
 
-        return mote.motedeltakere.stream()
+        return Mote.motedeltakere.stream()
                 .filter(erIkkeReservertSykmeldt(skalSykmeldtHaVarsler))
                 .noneMatch(deltaker -> deltaker.svartTidspunkt == null ||
                         deltaker.svartTidspunkt.isBefore(nyesteAlternativOpprettetTidspunkt) ||
-                        sisteSvarErIkkeReservertBruk(mote, skalSykmeldtHaVarsler));
+                        sisteSvarErIkkeReservertBruk(Mote, skalSykmeldtHaVarsler));
     }
 
-    private boolean sisteSvarErIkkeReservertBruk(Mote mote, boolean skalSykmeldtHaVarsler) {
+    private boolean sisteSvarErIkkeReservertBruk(Mote Mote, boolean skalSykmeldtHaVarsler) {
         return !skalSykmeldtHaVarsler &&
-                mote.motedeltakere.stream()
+                Mote.motedeltakere.stream()
                 .filter(motedeltaker -> motedeltaker.svartTidspunkt != null)
                 .sorted((o1, o2) -> o2.svartTidspunkt.compareTo(o1.svartTidspunkt))
                 .findFirst().get().motedeltakertype.equals("Bruker");
@@ -172,27 +172,27 @@ public class MoteService {
         return motedeltaker -> skalSykmeldtHaVarsler || !motedeltaker.motedeltakertype().equals("Bruker");
     }
 
-    public void svarMottatt(String motedeltakerSomSvarteUuid, Mote mote) {
-        Motedeltaker brukerSomSvarte = mote.motedeltakere.stream()
+    public void svarMottatt(String motedeltakerSomSvarteUuid, Mote Mote) {
+        Motedeltaker brukerSomSvarte = Mote.motedeltakere.stream()
                 .filter(deltaker -> deltaker.uuid.equals(motedeltakerSomSvarteUuid))
                 .findFirst().get();
-        mote.motedeltakere = mote.motedeltakere.stream()
+        Mote.motedeltakere = Mote.motedeltakere.stream()
                 .map(motedeltaker -> motedeltaker.uuid.equals(brukerSomSvarte.uuid) ? motedeltaker.svartTidspunkt(now()) : motedeltaker)
                 .collect(toList());
 
         if ("Bruker".equals(brukerSomSvarte.motedeltakertype)) {
             mqStoppRevarslingService.stoppReVarsel(brukerSomSvarte.uuid);
-            metricsService.reportAntallDagerSiden(mote.opprettetTidspunkt, "antallDagerBrukerSvar");
+            metricsService.reportAntallDagerSiden(Mote.opprettetTidspunkt, "antallDagerBrukerSvar");
         } else if ("arbeidsgiver".equals(brukerSomSvarte.motedeltakertype)) {
-            metricsService.reportAntallDagerSiden(mote.opprettetTidspunkt, "antallDagerArbeidsgiverSvar");
+            metricsService.reportAntallDagerSiden(Mote.opprettetTidspunkt, "antallDagerArbeidsgiverSvar");
         }
 
-        if (harAlleSvartPaaSisteForespoersel(mote)) {
+        if (harAlleSvartPaaSisteForespoersel(Mote)) {
             feedDAO.createFeedHendelse(new PFeedHendelse()
-                    .sistEndretAv(mote.eier)
+                    .sistEndretAv(Mote.eier)
                     .type(ALLE_SVAR_MOTTATT.name())
                     .uuid(UUID.randomUUID().toString())
-                    .moteId(mote.id)
+                    .moteId(Mote.id)
             );
         }
     }
@@ -209,12 +209,12 @@ public class MoteService {
         return moteDAO.findMoterByNavEnhet(navenhet);
     }
 
-    private void opprettFeedHendelseAvTypen(PFeedHendelse.FeedHendelseType type, Mote mote) {
+    private void opprettFeedHendelseAvTypen(PFeedHendelse.FeedHendelseType type, Mote Mote) {
         feedDAO.createFeedHendelse(new PFeedHendelse()
                 .sistEndretAv(getUserId())
-                .uuid(feedService.finnNyesteFeedUuidiMote(mote))
+                .uuid(feedService.finnNyesteFeedUuidiMote(Mote))
                 .type(type.name())
-                .moteId(mote.id)
+                .moteId(Mote.id)
         );
     }
 }

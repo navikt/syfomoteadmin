@@ -72,30 +72,30 @@ public class EpostInnholdUtil {
                 BUNN;
     }
 
-    public static PEpost arbeidsgiverAvbrytMote(String navn, String veiledernavn, Mote mote) {
+    public static PEpost arbeidsgiverAvbrytMote(String navn, String veiledernavn, Mote Mote) {
         return new PEpost()
                 .emne(arbeidsgiverAvbrytMoteEmne())
-                .innhold(arbeidsgiverAvbrytMoteInnhold(navn, veiledernavn, mote));
+                .innhold(arbeidsgiverAvbrytMoteInnhold(navn, veiledernavn, Mote));
     }
 
-    public static PEpost arbeidsgiverAvbrytBekreftetMote(String navn, String veiledernavn, Mote mote) {
+    public static PEpost arbeidsgiverAvbrytBekreftetMote(String navn, String veiledernavn, Mote Mote) {
         return new PEpost()
                 .emne(arbeidsgiverAvbrytMoteEmne())
-                .innhold(arbeidsgiverAvbrytBekreftetMoteInnhold(navn, veiledernavn, mote));
+                .innhold(arbeidsgiverAvbrytBekreftetMoteInnhold(navn, veiledernavn, Mote));
     }
 
     private static String arbeidsgiverAvbrytMoteEmne() {
         return "Dialogmøte med NAV avbrutt";
     }
 
-    private static String arbeidsgiverAvbrytMoteInnhold(String navn, String veiledernavn, Mote mote) {
+    private static String arbeidsgiverAvbrytMoteInnhold(String navn, String veiledernavn, Mote Mote) {
         return TOPP +
                 "<p>Til " + navn.trim() + ", </p>" +
                 "<p>Du har tidligere mottatt en møteforespørsel på flere tidspunkter for et dialogmøte med en av dine sykmeldte. " +
                 "Møteforespørselen er kansellert.</p>" +
 
-                motetidspunker(mote.alternativer) +
-                motested(mote.alternativer.get(0).sted) +
+                motetidspunker(Mote.alternativer) +
+                motested(Mote.alternativer.get(0).sted) +
 
                 harDuSporsmal() +
                 vennligHilsen(veiledernavn) +
@@ -131,14 +131,14 @@ public class EpostInnholdUtil {
         return builder.toString();
     }
 
-    private static String arbeidsgiverAvbrytBekreftetMoteInnhold(String navn, String veiledernavn, Mote mote) {
+    private static String arbeidsgiverAvbrytBekreftetMoteInnhold(String navn, String veiledernavn, Mote Mote) {
         return TOPP +
                 "<p>Til " + navn.trim() + ", </p>" +
                 "<p>Du har tidligere mottatt en bekreftelse på et tidspunkt for et dialogmøte med en av dine sykmeldte. " +
                 "Møteforespørselen er kansellert og du kan se bort fra henvendelsen.</p>" +
 
-                motetidspunker(asList(mote.valgtTidOgSted)) +
-                motested(mote.valgtTidOgSted.sted) +
+                motetidspunker(asList(Mote.valgtTidOgSted)) +
+                motested(Mote.valgtTidOgSted.sted) +
                 harDuSporsmal() +
                 vennligHilsen(veiledernavn) +
                 BUNN;

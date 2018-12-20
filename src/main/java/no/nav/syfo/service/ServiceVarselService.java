@@ -29,8 +29,8 @@ public class ServiceVarselService {
                 .withParameterListes(new XMLParameter("url", getProperty("TJENESTER_URL") + "/beskjed/melding/ny"));
 
         if ("SyfoMotebekreftelse".equals(varseltype)) {
-            Mote mote = moteService.findMoteByMotedeltakerUuid(uuid);
-            xmlVarsel.getParameterListes().add(new XMLParameter("tidsted", tilLangDatoMedKlokkeslettPostfixDagPrefix(mote.valgtTidOgSted.tid)));
+            Mote Mote = moteService.findMoteByMotedeltakerUuid(uuid);
+            xmlVarsel.getParameterListes().add(new XMLParameter("tidsted", tilLangDatoMedKlokkeslettPostfixDagPrefix(Mote.valgtTidOgSted.tid)));
         }
 
         String melding = marshallVarsel(xmlVarsel);

@@ -1,7 +1,6 @@
 package no.nav.syfo.repository.dao;
 
 import no.nav.syfo.domain.model.Mote;
-import no.nav.syfo.repository.model.PMote;
 import no.nav.syfo.repository.model.PMotedeltakerAktorId;
 import no.nav.syfo.repository.model.PMotedeltakerArbeidsgiver;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -34,22 +33,22 @@ public class MoteDAO {
     @Inject
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
-    public Mote create(Mote mote) {
+    public Mote create(Mote Mote) {
         Long nesteSekvensverdi = nesteSekvensverdi("MOTE_ID_SEQ", jdbcTemplate);
         String uuid = randomUUID().toString();
         MapSqlParameterSource namedParameters = new MapSqlParameterSource()
                 .addValue("mote_id", nesteSekvensverdi)
                 .addValue("mote_uuid", uuid)
-                .addValue("opprettet_av", mote.opprettetAv)
-                .addValue("nav_enhet", mote.navEnhet)
+                .addValue("opprettet_av", Mote.opprettetAv)
+                .addValue("nav_enhet", Mote.navEnhet)
                 .addValue("created", convert(now()))
                 .addValue("valgt_tid_sted_id", null)
                 .addValue("status", "OPPRETTET")
-                .addValue("eier", mote.eier);
+                .addValue("eier", Mote.eier);
         namedParameterJdbcTemplate.update("insert into mote " +
                 "(mote_id, mote_uuid, opprettet_av, nav_enhet, created, valgt_tid_sted_id, status, eier)" +
                 "VALUES (:mote_id, :mote_uuid, :opprettet_av, :nav_enhet, :created, :valgt_tid_sted_id, :status, :eier)", namedParameters);
-        return mote.id(nesteSekvensverdi).uuid(uuid);
+        return Mote.id(nesteSekvensverdi).uuid(uuid);
     }
 
     public void setStatus(long moteId, String status) {
@@ -104,24 +103,24 @@ public class MoteDAO {
                 .collect(toList());
     }
 
-    private Mote tilMote(PMote pMote) {
-        return map(pMote, p2Mote)
-                .alternativer(tidOgStedDAO.finnAlternativer(pMote.id))
-                .valgtTidOgSted(pMote.valgtTidStedId != 0 ? tidOgStedDAO.finnAlternativ(pMote.valgtTidStedId) : null)
-                .motedeltakere(motedeltakerDAO.motedeltakereByMoteId(pMote.id));
+    private Mote tilMote(no.nav.syfo.repository.model.PMote pPMote) {
+        return map(pPMote, p2Mote)
+                .alternativer(tidOgStedDAO.finnAlternativer(pPMote.id))
+                .valgtTidOgSted(pPMote.valgtTidStedId != 0 ? tidOgStedDAO.finnAlternativ(pPMote.valgtTidStedId) : null)
+                .motedeltakere(motedeltakerDAO.motedeltakereByMoteId(pPMote.id));
     }
 
-    private List<Mote> tilMote(List<PMote> pMoter) {
+    private List<Mote> tilMote(List<no.nav.syfo.repository.model.PMote> pMoter) {
         return pMoter.stream()
                 .map(this::tilMote)
                 .collect(toList());
     }
 
     public Mote findMoteByMotedeltakerUuid(String uuid) {
-        PMote pMote = jdbcTemplate.queryForObject("select * from mote " +
+        no.nav.syfo.repository.model.PMote pPMote = jdbcTemplate.queryForObject("select * from mote " +
                 "left join motedeltaker ON mote.mote_id = motedeltaker.mote_id " +
                 "where motedeltaker.motedeltaker_uuid = ?", new MoteMapper(), uuid);
-        return tilMote(pMote);
+        return tilMote(pPMote);
     }
 
     public List<Mote> finnMoterOpprettetSisteMnd() {
@@ -141,9 +140,9 @@ public class MoteDAO {
                 "where mote_uuid = ?", mottakerUserId, moteUuid);
     }
 
-    public static class MoteMapper implements RowMapper<PMote> {
-        public PMote mapRow(ResultSet rs, int rowNum) throws SQLException {
-            return new PMote()
+    public static class MoteMapper implements RowMapper<no.nav.syfo.repository.model.PMote> {
+        public no.nav.syfo.repository.model.PMote mapRow(ResultSet rs, int rowNum) throws SQLException {
+            return new no.nav.syfo.repository.model.PMote()
                     .id(rs.getLong("mote_id"))
                     .uuid(rs.getString("mote_uuid"))
                     .opprettetAv(rs.getString("opprettet_av"))

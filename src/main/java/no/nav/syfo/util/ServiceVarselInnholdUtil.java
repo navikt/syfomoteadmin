@@ -35,11 +35,11 @@ public class ServiceVarselInnholdUtil {
                         "vil du få en ny forespørsel. Har du spørsmål, kan du kontakte oss på 55 55 33 33. Med vennlig hilsen NAV");
     }
 
-    public static ServiceVarsel bekreftetEpost(Mote mote) {
-        tilLangDatoMedKlokkeslettPostfixDagPrefix(mote.valgtTidOgSted.tid);
+    public static ServiceVarsel bekreftetEpost(Mote Mote) {
+        tilLangDatoMedKlokkeslettPostfixDagPrefix(Mote.valgtTidOgSted.tid);
         return new ServiceVarsel()
                 .emne("Møtebekreftelse")
-                .innhold("Hei! Vi bekrefter møtetidspunkt " + tilLangDatoMedKlokkeslettPostfixDagPrefix(mote.valgtTidOgSted.tid).toLowerCase() +
+                .innhold("Hei! Vi bekrefter møtetidspunkt " + tilLangDatoMedKlokkeslettPostfixDagPrefix(Mote.valgtTidOgSted.tid).toLowerCase() +
                         " Du vil om kort tid få en innkalling i posten med mer informasjon om møtet. Vennlig hilsen NAV");
     }
 }

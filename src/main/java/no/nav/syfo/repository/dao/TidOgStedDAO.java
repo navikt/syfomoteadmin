@@ -2,7 +2,6 @@ package no.nav.syfo.repository.dao;
 
 
 import no.nav.syfo.domain.model.TidOgSted;
-import no.nav.syfo.repository.model.PTidOgSted;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -61,9 +60,9 @@ public class TidOgStedDAO {
         return tidOgSted.id(nesteSekvensverdi);
     }
 
-    public static class TidOgStedMapper implements RowMapper<PTidOgSted> {
-        public PTidOgSted mapRow(ResultSet rs, int rowNum) throws SQLException {
-            return new PTidOgSted()
+    public static class TidOgStedMapper implements RowMapper<no.nav.syfo.repository.model.PTidOgSted> {
+        public no.nav.syfo.repository.model.PTidOgSted mapRow(ResultSet rs, int rowNum) throws SQLException {
+            return new no.nav.syfo.repository.model.PTidOgSted()
                     .id(rs.getLong("tid_sted_id"))
                     .moteId(rs.getLong("mote_id"))
                     .sted(rs.getString("sted"))

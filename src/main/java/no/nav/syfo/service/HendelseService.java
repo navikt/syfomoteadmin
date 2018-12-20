@@ -55,13 +55,13 @@ public class HendelseService {
         return getUserId() != null ? getUserId() : "srvmoteadmin";
     }
 
-    public void moteStatusEndret(Mote mote) {
+    void moteStatusEndret(Mote Mote) {
         HendelseMoteStatusEndret hendelse = new HendelseMoteStatusEndret()
                 .type(MOTESTATUS_ENDRET)
-                .moteId(mote.id)
+                .moteId(Mote.id)
                 .inntruffetdato(now())
                 .opprettetAv(opprettetAv())
-                .status(mote.status);
+                .status(Mote.status);
         hendelseDAO.create(hendelse);
     }
 

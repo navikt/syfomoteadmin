@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 @Accessors(fluent = true)
 @EqualsAndHashCode(callSuper = true)
 public class HendelseVarselVeileder extends Hendelse {
-    public Mote mote;
+    public Mote Mote;
     public Kanal kanal;
     public String adresse;
     public String veilederident;

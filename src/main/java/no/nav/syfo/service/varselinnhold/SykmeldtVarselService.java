@@ -19,21 +19,21 @@ public class SykmeldtVarselService {
     @Inject
     private ServiceVarselService serviceVarselService;
 
-    public void sendVarsel(Varseltype varseltype, Mote mote) {
-        Kontaktinfo kontaktinfo = dkifService.hentKontaktinfoAktoerId(mote.sykmeldt().aktorId);
+    public void sendVarsel(Varseltype varseltype, Mote Mote) {
+        Kontaktinfo kontaktinfo = dkifService.hentKontaktinfoAktoerId(Mote.sykmeldt().aktorId);
         if (!kontaktinfo.skalHaVarsel) {
             return;
         }
         if (varseltype == OPPRETTET) {
-            mqOppgaveVarselService.sendOppgaveVarsel(mote.sykmeldt().aktorId, mote.sykmeldt().uuid);
+            mqOppgaveVarselService.sendOppgaveVarsel(Mote.sykmeldt().aktorId, Mote.sykmeldt().uuid);
         } else if (varseltype == AVBRUTT_BEKREFTET) {
-            serviceVarselService.sendServiceVarsel(mote.sykmeldt().aktorId, mote.sykmeldt().uuid, "NaermesteLederMoteAvbrutt");
+            serviceVarselService.sendServiceVarsel(Mote.sykmeldt().aktorId, Mote.sykmeldt().uuid, "NaermesteLederMoteAvbrutt");
         } else if (varseltype == AVBRUTT) {
-            serviceVarselService.sendServiceVarsel(mote.sykmeldt().aktorId, mote.sykmeldt().uuid, "SyfoMoteAvbrutt");
+            serviceVarselService.sendServiceVarsel(Mote.sykmeldt().aktorId, Mote.sykmeldt().uuid, "SyfoMoteAvbrutt");
         } else if (varseltype == BEKREFTET) {
-            serviceVarselService.sendServiceVarsel(mote.sykmeldt().aktorId, mote.sykmeldt().uuid, "SyfoMotebekreftelse");
+            serviceVarselService.sendServiceVarsel(Mote.sykmeldt().aktorId, Mote.sykmeldt().uuid, "SyfoMotebekreftelse");
         } else if (varseltype == NYE_TIDSPUNKT) {
-            serviceVarselService.sendServiceVarsel(mote.sykmeldt().aktorId, mote.sykmeldt().uuid, "SyfomoteNyetidspunkt");
+            serviceVarselService.sendServiceVarsel(Mote.sykmeldt().aktorId, Mote.sykmeldt().uuid, "SyfomoteNyetidspunkt");
         }
     }
 }

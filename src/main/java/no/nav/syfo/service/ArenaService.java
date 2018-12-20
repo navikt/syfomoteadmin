@@ -24,10 +24,10 @@ public class ArenaService {
     private AktoerService aktoerService;
 
     public void bestillOppgave(String moteUuid) {
-        Mote mote = moteService.findMoteByUUID(moteUuid);
+        Mote Mote = moteService.findMoteByUUID(moteUuid);
         try {
-            String fnr = aktoerService.hentFnrForAktoer(finnAktoerFraMote(mote).aktorId);
-            behandleArbeidOgAktivitetOppgaveV1.bestillOppgave(request(fnr, mote.navEnhet));
+            String fnr = aktoerService.hentFnrForAktoer(finnAktoerFraMote(Mote).aktorId);
+            behandleArbeidOgAktivitetOppgaveV1.bestillOppgave(request(fnr, Mote.navEnhet));
         } catch (BestillOppgaveSakIkkeOpprettet | BestillOppgaveOrganisasjonIkkeFunnet | BestillOppgaveSikkerhetsbegrensning
                 | BestillOppgavePersonIkkeFunnet | BestillOppgavePersonErInaktiv | BestillOppgaveUgyldigInput e) {
             LOG.warn("Kunne ikke bestille sak", e);

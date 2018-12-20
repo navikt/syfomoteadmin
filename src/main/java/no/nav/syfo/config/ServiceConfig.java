@@ -1,7 +1,7 @@
 package no.nav.syfo.config;
 
-import no.nav.syfo.rest.services.HistorikkService;
-import no.nav.syfo.rest.services.TilgangService;
+import no.nav.syfo.service.HistorikkService;
+import no.nav.syfo.service.TilgangService;
 import no.nav.syfo.service.*;
 import no.nav.syfo.service.mq.MqHenvendelseService;
 import no.nav.syfo.service.mq.MqOppgaveVarselService;
