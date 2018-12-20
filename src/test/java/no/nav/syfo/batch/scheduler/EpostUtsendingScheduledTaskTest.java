@@ -2,6 +2,7 @@ package no.nav.syfo.batch.scheduler;
 
 import no.nav.syfo.repository.model.PEpost;
 import no.nav.syfo.service.EpostService;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -27,6 +28,13 @@ public class EpostUtsendingScheduledTaskTest {
     @Before
     public void setup() {
         setProperty("LOCAL_MOCK", "false");
+        setProperty("TOGGLE_ENABLE_BATCH", "true");
+    }
+
+    @After
+    public void cleanUp() {
+        setProperty("LOCAL_MOCK", "");
+        setProperty("TOGGLE_ENABLE_BATCH", "");
     }
 
     @Test

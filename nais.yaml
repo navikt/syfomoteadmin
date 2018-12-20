@@ -45,9 +45,7 @@ fasitResources:
     resourceType: baseurl
   - alias: tjenester
     resourceType: baseurl
-  - alias: moteadmin.properties
-    resourceType: applicationproperties
-  - alias: motetoggles.properties
+  - alias: syfomoteadmin.properties
     resourceType: applicationproperties
   - alias: moteadminDB
     resourceType: datasource

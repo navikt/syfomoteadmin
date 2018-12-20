@@ -20,6 +20,10 @@ public final class ToggleUtil {
         return getToggleDefaultOn("TOGGLES_SEND_EPOST");
     }
 
+    public static boolean toggleBatch() {
+        return getToggleDefaultOff("TOGGLE_ENABLE_BATCH");
+    }
+
     public static boolean toggleDisablePolicies() {
         return getToggleDefaultOff("TOGGLES_DISABLE_POLICIES");
     }
