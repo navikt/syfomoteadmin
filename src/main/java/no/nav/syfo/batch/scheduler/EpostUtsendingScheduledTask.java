@@ -27,8 +27,6 @@ public class EpostUtsendingScheduledTask implements ScheduledTask {
                 epostService.send(epost);
                 epostService.slettEpostEtterSending(epost.id);
             });
-        } else {
-            LOG.info("TRACEBATCH: Not run {}: Batch er togglet av", this.getClass().getName());
         }
     }
 }
