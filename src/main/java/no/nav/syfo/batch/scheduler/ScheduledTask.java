@@ -17,7 +17,7 @@ public interface ScheduledTask extends Runnable {
     Function<String, Trigger> GET_FASIT_TRIGGER = className -> new CronTrigger(
             Optional
                     .ofNullable(className)
-                    .map(s -> format("MOTEADMIN_SCHEDULER_%1s_CRON", className))
+                    .map(s -> format("MOTEADMIN_SCHEDULER_%1s_CRON", className.toUpperCase()))
                     .map(p -> getProperty(p, MIDNATT))
                     .orElse(MIDNATT)
     );

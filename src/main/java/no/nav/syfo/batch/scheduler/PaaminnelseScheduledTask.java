@@ -53,6 +53,8 @@ public class PaaminnelseScheduledTask implements ScheduledTask {
                     .stream()
                     .map(motedeltaker -> moteService.findMoteByMotedeltakerUuid(motedeltaker.uuid))
                     .forEach(mote -> varselService.sendVarsel(PAAMINNELSE, mote));
+        } else {
+            LOG.info("TRACEBATCH: Not run {}: Batch er togglet av", this.getClass().getName());
         }
     }
 }
