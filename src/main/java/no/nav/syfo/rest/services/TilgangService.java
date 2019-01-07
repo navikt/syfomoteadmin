@@ -1,8 +1,10 @@
 package no.nav.syfo.rest.services;
 
-import no.nav.brukerdialog.security.context.SubjectHandler;
+import no.nav.common.auth.SsoToken;
+import no.nav.common.auth.SubjectHandler;
 import org.springframework.cache.annotation.Cacheable;
 
+import javax.ws.rs.NotAuthorizedException;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.core.MediaType;
@@ -22,7 +24,8 @@ public class TilgangService {
 
     @Cacheable(value = "tilgang", keyGenerator = "userkeygenerator")
     public Response sjekkTilgangTilPerson(String fnr) {
-        String ssoToken = SubjectHandler.getSubjectHandler().getInternSsoToken();
+        String ssoToken = SubjectHandler.getSsoToken(SsoToken.Type.OIDC)
+                .orElseThrow((() -> new NotAuthorizedException("Finner ikke token")));
         Response response = client.target(hentTilgangskontrollUrl(TILGANG_TIL_BRUKER_PATH))
                 .queryParam("fnr", fnr)
                 .request(MediaType.APPLICATION_JSON)
@@ -38,7 +41,8 @@ public class TilgangService {
 
     @Cacheable(value = "tilgang", keyGenerator = "userkeygenerator")
     public Response sjekkTilgangTilEnhet(String enhet) {
-        String ssoToken = SubjectHandler.getSubjectHandler().getInternSsoToken();
+        String ssoToken = SubjectHandler.getSsoToken(SsoToken.Type.OIDC)
+                .orElseThrow((() -> new NotAuthorizedException("Finner ikke token")));
         Response response = client.target(hentTilgangskontrollUrl(TILGANG_TIL_ENHETPATH))
                 .queryParam("enhet", enhet)
                 .request(MediaType.APPLICATION_JSON)
