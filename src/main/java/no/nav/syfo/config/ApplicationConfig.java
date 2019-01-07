@@ -4,11 +4,20 @@ import no.nav.apiapp.ApiApplication;
 import no.nav.apiapp.config.ApiAppConfigurator;
 import no.nav.metrics.aspects.CountAspect;
 import no.nav.metrics.aspects.TimerAspect;
-import no.nav.syfo.config.cache.CacheConfig;
 import no.nav.syfo.batch.config.ScheduledTaskConfig;
 import no.nav.syfo.batch.scheduler.SchedulingConfigurerImpl;
+import no.nav.syfo.config.cache.CacheConfig;
 import no.nav.syfo.config.consumer.LdapConfig;
+import no.nav.syfo.rest.api.system.AuthorizationFilter;
 import org.springframework.context.annotation.*;
+import org.springframework.transaction.annotation.Transactional;
+
+import javax.inject.Inject;
+import javax.servlet.DispatcherType;
+import javax.servlet.ServletContext;
+import javax.sql.DataSource;
+
+import static java.util.EnumSet.allOf;
 
 @Configuration
 @EnableAspectJAutoProxy
@@ -37,9 +46,20 @@ public class ApplicationConfig implements ApiApplication.NaisApiApplication {
         return new CountAspect();
     }
 
+    @Inject
+    private DataSource dataSource;
+
+    @Transactional
+    @Override
+    public void startup(ServletContext servletContext) {
+        servletContext.addFilter(AuthorizationFilter.class.getSimpleName(), new AuthorizationFilter())
+                .addMappingForUrlPatterns(allOf(DispatcherType.class), false, "/api/system/*");
+    }
+
     @Override
     public void configure(ApiAppConfigurator apiAppConfigurator) {
         apiAppConfigurator
+                .addPublicPath("/api/system/.*")
                 .issoLogin()
                 .azureADB2CLogin()
                 .sts();

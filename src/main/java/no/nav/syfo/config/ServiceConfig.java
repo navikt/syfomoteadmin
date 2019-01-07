@@ -4,8 +4,8 @@ import no.nav.syfo.rest.services.HistorikkService;
 import no.nav.syfo.rest.services.TilgangService;
 import no.nav.syfo.service.*;
 import no.nav.syfo.service.mq.MqHenvendelseService;
-import no.nav.syfo.service.mq.MqStoppRevarslingService;
 import no.nav.syfo.service.mq.MqOppgaveVarselService;
+import no.nav.syfo.service.mq.MqStoppRevarslingService;
 import no.nav.syfo.service.varselinnhold.ArbeidsgiverVarselService;
 import no.nav.syfo.service.varselinnhold.SykmeldtVarselService;
 import no.nav.syfo.service.varselinnhold.VeilederVarselService;
@@ -27,10 +27,12 @@ public class ServiceConfig {
     }
 
     @Bean
-    public MoteService moteService() { return new MoteService(); }
+    public MoteService moteService() {
+        return new MoteService();
+    }
 
     @Bean
-    public NaermesteLedersMoterService naermesteLedersMoterService(){
+    public NaermesteLedersMoterService naermesteLedersMoterService() {
         return new NaermesteLedersMoterService();
     }
 
