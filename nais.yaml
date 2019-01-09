@@ -26,7 +26,7 @@ resources:
     memory: 1024Mi
 fasitResources:
   exposed:
-  - alias: syfomoteadminapifss
+  - alias: syfomoteadminapi
     resourceType: restservice
     path: /syfomoteadmin/api
   - alias: syfomoteadminfeedveilederoppgaver
