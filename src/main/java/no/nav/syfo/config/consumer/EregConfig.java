@@ -2,10 +2,13 @@ package no.nav.syfo.config.consumer;
 
 import no.nav.sbl.dialogarena.common.cxf.CXFClient;
 import no.nav.sbl.dialogarena.types.Pingable;
+import no.nav.sbl.dialogarena.types.Pingable.Ping.PingMetadata;
 import no.nav.syfo.config.mocks.OrganisasjonMock;
 import no.nav.tjeneste.virksomhet.organisasjon.v4.OrganisasjonV4;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import java.util.UUID;
 
 import static java.lang.System.getProperty;
 import static no.nav.sbl.dialogarena.common.cxf.InstanceSwitcher.createMetricsProxyWithInstanceSwitcher;
@@ -31,9 +34,14 @@ public class EregConfig {
 
     @Bean
     public Pingable organisasjonPing() {
-        Pingable.Ping.PingMetadata pingMetadata = new Pingable.Ping.PingMetadata(ENDEPUNKT_URL, ENDEPUNKT_NAVN, KRITISK);
+        PingMetadata pingMetadata = new PingMetadata(
+                UUID.randomUUID().toString(),
+                ENDEPUNKT_URL,
+                ENDEPUNKT_NAVN,
+                KRITISK
+        );
         final OrganisasjonV4 organisasjonPing = factory()
-                .configureStsForSystemUserInFSS()
+                .configureStsForSystemUser()
                 .build();
         return () -> {
             try {
@@ -48,5 +56,4 @@ public class EregConfig {
     private CXFClient<OrganisasjonV4> factory() {
         return new CXFClient<>(OrganisasjonV4.class).address(ENDEPUNKT_URL);
     }
-
 }

@@ -2,10 +2,13 @@ package no.nav.syfo.config.consumer;
 
 import no.nav.sbl.dialogarena.common.cxf.CXFClient;
 import no.nav.sbl.dialogarena.types.Pingable;
+import no.nav.sbl.dialogarena.types.Pingable.Ping.PingMetadata;
 import no.nav.syfo.config.mocks.BrukerProfilV3Mock;
 import no.nav.tjeneste.virksomhet.brukerprofil.v3.BrukerprofilV3;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import java.util.UUID;
 
 import static java.lang.System.getProperty;
 import static no.nav.sbl.dialogarena.common.cxf.InstanceSwitcher.createMetricsProxyWithInstanceSwitcher;
@@ -31,11 +34,16 @@ public class BrukerprofilConfig {
 
     @Bean
     public Pingable brukerprofilV3Ping() {
-        Pingable.Ping.PingMetadata pingMetadata = new Pingable.Ping.PingMetadata(ENDEPUNKT_URL, ENDEPUNKT_NAVN, KRITISK);
+        PingMetadata pingMetadata = new PingMetadata(
+                UUID.randomUUID().toString(),
+                ENDEPUNKT_URL,
+                ENDEPUNKT_NAVN,
+                KRITISK
+        );
         return () -> {
             try {
                 factory()
-                        .configureStsForSystemUserInFSS()
+                        .configureStsForSystemUser()
                         .build();
                 return lyktes(pingMetadata);
             } catch (Exception e) {
