@@ -77,7 +77,7 @@ public class NaermesteLedersMoterServiceTest {
                                                 .tid(LocalDateTime.of(2017, 3, 2, 12, 13))
                                 )))));
 
-        List<Mote> moter = naermesteLedersMoterService.hentNaermeteLedersMoter("nlAktoerId");
+        List<Mote> moter = naermesteLedersMoterService.hentNaermesteLedersMoter("nlAktoerId");
 
         assertThat(moter).hasSize(3);
         assertThat(moter.get(0).id).isEqualTo(1L);
@@ -131,7 +131,7 @@ public class NaermesteLedersMoterServiceTest {
                                                 .tid(LocalDateTime.of(2017, 3, 2, 12, 13))
                                 )))));
 
-        List<Mote> moter = naermesteLedersMoterService.hentNaermeteLedersMoter("nlAktoerId");
+        List<Mote> moter = naermesteLedersMoterService.hentNaermesteLedersMoter("nlAktoerId");
 
         assertThat(moter).hasSize(1);
         assertThat(moter.get(0).id).isEqualTo(3L);
@@ -153,7 +153,7 @@ public class NaermesteLedersMoterServiceTest {
                         new Mote()
                                 .id(2L)));
 
-        List<Mote> moter = naermesteLedersMoterService.hentNaermeteLedersMoter("nlAktoerId");
+        List<Mote> moter = naermesteLedersMoterService.hentNaermesteLedersMoter("nlAktoerId");
 
         assertThat(moter).isEmpty();
     }
@@ -171,7 +171,7 @@ public class NaermesteLedersMoterServiceTest {
 
         when(moteService.findMoterByBrukerAktoerIdOgAGOrgnummer(startsWith("aktoerId"), startsWith("orgnummer"))).thenReturn(emptyList());
 
-        List<Mote> moter = naermesteLedersMoterService.hentNaermeteLedersMoter("nlAktoerId");
+        List<Mote> moter = naermesteLedersMoterService.hentNaermesteLedersMoter("nlAktoerId");
 
         assertThat(moter).isEmpty();
     }

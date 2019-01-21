@@ -103,7 +103,7 @@ public class MoteBrukerService {
 
     private List<Mote> hentMoteListe(String aktorId, String brukerkontekst) {
         if (Brukerkontekst.ARBEIDSGIVER.equals(brukerkontekst)) {
-            return naermesteLedersMoterService.hentNaermeteLedersMoter(aktorId);
+            return naermesteLedersMoterService.hentNaermesteLedersMoter(aktorId);
         } else if (Brukerkontekst.ARBEIDSTAKER.equals(brukerkontekst)) {
             return moteService.findMoterByBrukerAktoerId(aktorId);
         } else {

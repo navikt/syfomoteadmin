@@ -3,7 +3,6 @@ package no.nav.syfo.service;
 import no.nav.syfo.domain.model.Ansatt;
 import no.nav.syfo.domain.model.Mote;
 import no.nav.syfo.domain.model.TidOgSted;
-import org.springframework.cache.annotation.Cacheable;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
@@ -11,13 +10,13 @@ import java.util.List;
 import java.util.function.Predicate;
 
 public class NaermesteLedersMoterService {
+    
     @Inject
     private SykefravaersoppfoelgingService sykefravaersoppfoelgingService;
     @Inject
     private MoteService moteService;
 
-    @Cacheable(value = "syfo", keyGenerator = "userkeygenerator")
-    public List<Mote> hentNaermeteLedersMoter(String nlAktoerId) {
+    public List<Mote> hentNaermesteLedersMoter(String nlAktoerId) {
         List<Ansatt> ansatte = sykefravaersoppfoelgingService.hentNaermesteLedersAnsattListe(nlAktoerId);
 
         List<Mote> moter = new ArrayList<>();
