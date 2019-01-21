@@ -51,16 +51,20 @@ public class MoteBrukerService {
     public List<BrukerMote> hentBrukerMoteListe(String aktorId, String brukerkontekst) {
         List<Mote> moter = hentMoteListe(aktorId, brukerkontekst);
 
-        return mapListe(moter, mote2BrukerMote).stream()
-                .map(brukerMote -> brukerMote.deltakere(brukerMote.deltakere()
-                        .stream()
-                        .map(deltaker -> {
-                            if (Brukerkontekst.ARBEIDSTAKER.equals(deltaker.type)) {
-                                return deltaker.navn(brukerprofilService.finnBrukerPersonnavnByAktoerId(deltaker.aktoerId));
-                            }
-                            return deltaker;
-                        })
-                        .collect(toList())))
+        return mapListe(moter, mote2BrukerMote)
+                .stream()
+                .map(brukerMote -> brukerMote
+                        .fnr(finnAktoersFnrFraMotet(brukerMote))
+                        .deltakere(brukerMote.deltakere()
+                                .stream()
+                                .map(deltaker -> {
+                                    if (Brukerkontekst.ARBEIDSTAKER.equals(deltaker.type)) {
+                                        return deltaker.navn(brukerprofilService.finnBrukerPersonnavnByAktoerId(deltaker.aktoerId));
+                                    }
+                                    return deltaker;
+                                })
+                                .collect(toList())))
+
                 .collect(toList());
     }
 
@@ -119,5 +123,12 @@ public class MoteBrukerService {
         return motedeltaker.tidOgStedAlternativer
                 .stream()
                 .noneMatch(alternativ -> motedeltaker.svartTidspunkt == null || alternativ.created.isAfter(motedeltaker.svartTidspunkt));
+    }
+
+    private String finnAktoersFnrFraMotet(BrukerMote mote) {
+        return aktoerService.hentFnrForAktoer(mote.deltakere.stream()
+                .filter(motedeltaker -> "Bruker".equals(motedeltaker.type))
+                .findFirst().orElseThrow(() -> new NotFoundException("Fant ikke bruker!"))
+                .aktoerId);
     }
 }
