@@ -42,8 +42,6 @@ public class BrukerMoterRessurs {
         String innloggetIdent = getUserId();
         String innloggetAktorId = aktoerService.hentAktoerIdForIdent(innloggetIdent);
 
-        brukertilgangService.kastExceptionHvisIkkeTilgang(innloggetIdent);
-
         return moteBrukerService.hentBrukerMoteListe(innloggetAktorId, Brukerkontekst.ARBEIDSGIVER);
     }
 
