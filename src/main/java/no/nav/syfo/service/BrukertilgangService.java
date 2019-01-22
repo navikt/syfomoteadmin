@@ -16,7 +16,7 @@ public class BrukertilgangService {
     @Inject
     private AktoerService aktoerService;
     @Inject
-    private BrukerprofilService brukerprofilService;
+    private PersonService personService;
     @Inject
     private SykefravaersoppfoelgingService sykefravaersoppfoelgingService;
 
@@ -30,9 +30,10 @@ public class BrukertilgangService {
     }
 
     boolean harTilgangTilOppslaattBruker(String innloggetIdent, String brukerFnr) {
+        String brukerAktorId = aktoerService.hentAktoerIdForIdent(brukerFnr);
         try {
             return !(sporOmNoenAndreEnnSegSelvEllerEgneAnsatte(innloggetIdent, brukerFnr)
-                    || brukerprofilService.hentBruker(brukerFnr).erKode6);
+                    || personService.erPersonKode6(brukerAktorId));
         } catch (ForbiddenException e) {
             return false;
         }

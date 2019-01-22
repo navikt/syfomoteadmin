@@ -62,6 +62,11 @@ public class ServiceConfig {
     }
 
     @Bean
+    public PersonService personService() {
+        return new PersonService();
+    }
+
+    @Bean
     public EgenAnsattService egenAnsattService() {
         return new EgenAnsattService();
     }

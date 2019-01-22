@@ -28,13 +28,13 @@ public class EpostUtsendingScheduledTaskTest {
     @Before
     public void setup() {
         setProperty("LOCAL_MOCK", "false");
-        setProperty("TOGGLE_ENABLE_BATCH", "true");
+        setProperty("TOGGLE_ENABLE_BATCH_EPOST", "true");
     }
 
     @After
     public void cleanUp() {
         setProperty("LOCAL_MOCK", "");
-        setProperty("TOGGLE_ENABLE_BATCH", "");
+        setProperty("TOGGLE_ENABLE_BATCH_EPOST", "");
     }
 
     @Test

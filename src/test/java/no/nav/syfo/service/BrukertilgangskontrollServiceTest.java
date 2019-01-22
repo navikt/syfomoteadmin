@@ -1,7 +1,6 @@
 package no.nav.syfo.service;
 
 import no.nav.syfo.domain.model.Ansatt;
-import no.nav.syfo.domain.model.TpsPerson;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,6 +23,8 @@ public class BrukertilgangskontrollServiceTest {
     private BrukerprofilService brukerprofilService;
     @Mock
     private SykefravaersoppfoelgingService sykefravaersoppfoelgingService;
+    @Mock
+    private PersonService personService;
     @InjectMocks
     private BrukertilgangService brukertilgangService;
 
@@ -36,7 +37,6 @@ public class BrukertilgangskontrollServiceTest {
     public void setup() {
         when(aktoerService.hentAktoerIdForIdent(INNLOGGET_FNR)).thenReturn(INNLOGGET_AKTOERID);
         when(aktoerService.hentAktoerIdForIdent(SPOR_OM_FNR)).thenReturn(SPOR_OM_AKTOERID);
-        when(brukerprofilService.hentBruker(SPOR_OM_FNR)).thenReturn(new TpsPerson().erKode6(false));
     }
 
     @Test
@@ -44,7 +44,7 @@ public class BrukertilgangskontrollServiceTest {
         when(sykefravaersoppfoelgingService.hentNaermesteLedersAnsattListe(INNLOGGET_AKTOERID)).thenReturn(Collections.singletonList(
                 new Ansatt().aktoerId(SPOR_OM_AKTOERID)
         ));
-        when(brukerprofilService.hentBruker(SPOR_OM_FNR)).thenReturn(new TpsPerson().erKode6(true));
+        when(personService.erPersonKode6(SPOR_OM_AKTOERID)).thenReturn(true);
 
         boolean tilgang = brukertilgangService.harTilgangTilOppslaattBruker(INNLOGGET_FNR, SPOR_OM_FNR);
         assertThat(tilgang).isFalse();

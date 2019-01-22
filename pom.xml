@@ -32,6 +32,7 @@
         <javax.jms-api.version>2.0.1</javax.jms-api.version>
 
         <!-- Tjenester  -->
+        <nav-person-v3.version>3.4.1</nav-person-v3.version>
         <organisasjonenhet-v1-tjenestespesifikasjon.version>1.0.3</organisasjonenhet-v1-tjenestespesifikasjon.version>
         <organisasjonRessursEnhet-v1-tjenestespesifikasjon.version>1.0.3</organisasjonRessursEnhet-v1-tjenestespesifikasjon.version>
         <brukerprofil-v3-tjenestespesifikasjon.version>3.0.1</brukerprofil-v3-tjenestespesifikasjon.version>
@@ -83,6 +84,11 @@
 
     <dependencies>
         <!-- Tjenester -->
+        <dependency>
+            <groupId>no.nav.tjenester</groupId>
+            <artifactId>nav-person-v3-tjenestespesifikasjon</artifactId>
+            <version>${nav-person-v3.version}</version>
+        </dependency>
         <dependency>
             <groupId>no.nav.syfo.tjenester</groupId>
             <artifactId>sykefravaersoppfoelgingv1-tjenestespesifikasjon</artifactId>

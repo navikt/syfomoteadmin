@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Import;
         AktorConfig.class,
         EpostConfig.class,
         BrukerprofilConfig.class,
+        PersonConfig.class,
         SykefravaersoppfoelgingConfig.class,
         EgenAnsattConfig.class
 })

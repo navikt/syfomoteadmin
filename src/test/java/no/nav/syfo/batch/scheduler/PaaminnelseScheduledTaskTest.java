@@ -28,12 +28,12 @@ public class PaaminnelseScheduledTaskTest {
 
     @Before
     public void setup() {
-        setProperty("TOGGLE_ENABLE_BATCH", "true");
+        setProperty("TOGGLE_ENABLE_BATCH_PAAMINNELSE", "true");
     }
 
     @After
     public void cleanUp() {
-        setProperty("TOGGLE_ENABLE_BATCH", "");
+        setProperty("TOGGLE_ENABLE_BATCH_PAAMINNELSE", "");
     }
 
     @Test
