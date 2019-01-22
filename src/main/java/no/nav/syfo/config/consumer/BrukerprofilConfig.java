@@ -26,7 +26,7 @@ public class BrukerprofilConfig {
     @Bean
     public BrukerprofilV3 brukerprofilV3() {
         BrukerprofilV3 prod = factory()
-                .configureStsForOnBehalfOfWithJWT()
+                .configureStsForSystemUser()
                 .build();
         BrukerprofilV3 mock = new BrukerProfilV3Mock();
         return createMetricsProxyWithInstanceSwitcher(ENDEPUNKT_NAVN, prod, mock, MOCK_KEY, BrukerprofilV3.class);
