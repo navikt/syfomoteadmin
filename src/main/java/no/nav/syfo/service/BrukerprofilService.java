@@ -26,7 +26,7 @@ public class BrukerprofilService {
     @Inject
     private AktoerService aktoerService;
 
-    @Cacheable(value = "tps", keyGenerator = "userkeygenerator")
+    @Cacheable(value = "tpsnavn", keyGenerator = "userkeygenerator")
     public String finnBrukerPersonnavnByAktoerId(String aktoerId) {
         return finnBrukerPersonnavnByFnr(aktoerService.hentFnrForAktoer(aktoerId));
     }
@@ -35,7 +35,7 @@ public class BrukerprofilService {
         return hentBruker(fnr).navn;
     }
 
-    @Cacheable(value = "tps", keyGenerator = "userkeygenerator")
+    @Cacheable(value = "tpsbruker", keyGenerator = "userkeygenerator")
     public TpsPerson hentBruker(String fnr) {
         if (isBlank(fnr) || !fnr.matches("\\d{11}$")) {
             LOG.error("{} forsøker å hente fnr {}", getUserId(), fnr);

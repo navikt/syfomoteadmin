@@ -34,7 +34,8 @@ public class CacheConfig implements CachingConfigurer {
         config.addCache(setupCache("norg"));
         config.addCache(setupCache("syfo"));
         config.addCache(setupCache("tilgang"));
-        config.addCache(setupCache("tps"));
+        config.addCache(setupCache("tpsnavn"));
+        config.addCache(setupCache("tpsbruker"));
         return CacheManager.newInstance(config);
     }
 
