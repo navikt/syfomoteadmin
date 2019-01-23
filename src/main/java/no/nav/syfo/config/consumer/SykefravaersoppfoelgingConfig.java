@@ -23,10 +23,19 @@ public class SykefravaersoppfoelgingConfig {
     private static final String ENDEPUNKT_NAVN = "SYKEFRAVAERSOPPFOELGING_V1";
     private static final boolean KRITISK = true;
 
-    @Bean
+    @Bean(name = "sykefravaersoppfoelgingV1")
     public SykefravaersoppfoelgingV1 sykefravaersoppfoelgingV1() {
         SykefravaersoppfoelgingV1 prod = factory()
                 .configureStsForOnBehalfOfWithJWT()
+                .build();
+        SykefravaersoppfoelgingV1 mock = new SykefravaersoppfoelgingV1Mock();
+        return createMetricsProxyWithInstanceSwitcher(ENDEPUNKT_NAVN, prod, mock, MOCK_KEY, SykefravaersoppfoelgingV1.class);
+    }
+
+    @Bean(name = "sykefravaersoppfoelgingV1SystemBruker")
+    public SykefravaersoppfoelgingV1 sykefravaersoppfoelgingV1Systembruker() {
+        SykefravaersoppfoelgingV1 prod = factory()
+                .configureStsForSystemUser()
                 .build();
         SykefravaersoppfoelgingV1 mock = new SykefravaersoppfoelgingV1Mock();
         return createMetricsProxyWithInstanceSwitcher(ENDEPUNKT_NAVN, prod, mock, MOCK_KEY, SykefravaersoppfoelgingV1.class);

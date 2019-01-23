@@ -167,7 +167,7 @@ public class MoterRessurs {
             throw new ForbiddenException();
         } else {
             String aktorId = aktoerService.hentAktoerIdForIdent(nyttMoteRequest.fnr);
-            NaermesteLeder naermesteLeder = sykefravaersoppfoelgingService.hentNaermesteLeder(aktorId, nyttMoteRequest.orgnummer);
+            NaermesteLeder naermesteLeder = sykefravaersoppfoelgingService.hentNaermesteLederSomBruker(aktorId, nyttMoteRequest.orgnummer);
             nyttMoteRequest.navn(naermesteLeder.navn);
             nyttMoteRequest.epost(naermesteLeder.epost);
 
@@ -197,7 +197,7 @@ public class MoterRessurs {
             Veileder veileder = veilederService.hentVeileder(getUserId())
                     .mote(Mote);
             veilederVarselService.sendVarsel(OPPRETTET, veileder);
-            arbeidsgiverVarselService.sendVarsel(OPPRETTET, Mote);
+            arbeidsgiverVarselService.sendVarsel(OPPRETTET, Mote, false);
             sykmeldtVarselService.sendVarsel(OPPRETTET, Mote);
         }
     }

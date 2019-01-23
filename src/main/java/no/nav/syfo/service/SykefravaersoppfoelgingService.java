@@ -8,9 +8,10 @@ import no.nav.tjeneste.virksomhet.sykefravaersoppfoelging.v1.Sykefravaersoppfoel
 import no.nav.tjeneste.virksomhet.sykefravaersoppfoelging.v1.meldinger.WSHentNaermesteLederRequest;
 import no.nav.tjeneste.virksomhet.sykefravaersoppfoelging.v1.meldinger.WSHentNaermesteLedersAnsattListeRequest;
 import org.slf4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.cache.annotation.Cacheable;
 
-import javax.inject.Inject;
 import javax.ws.rs.ForbiddenException;
 import java.util.List;
 
@@ -25,8 +26,12 @@ import static org.slf4j.LoggerFactory.getLogger;
 public class SykefravaersoppfoelgingService {
     private static final Logger LOG = getLogger(SykefravaersoppfoelgingService.class);
 
-    @Inject
+    @Autowired
+    @Qualifier("sykefravaersoppfoelgingV1")
     private SykefravaersoppfoelgingV1 sykefravaersoppfoelgingV1;
+    @Autowired
+    @Qualifier("sykefravaersoppfoelgingV1SystemBruker")
+    private SykefravaersoppfoelgingV1 sykefravaersoppfoelgingV1SystemBruker;
 
     @Cacheable(value = "syfo", keyGenerator = "userkeygenerator")
     public List<Ansatt> hentNaermesteLedersAnsattListe(String nlAktoerId) {
@@ -34,7 +39,7 @@ public class SykefravaersoppfoelgingService {
             return mapListe(sykefravaersoppfoelgingV1.hentNaermesteLedersAnsattListe(
                     new WSHentNaermesteLedersAnsattListeRequest().withAktoerId(nlAktoerId)).getAnsattListe(), ws2Ansatt);
         } catch (HentNaermesteLedersAnsattListeSikkerhetsbegrensning e) {
-            LOG.error("{} fikk Ikke tilgang til å hente nærmeste leders ansatt-liste med nlAktoerId {}. Returnerer tom liste.", getUserId(), nlAktoerId, e);
+            LOG.error("Fikk Ikke tilgang til å hente nærmeste leders ansatt-liste med nlAktoerId {}. Returnerer tom liste.", nlAktoerId, e);
             throw new ForbiddenException("Ikke tilgang til å hente nærmeste leders ansatt-liste", e);
         } catch (RuntimeException e) {
             LOG.error("Runtimefeil ved henting av nærmeste leders ansatt-liste for nlAktoerId {} av bruker {}. Returnerer tom liste.", nlAktoerId, getUserId(), e);
@@ -43,17 +48,25 @@ public class SykefravaersoppfoelgingService {
     }
 
     @Cacheable(value = "syfo", keyGenerator = "userkeygenerator")
-    public NaermesteLeder hentNaermesteLeder(String aktoerId, String orgnummer) {
+    public NaermesteLeder hentNaermesteLederSomBruker(String aktoerId, String orgnummer) {
+        return hentNaermesteLeder(aktoerId, orgnummer, sykefravaersoppfoelgingV1, orgnummer);
+    }
+
+    public NaermesteLeder hentNaermesteLederSomSystembruker(String aktoerId, String orgnummer) {
+        return hentNaermesteLeder(aktoerId, orgnummer, sykefravaersoppfoelgingV1SystemBruker, orgnummer);
+    }
+
+    private NaermesteLeder hentNaermesteLeder(String aktoerId, String orgnummer, SykefravaersoppfoelgingV1 sykefravaersoppfoelgingV1SystemBruker, String orgnummer2) {
         try {
             try {
-                return map(sykefravaersoppfoelgingV1.hentNaermesteLeder(
+                return map(sykefravaersoppfoelgingV1SystemBruker.hentNaermesteLeder(
                         new WSHentNaermesteLederRequest().withAktoerId(aktoerId).withOrgnummer(orgnummer)).getNaermesteLeder(), ws2naermesteleder);
             } catch (HentNaermesteLederSikkerhetsbegrensning e) {
-                LOG.error("Bruker {} har ikke tilgang til å hente nærmeste leder for aktoerId {} og orgnummer {}", getUserId(), aktoerId, orgnummer, e);
+                LOG.error("Bruker har ikke tilgang til å hente nærmeste leder for aktoerId {} og orgnummer {}", aktoerId, orgnummer2, e);
                 throw new ForbiddenException(e);
             }
         } catch (RuntimeException e) {
-            LOG.error("Feil ved henting av nærmeste leder for bruker {} ved forespørsel om aktoerId {} og orgnummer {}. Returnerer tom liste.", getUserId(), aktoerId, orgnummer, e);
+            LOG.error("Feil ved henting av nærmeste leder for bruker ved forespørsel om aktoerId {} og orgnummer {}. Returnerer tom liste.", aktoerId, orgnummer2, e);
             throw new RuntimeException(e);
         }
     }

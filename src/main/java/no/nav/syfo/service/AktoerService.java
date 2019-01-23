@@ -19,7 +19,7 @@ public class AktoerService {
 
     public String hentAktoerIdForIdent(String fnr) {
         if (isBlank(fnr) || !fnr.matches("\\d{11}$")) {
-            LOG.error("{} forsøker å hente fnr {}", getUserId(), fnr);
+            LOG.error("Forsøker å hente aktørId for fnr {} på feil format", fnr);
             throw new RuntimeException();
         }
 
@@ -28,7 +28,7 @@ public class AktoerService {
 
     public String hentFnrForAktoer(String aktoerId) {
         if (isBlank(aktoerId) || !aktoerId.matches("\\d{13}$")) {
-            LOG.error("{} forsøker å hente fnr {}", getUserId(), aktoerId);
+            LOG.error("Forsøker å hente fnr for aktørId {} på feil format", aktoerId);
             throw new RuntimeException();
         }
 

@@ -10,10 +10,10 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static java.time.LocalDateTime.now;
+import static no.nav.common.auth.SubjectHandler.getIdent;
 import static no.nav.syfo.domain.model.HendelseVarselMotedeltaker.Resultat.OK;
 import static no.nav.syfo.domain.model.HendelsesType.MOTESTATUS_ENDRET;
 import static no.nav.syfo.domain.model.HendelsesType.VARSEL;
-import static no.nav.syfo.util.SubjectHandlerUtil.getUserId;
 
 public class HendelseService {
 
@@ -52,7 +52,7 @@ public class HendelseService {
     }
 
     private static String opprettetAv() {
-        return getUserId() != null ? getUserId() : "srvmoteadmin";
+        return getIdent().orElse("srvmoteadmin");
     }
 
     void moteStatusEndret(Mote Mote) {

@@ -52,7 +52,7 @@ public class PaaminnelseScheduledTask implements ScheduledTask {
             motedeltakerService.findMotedeltakereSomIkkeHarSvartSisteDognet(antallDagerBakoverEkstra)
                     .stream()
                     .map(motedeltaker -> moteService.findMoteByMotedeltakerUuid(motedeltaker.uuid))
-                    .forEach(mote -> varselService.sendVarsel(PAAMINNELSE, mote));
+                    .forEach(mote -> varselService.sendVarsel(PAAMINNELSE, mote, true));
         }
     }
 }

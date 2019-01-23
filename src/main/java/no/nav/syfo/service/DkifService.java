@@ -17,7 +17,6 @@ import java.time.OffsetDateTime;
 
 import static java.util.Optional.ofNullable;
 import static no.nav.syfo.domain.model.Kontaktinfo.FeilAarsak.*;
-import static no.nav.syfo.util.SubjectHandlerUtil.getUserId;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.slf4j.LoggerFactory.getLogger;
 
@@ -31,7 +30,7 @@ public class DkifService {
     @Cacheable(value = "dkif", keyGenerator = "userkeygenerator")
     public Kontaktinfo hentKontaktinfoFnr(String fnr) {
         if (isBlank(fnr) || !fnr.matches("\\d{11}$")) {
-            LOG.error("{} forsøker å hente fnr {}", getUserId(), fnr);
+            LOG.error("Forsøker å hente kontaktinfor for fnr {}", fnr);
             throw new RuntimeException();
         }
 

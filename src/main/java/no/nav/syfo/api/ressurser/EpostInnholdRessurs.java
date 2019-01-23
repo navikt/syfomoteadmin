@@ -73,7 +73,7 @@ public class EpostInnholdRessurs {
             if (type.equals(Varseltype.AVBRUTT) && Mote.status.equals(MoteStatus.BEKREFTET)) {
                 type = Varseltype.AVBRUTT_BEKREFTET;
             }
-            PEpost epost = arbeidsgiverVarselService.varselinnhold(type, Mote);
+            PEpost epost = arbeidsgiverVarselService.varselinnhold(type, Mote, false);
             return new RSEpostInnhold().emne(epost.emne).innhold(finnInnholdIHTMLTag(epost.innhold));
         } else {
             throw new ForbiddenException("Innlogget bruker har ikke tilgang til denne informasjonen");

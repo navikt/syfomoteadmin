@@ -80,7 +80,7 @@ public class MoteService {
             Veileder veileder = veilederService.hentVeileder(userId).mote(Mote);
             Varseltype varseltype = Mote.status.equals(MoteStatus.BEKREFTET) ? Varseltype.AVBRUTT_BEKREFTET : Varseltype.AVBRUTT;
             veilederVarselService.sendVarsel(varseltype, veileder);
-            arbeidsgiverVarselService.sendVarsel(varseltype, Mote);
+            arbeidsgiverVarselService.sendVarsel(varseltype, Mote, false);
             sykmeldtVarselService.sendVarsel(varseltype, Mote);
         }
         moteDAO.setStatus(Mote.id, AVBRUTT.name());
@@ -107,7 +107,7 @@ public class MoteService {
 
         mqStoppRevarslingService.stoppReVarsel(finnAktoerIMote(Mote).uuid);
         veilederVarselService.sendVarsel(Varseltype.BEKREFTET, veileder);
-        arbeidsgiverVarselService.sendVarsel(Varseltype.BEKREFTET, Mote);
+        arbeidsgiverVarselService.sendVarsel(Varseltype.BEKREFTET, Mote, false);
         sykmeldtVarselService.sendVarsel(Varseltype.BEKREFTET, Mote);
         if (feedService.skalOppretteFeedHendelse(Mote, PFeedHendelse.FeedHendelseType.BEKREFTET)) {
             opprettFeedHendelseAvTypen(PFeedHendelse.FeedHendelseType.BEKREFTET, Mote);
@@ -128,7 +128,7 @@ public class MoteService {
         Veileder veileder = veilederService.hentVeileder(userId).mote(Mote);
 
         veilederVarselService.sendVarsel(Varseltype.NYE_TIDSPUNKT, veileder);
-        arbeidsgiverVarselService.sendVarsel(Varseltype.NYE_TIDSPUNKT, Mote);
+        arbeidsgiverVarselService.sendVarsel(Varseltype.NYE_TIDSPUNKT, Mote, false);
         sykmeldtVarselService.sendVarsel(Varseltype.NYE_TIDSPUNKT, Mote);
         if (feedService.skalOppretteFeedHendelse(Mote, PFeedHendelse.FeedHendelseType.FLERE_TIDSPUNKT)) {
             opprettFeedHendelseAvTypen(PFeedHendelse.FeedHendelseType.FLERE_TIDSPUNKT, Mote);

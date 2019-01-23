@@ -285,7 +285,7 @@ public class MoterRessursTilgangTest extends AbstractRessursTilgangTest {
         when(brukerprofilService.hentBruker(FNR)).thenReturn(tpsPerson);
         when(tilgangskontrollResponse.getStatus()).thenReturn(200);
         when(aktoerService.hentAktoerIdForIdent(FNR)).thenReturn(AKTOER_ID);
-        when(sykefravaersoppfoelgingService.hentNaermesteLeder(AKTOER_ID, nyttMoteRequest.orgnummer)).thenReturn(
+        when(sykefravaersoppfoelgingService.hentNaermesteLederSomBruker(AKTOER_ID, nyttMoteRequest.orgnummer)).thenReturn(
                 new NaermesteLeder()
                         .navn("Frida Frisk")
                         .epost("frida.frisk@bedrift.no")

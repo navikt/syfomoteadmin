@@ -13,7 +13,6 @@ import org.springframework.cache.annotation.Cacheable;
 
 import javax.inject.Inject;
 
-import static no.nav.syfo.util.SubjectHandlerUtil.getUserId;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.text.WordUtils.capitalize;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -38,7 +37,7 @@ public class BrukerprofilService {
     @Cacheable(value = "tpsbruker", keyGenerator = "userkeygenerator")
     public TpsPerson hentBruker(String fnr) {
         if (isBlank(fnr) || !fnr.matches("\\d{11}$")) {
-            LOG.error("{} forsøker å hente fnr {}", getUserId(), fnr);
+            LOG.error("Forsøker å hente brukerinfo for fnr {}", fnr);
             throw new RuntimeException();
         }
         try {
