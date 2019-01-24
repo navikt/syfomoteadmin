@@ -20,8 +20,12 @@ public final class ToggleUtil {
         return getToggleDefaultOn("TOGGLES_SEND_EPOST");
     }
 
-    public static boolean toggleBatch() {
-        return getToggleDefaultOff("TOGGLE_ENABLE_BATCH");
+    public static boolean toggleBatchPaaminelse() {
+        return getToggleDefaultOff("TOGGLE_ENABLE_BATCH_PAAMINNELSE");
+    }
+
+    public static boolean toggleBatchEpost() {
+        return getToggleDefaultOff("TOGGLE_ENABLE_BATCH_EPOST");
     }
 
     public static boolean toggleDisablePolicies() {

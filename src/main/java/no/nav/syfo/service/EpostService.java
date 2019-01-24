@@ -54,6 +54,8 @@ public class EpostService {
     }
 
     public void send(PEpost epost) {
+        LOG.info("Forsoker aa sende epost med id {}", epost.id);
+
         Multipart innhold = lagOutlookForesporsel(epost.innhold);
 
         int vedleggNummer = 1;

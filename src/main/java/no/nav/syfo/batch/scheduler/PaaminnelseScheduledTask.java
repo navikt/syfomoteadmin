@@ -11,7 +11,7 @@ import javax.inject.Inject;
 import java.time.LocalDate;
 
 import static no.nav.syfo.domain.model.Varseltype.PAAMINNELSE;
-import static no.nav.syfo.util.ToggleUtil.toggleBatch;
+import static no.nav.syfo.util.ToggleUtil.toggleBatchPaaminelse;
 import static no.nav.syfo.util.time.HelgedagUtil.erHelgedag;
 import static no.nav.syfo.util.time.NorskeHelligDagerUtil.erNorskHelligDag;
 import static org.slf4j.LoggerFactory.getLogger;
@@ -32,7 +32,7 @@ public class PaaminnelseScheduledTask implements ScheduledTask {
     @Transactional
     @Override
     public void run() {
-        if (toggleBatch()) {
+        if (toggleBatchPaaminelse()) {
             LOG.info("TRACEBATCH: run {}", this.getClass().getName());
 
             int antallDagerBakoverEkstra = 0;

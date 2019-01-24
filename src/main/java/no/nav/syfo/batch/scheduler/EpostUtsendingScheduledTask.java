@@ -7,7 +7,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.inject.Inject;
 
 import static java.lang.System.getProperty;
-import static no.nav.syfo.util.ToggleUtil.toggleBatch;
+import static no.nav.syfo.util.ToggleUtil.toggleBatchEpost;
 import static org.slf4j.LoggerFactory.getLogger;
 
 public class EpostUtsendingScheduledTask implements ScheduledTask {
@@ -20,7 +20,7 @@ public class EpostUtsendingScheduledTask implements ScheduledTask {
     @Transactional
     @Override
     public void run() {
-        if (!"true".equals(getProperty("LOCAL_MOCK")) && toggleBatch()) {
+        if (!"true".equals(getProperty("LOCAL_MOCK")) && toggleBatchEpost()) {
             LOG.info("TRACEBATCH: run {}", this.getClass().getName());
 
             epostService.finnEpostForSending().forEach(epost -> {
