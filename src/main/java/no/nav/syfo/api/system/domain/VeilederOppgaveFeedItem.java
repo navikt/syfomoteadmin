@@ -3,14 +3,12 @@ package no.nav.syfo.api.system.domain;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 import lombok.experimental.Accessors;
 
 import java.time.LocalDateTime;
 
 @Data
 @Accessors(fluent = true)
-@EqualsAndHashCode
 public class VeilederOppgaveFeedItem {
     public String uuid;
     public String type;
@@ -25,7 +23,6 @@ public class VeilederOppgaveFeedItem {
     public LocalDateTime sistEndret;
     public String sistEndretAv;
     public String status;
-
 
     public enum FeedHendelseType {
         ALLE_SVAR_MOTTATT,

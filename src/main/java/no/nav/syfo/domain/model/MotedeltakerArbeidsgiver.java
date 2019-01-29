@@ -7,7 +7,6 @@ import lombok.experimental.Accessors;
 import java.time.LocalDateTime;
 import java.util.List;
 
-
 @Data
 @Accessors(fluent = true)
 @EqualsAndHashCode(callSuper = true)
@@ -24,22 +23,27 @@ public class MotedeltakerArbeidsgiver extends Motedeltaker {
         this.uuid = uuid;
         return this;
     }
+
     public MotedeltakerArbeidsgiver navn(String navn) {
         this.navn = navn;
         return this;
     }
+
     public MotedeltakerArbeidsgiver motedeltakertype(String motedeltakertype) {
         this.motedeltakertype = motedeltakertype;
         return this;
     }
+
     public MotedeltakerArbeidsgiver svartTidspunkt(LocalDateTime svartTidspunkt) {
         this.svartTidspunkt = svartTidspunkt;
         return this;
     }
+
     public MotedeltakerArbeidsgiver status(MotedeltakerStatus status) {
         this.status = status;
         return this;
     }
+
     public MotedeltakerArbeidsgiver tidOgStedAlternativer(List<TidOgSted> tidOgStedAlternativer) {
         this.tidOgStedAlternativer = tidOgStedAlternativer;
         return this;

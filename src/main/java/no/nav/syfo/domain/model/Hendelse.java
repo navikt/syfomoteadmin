@@ -10,10 +10,8 @@ import java.time.LocalDateTime;
 @Accessors(fluent = true)
 @EqualsAndHashCode(of = "id")
 public class Hendelse {
-
     public Long id;
     public HendelsesType type;
     public LocalDateTime inntruffetdato;
     public String opprettetAv;
-
 }
