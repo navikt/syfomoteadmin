@@ -27,7 +27,7 @@ public class PersonConfig {
     @Bean
     public PersonV3 personV3() {
         PersonV3 prod = factory()
-                .configureStsForOnBehalfOfWithJWT()
+                .configureStsForSystemUser()
                 .build();
         PersonV3 mock = new PersonV3Mock();
         return createMetricsProxyWithInstanceSwitcher(ENDEPUNKT_NAVN, prod, mock, MOCK_KEY, PersonV3.class);
