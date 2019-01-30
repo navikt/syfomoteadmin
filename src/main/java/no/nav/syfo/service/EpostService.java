@@ -5,19 +5,15 @@ import no.nav.syfo.repository.model.PEpost;
 import no.nav.syfo.repository.model.PEpostVedlegg;
 import org.slf4j.Logger;
 import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.mail.javamail.MimeMessagePreparator;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-import javax.mail.BodyPart;
-import javax.mail.MessagingException;
 import javax.mail.Multipart;
 import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMultipart;
-import java.io.IOException;
 import java.util.List;
 
+import static javax.mail.Message.RecipientType.TO;
 import static no.nav.syfo.util.OutlookEventUtil.addIcsFil;
 import static no.nav.syfo.util.OutlookEventUtil.lagOutlookForesporsel;
 import static no.nav.syfo.util.ToggleUtil.toggleIgnorerEpostFeil;
@@ -64,21 +60,14 @@ public class EpostService {
         }
 
         Multipart finalInnhold = innhold;
-
+        MimeMessagePreparator simpleMessagePreparator = mimeMessage -> {
+            mimeMessage.setRecipient(TO, new InternetAddress(epost.mottaker));
+            mimeMessage.setFrom(new InternetAddress(IKKE_SVAR_NAV_NO));
+            mimeMessage.setContent(finalInnhold, TEXT_HTML_CHARSET_UTF_8);
+            mimeMessage.setSubject(epost.emne);
+        };
         try {
-            String innholdTekst = hentTekstFraMimeMultipart((MimeMultipart) finalInnhold);
-            MimeMessagePreparator simpleMessagePreparator = mimeMessage -> {
-                MimeMessageHelper messageHelper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
-                messageHelper.setTo(new InternetAddress(epost.mottaker));
-                messageHelper.setFrom(new InternetAddress(IKKE_SVAR_NAV_NO));
-                messageHelper.setText(innholdTekst, true);
-                messageHelper.setSubject(epost.emne);
-            };
-
             javaMailSender.send(simpleMessagePreparator);
-        } catch (MessagingException | IOException e) {
-            LOG.error("Feil ved sending av epost", e);
-            throw new RuntimeException("Feil ved sending av epost");
         } catch (Exception e) {
             if (toggleIgnorerEpostFeil()) {
                 LOG.error("Feil ved sending av epost. Pga. SMTP kan finne på å sende mail selv om den gir en feil ignorerer vi den i testmiljøet." +
@@ -87,23 +76,5 @@ public class EpostService {
             }
             throw e;
         }
-    }
-
-    private String hentTekstFraMimeMultipart(MimeMultipart mimeMultipart) throws MessagingException, IOException {
-        String tekst = "";
-        int teller = mimeMultipart.getCount();
-        for (int i = 0; i < teller; i++) {
-            BodyPart bodyPart = mimeMultipart.getBodyPart(i);
-            if (bodyPart.isMimeType("text/plain")) {
-                tekst = tekst + "\n" + bodyPart.getContent();
-                break; // without break same text appears twice in my tests
-            } else if (bodyPart.isMimeType("text/html")) {
-                String html = (String) bodyPart.getContent();
-                tekst = tekst + "\n" + org.jsoup.Jsoup.parse(html).text();
-            } else if (bodyPart.getContent() instanceof MimeMultipart) {
-                tekst = tekst + hentTekstFraMimeMultipart((MimeMultipart) bodyPart.getContent());
-            }
-        }
-        return tekst;
     }
 }
