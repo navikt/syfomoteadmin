@@ -30,10 +30,9 @@ public class BrukertilgangService {
     }
 
     boolean harTilgangTilOppslaattBruker(String innloggetIdent, String brukerFnr) {
-        String brukerAktorId = aktoerService.hentAktoerIdForIdent(brukerFnr);
         try {
             return !(sporOmNoenAndreEnnSegSelvEllerEgneAnsatte(innloggetIdent, brukerFnr)
-                    || personService.erPersonKode6(brukerAktorId));
+                    || personService.erPersonKode6(brukerFnr));
         } catch (ForbiddenException e) {
             return false;
         }

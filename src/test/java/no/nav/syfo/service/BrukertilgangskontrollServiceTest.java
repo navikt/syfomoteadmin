@@ -44,7 +44,7 @@ public class BrukertilgangskontrollServiceTest {
         when(sykefravaersoppfoelgingService.hentNaermesteLedersAnsattListe(INNLOGGET_AKTOERID)).thenReturn(Collections.singletonList(
                 new Ansatt().aktoerId(SPOR_OM_AKTOERID)
         ));
-        when(personService.erPersonKode6(SPOR_OM_AKTOERID)).thenReturn(true);
+        when(personService.erPersonKode6(SPOR_OM_FNR)).thenReturn(true);
 
         boolean tilgang = brukertilgangService.harTilgangTilOppslaattBruker(INNLOGGET_FNR, SPOR_OM_FNR);
         assertThat(tilgang).isFalse();

@@ -1,12 +1,10 @@
 package no.nav.syfo.service;
 
-import no.nav.tjeneste.virksomhet.person.v3.binding.HentPersonPersonIkkeFunnet;
-import no.nav.tjeneste.virksomhet.person.v3.binding.HentPersonSikkerhetsbegrensning;
-import no.nav.tjeneste.virksomhet.person.v3.binding.PersonV3;
-import no.nav.tjeneste.virksomhet.person.v3.informasjon.AktoerId;
-import no.nav.tjeneste.virksomhet.person.v3.informasjon.Diskresjonskoder;
-import no.nav.tjeneste.virksomhet.person.v3.informasjon.Person;
-import no.nav.tjeneste.virksomhet.person.v3.meldinger.HentPersonRequest;
+import no.nav.tjeneste.virksomhet.person.v3.HentPersonPersonIkkeFunnet;
+import no.nav.tjeneste.virksomhet.person.v3.HentPersonSikkerhetsbegrensning;
+import no.nav.tjeneste.virksomhet.person.v3.PersonV3;
+import no.nav.tjeneste.virksomhet.person.v3.informasjon.*;
+import no.nav.tjeneste.virksomhet.person.v3.meldinger.WSHentPersonRequest;
 import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
@@ -25,37 +23,43 @@ public class PersonService {
     @Autowired
     private PersonV3 personV3;
 
-    public boolean erPersonKode6(String aktorId) {
-        return KODE6.equals(hentDiskresjonskodeForAktor(aktorId));
+    public boolean erPersonKode6(String fnr) {
+        return KODE6.equals(hentDiskresjonskodeForFnr(fnr));
     }
 
-    private String hentDiskresjonskodeForAktor(String aktorId) {
-        Person person = hentPersonFraAktoerId(aktorId);
+    private String hentDiskresjonskodeForFnr(String aktorId) {
+        WSPerson person = hentPersonFraFnr(aktorId);
         return ofNullable(person.getDiskresjonskode())
-                .map(Diskresjonskoder::getValue)
+                .map(WSDiskresjonskoder::getValue)
                 .orElse("");
 
     }
 
     @Cacheable(value = "person", keyGenerator = "userkeygenerator")
-    public Person hentPersonFraAktoerId(String aktorId) {
-        if (isBlank(aktorId) || !aktorId.matches("\\d{13}$")) {
-            LOG.error("Ugyldig format på aktoerId: " + aktorId);
+    public WSPerson hentPersonFraFnr(String fnr) {
+        if (isBlank(fnr) || !fnr.matches("\\d{11}$")) {
+            LOG.error("Ugyldig format på fnr");
             throw new IllegalArgumentException();
         }
         try {
-            return personV3.hentPerson(new HentPersonRequest()
-                    .withAktoer(new AktoerId()
-                            .withAktoerId(aktorId)))
+            WSNorskIdent norskIdent = new WSNorskIdent();
+            norskIdent.setIdent(fnr);
+            WSPersonIdent personIdent = new WSPersonIdent();
+            personIdent.setIdent(norskIdent);
+
+            WSHentPersonRequest request = new WSHentPersonRequest();
+            request.setAktoer(personIdent);
+            return personV3
+                    .hentPerson(request)
                     .getPerson();
         } catch (HentPersonSikkerhetsbegrensning e) {
-            LOG.error("Fikk sikkerhetsbegrensing ved oppslag med aktorId: " + aktorId);
+            LOG.error("Fikk sikkerhetsbegrensing ved oppslag med fnr");
             throw new ForbiddenException();
         } catch (HentPersonPersonIkkeFunnet e) {
-            LOG.error("Fant ikke person med aktorId: " + aktorId);
+            LOG.error("Fant ikke person");
             throw new RuntimeException();
         } catch (RuntimeException e) {
-            LOG.error("Fikk RuntimeException mot TPS for person ved oppslag av aktorId: " + aktorId);
+            LOG.error("Fikk RuntimeException mot TPS for person ved oppslag av person");
             throw new RuntimeException();
         }
     }
