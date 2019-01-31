@@ -29,13 +29,15 @@ public class EpostUtsendingScheduledTask implements ScheduledTask {
 
             List<PEpost> epostListe = epostService.finnEpostForSending();
 
-            Random rand = new Random();
-            PEpost epost = epostListe.get(rand.nextInt(epostListe.size()));
-            LOG.info("TRACEBATCH: run epost  {}", epost.id);
-//            epostService.finnEpostForSending().forEach(epost -> {
+            if(epostListe.size() > 0) {
+                Random rand = new Random();
+                PEpost epost = epostListe.get(rand.nextInt(epostListe.size()));
+
+                LOG.info("TRACEBATCH: run epost  {}", epost.id);
+                
                 epostService.send(epost);
                 epostService.slettEpostEtterSending(epost.id);
-//            });
+            }
         }
     }
 }

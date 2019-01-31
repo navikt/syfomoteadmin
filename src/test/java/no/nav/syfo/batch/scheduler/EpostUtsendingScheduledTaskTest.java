@@ -67,9 +67,7 @@ public class EpostUtsendingScheduledTaskTest {
                         .mottaker("test@nav.no")
         ));
         epostUtsendingScheduledTask.run();
-
-//        verify(epostService, times(2)).send(any());
-//        verify(epostService, times(2)).slettEpostEtterSending(anyLong());
+        
         verify(epostService, times(1)).send(any());
         verify(epostService, times(1)).slettEpostEtterSending(anyLong());
     }
