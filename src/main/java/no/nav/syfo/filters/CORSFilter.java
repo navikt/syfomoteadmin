@@ -23,7 +23,7 @@ public class CORSFilter implements Filter {
 
         if (!requestUriErMotSystemEllerInternalEndepunkt(httpRequest.getRequestURI())) {
             String origin = httpRequest.getHeader("Origin");
-            if (originErWhitelisted(origin, httpRequest.getRequestURI())) {
+            if (originErWhitelisted(origin)) {
                 httpResponse.setHeader("Access-Control-Allow-Origin", origin);
                 httpResponse.setHeader("Access-Control-Allow-Credentials", "true");
                 httpResponse.setHeader("Access-Control-Allow-Headers", "Origin, Content-Type, Accept, NAV_CSRF_PROTECTION");
@@ -38,12 +38,12 @@ public class CORSFilter implements Filter {
     public void destroy() {}
 
 
-    private boolean originErWhitelisted(String origin, String uri) {
+    private boolean originErWhitelisted(String origin) {
         return whitelistedUrls.contains(origin);
 
     }
 
-    private boolean requestUriErMotSystemEllerInternalEndepunkt(String requestUrl) {
-        return requestUrl.contains("/api/system") || requestUrl.contains("/internal");
+    private boolean requestUriErMotSystemEllerInternalEndepunkt(String requestUri) {
+        return requestUri.contains("/api/system") || requestUri.contains("/internal");
     }
 }
