@@ -9,6 +9,7 @@ import no.nav.syfo.batch.scheduler.SchedulingConfigurerImpl;
 import no.nav.syfo.config.cache.CacheConfig;
 import no.nav.syfo.config.consumer.LdapConfig;
 import no.nav.syfo.api.system.AuthorizationFilter;
+import no.nav.syfo.filter.CORSFilter;
 import org.springframework.context.annotation.*;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -54,6 +55,8 @@ public class ApplicationConfig implements ApiApplication.NaisApiApplication {
     public void startup(ServletContext servletContext) {
         servletContext.addFilter(AuthorizationFilter.class.getSimpleName(), new AuthorizationFilter())
                 .addMappingForUrlPatterns(allOf(DispatcherType.class), false, "/api/system/*");
+        servletContext.addFilter(CORSFilter.class.getSimpleName(), new CORSFilter())
+                .addMappingForUrlPatterns(allOf(DispatcherType.class), false, "/api/*");
     }
 
     @Override
