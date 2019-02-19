@@ -1,4 +1,4 @@
-package no.nav.syfo.filter;
+package no.nav.syfo.filters;
 
 import javax.servlet.*;
 import javax.servlet.http.HttpServletRequest;
@@ -21,7 +21,7 @@ public class CORSFilter implements Filter {
         HttpServletResponse httpResponse = (HttpServletResponse) servletResponse;
         HttpServletRequest httpRequest = (HttpServletRequest) servletRequest;
 
-        if (!requestUriErMotFeedEllerInternalEndepunkt(httpRequest.getRequestURI())) {
+        if (!requestUriErMotSystemEllerInternalEndepunkt(httpRequest.getRequestURI())) {
             String origin = httpRequest.getHeader("Origin");
             if (originErWhitelisted(origin, httpRequest.getRequestURI())) {
                 httpResponse.setHeader("Access-Control-Allow-Origin", origin);
@@ -43,7 +43,7 @@ public class CORSFilter implements Filter {
 
     }
 
-    private boolean requestUriErMotFeedEllerInternalEndepunkt(String requestUrl) {
+    private boolean requestUriErMotSystemEllerInternalEndepunkt(String requestUrl) {
         return requestUrl.contains("/api/system") || requestUrl.contains("/internal");
     }
 }

@@ -9,7 +9,7 @@ import no.nav.syfo.batch.scheduler.SchedulingConfigurerImpl;
 import no.nav.syfo.config.cache.CacheConfig;
 import no.nav.syfo.config.consumer.LdapConfig;
 import no.nav.syfo.api.system.AuthorizationFilter;
-import no.nav.syfo.filter.CORSFilter;
+import no.nav.syfo.filters.CORSFilter;
 import org.springframework.context.annotation.*;
 import org.springframework.transaction.annotation.Transactional;
 
