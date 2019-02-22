@@ -3,21 +3,32 @@ package no.nav.syfo.service;
 import no.nav.syfo.domain.model.Ansatt;
 import no.nav.syfo.domain.model.Mote;
 import no.nav.syfo.domain.model.TidOgSted;
+import no.nav.syfo.oidc.OIDCIssuer;
+import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Predicate;
 
+@Service
 public class NaermesteLedersMoterService {
-    
-    @Inject
+
     private SykefravaersoppfoelgingService sykefravaersoppfoelgingService;
-    @Inject
+
     private MoteService moteService;
 
+    @Inject
+    public NaermesteLedersMoterService(
+            SykefravaersoppfoelgingService sykefravaersoppfoelgingService,
+            MoteService moteService
+    ) {
+        this.sykefravaersoppfoelgingService = sykefravaersoppfoelgingService;
+        this.moteService = moteService;
+    }
+
     public List<Mote> hentNaermesteLedersMoter(String nlAktoerId) {
-        List<Ansatt> ansatte = sykefravaersoppfoelgingService.hentNaermesteLedersAnsattListe(nlAktoerId);
+        List<Ansatt> ansatte = sykefravaersoppfoelgingService.hentNaermesteLedersAnsattListe(nlAktoerId, OIDCIssuer.EKSTERN);
 
         List<Mote> moter = new ArrayList<>();
         for (Ansatt ansatt : ansatte) {

@@ -1,6 +1,7 @@
 package no.nav.syfo.service;
 
 import no.nav.syfo.domain.model.Ansatt;
+import no.nav.syfo.oidc.OIDCIssuer;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -41,7 +42,7 @@ public class BrukertilgangskontrollServiceTest {
 
     @Test
     public void harTilgangTilOppslaattBrukerGirFalseNaarOppslaattBrukerErKode6() {
-        when(sykefravaersoppfoelgingService.hentNaermesteLedersAnsattListe(INNLOGGET_AKTOERID)).thenReturn(Collections.singletonList(
+        when(sykefravaersoppfoelgingService.hentNaermesteLedersAnsattListe(INNLOGGET_AKTOERID, OIDCIssuer.EKSTERN)).thenReturn(Collections.singletonList(
                 new Ansatt().aktoerId(SPOR_OM_AKTOERID)
         ));
         when(personService.erPersonKode6(SPOR_OM_FNR)).thenReturn(true);
@@ -58,7 +59,7 @@ public class BrukertilgangskontrollServiceTest {
 
     @Test
     public void harTilgangTilOppslaattBrukerGirTrueNaarManSporOmEnAnsatt() {
-        when(sykefravaersoppfoelgingService.hentNaermesteLedersAnsattListe(INNLOGGET_AKTOERID)).thenReturn(Collections.singletonList(
+        when(sykefravaersoppfoelgingService.hentNaermesteLedersAnsattListe(INNLOGGET_AKTOERID, OIDCIssuer.EKSTERN)).thenReturn(Collections.singletonList(
                 new Ansatt().aktoerId(SPOR_OM_AKTOERID)
         ));
         boolean tilgang = brukertilgangService.harTilgangTilOppslaattBruker(INNLOGGET_FNR, SPOR_OM_FNR);
@@ -67,7 +68,7 @@ public class BrukertilgangskontrollServiceTest {
 
     @Test
     public void harTilgangTilOppslaattBrukerGirFalseNaarManSporOmEnSomIkkeErSegSelvOgIkkeAnsatt() {
-        when(sykefravaersoppfoelgingService.hentNaermesteLedersAnsattListe(INNLOGGET_AKTOERID)).thenReturn(Collections.emptyList());
+        when(sykefravaersoppfoelgingService.hentNaermesteLedersAnsattListe(INNLOGGET_AKTOERID, OIDCIssuer.EKSTERN)).thenReturn(Collections.emptyList());
         boolean tilgang = brukertilgangService.harTilgangTilOppslaattBruker(INNLOGGET_FNR, SPOR_OM_FNR);
         assertThat(tilgang).isFalse();
     }
@@ -80,7 +81,7 @@ public class BrukertilgangskontrollServiceTest {
 
     @Test
     public void sporOmNoenAndreEnnSegSelvGirFalseNaarManSporOmEnAnsatt() {
-        when(sykefravaersoppfoelgingService.hentNaermesteLedersAnsattListe(INNLOGGET_AKTOERID)).thenReturn(Collections.singletonList(
+        when(sykefravaersoppfoelgingService.hentNaermesteLedersAnsattListe(INNLOGGET_AKTOERID, OIDCIssuer.EKSTERN)).thenReturn(Collections.singletonList(
                 new Ansatt().aktoerId(SPOR_OM_AKTOERID)
         ));
         boolean tilgang = brukertilgangService.sporOmNoenAndreEnnSegSelvEllerEgneAnsatte(INNLOGGET_FNR, SPOR_OM_FNR);
@@ -89,7 +90,7 @@ public class BrukertilgangskontrollServiceTest {
 
     @Test
     public void sporOmNoenAndreEnnSegSelvGirTrueNaarManSporOmEnSomIkkeErSegSelvOgIkkeAnsatt() {
-        when(sykefravaersoppfoelgingService.hentNaermesteLedersAnsattListe(INNLOGGET_AKTOERID)).thenReturn(Collections.emptyList());
+        when(sykefravaersoppfoelgingService.hentNaermesteLedersAnsattListe(INNLOGGET_AKTOERID, OIDCIssuer.EKSTERN)).thenReturn(Collections.emptyList());
         boolean tilgang = brukertilgangService.sporOmNoenAndreEnnSegSelvEllerEgneAnsatte(INNLOGGET_FNR, SPOR_OM_FNR);
         assertThat(tilgang).isTrue();
     }

@@ -6,20 +6,30 @@ import no.nav.syfo.domain.model.Veileder;
 import no.nav.syfo.repository.model.PEpost;
 import no.nav.syfo.service.EpostService;
 import no.nav.syfo.service.HendelseService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-import javax.inject.Inject;
 import java.util.List;
 
 import static java.util.stream.Collectors.toList;
 import static no.nav.syfo.domain.model.Varseltype.*;
 import static no.nav.syfo.util.EpostInnholdVeilederUtil.*;
 
+@Service
 public class VeilederVarselService {
 
-    @Inject
     private EpostService epostService;
-    @Inject
+
     private HendelseService hendelseService;
+
+    @Autowired
+    public VeilederVarselService(
+            EpostService epostService,
+            HendelseService hendelseService
+    ) {
+        this.epostService = epostService;
+        this.hendelseService = hendelseService;
+    }
 
     public void sendVarsel(Varseltype varseltype, Veileder veileder) {
         if (varseltype == OPPRETTET) {

@@ -5,10 +5,15 @@ import no.nav.tjeneste.virksomhet.sykefravaersoppfoelging.v1.informasjon.WSAnsat
 import no.nav.tjeneste.virksomhet.sykefravaersoppfoelging.v1.informasjon.WSNaermesteLeder;
 import no.nav.tjeneste.virksomhet.sykefravaersoppfoelging.v1.informasjon.WSNaermesteLederStatus;
 import no.nav.tjeneste.virksomhet.sykefravaersoppfoelging.v1.meldinger.*;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Service;
 
 import static java.time.LocalDate.now;
 import static java.util.Arrays.asList;
+import static no.nav.syfo.config.consumer.SykefravaersoppfoelgingConfig.MOCK_KEY;
 
+@Service
+@ConditionalOnProperty(value = MOCK_KEY, havingValue = "true")
 public class SykefravaersoppfoelgingV1Mock implements SykefravaersoppfoelgingV1 {
 
     @Override

@@ -6,7 +6,13 @@ import no.nav.tjeneste.virksomhet.person.v3.informasjon.WSNorskIdent;
 import no.nav.tjeneste.virksomhet.person.v3.informasjon.WSPerson;
 import no.nav.tjeneste.virksomhet.person.v3.informasjon.WSPersonIdent;
 import no.nav.tjeneste.virksomhet.person.v3.meldinger.*;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Service;
 
+import static no.nav.syfo.config.consumer.PersonConfig.MOCK_KEY;
+
+@Service
+@ConditionalOnProperty(value = MOCK_KEY, havingValue = "true")
 public class PersonV3Mock implements PersonV3 {
     @Override
     public WSHentPersonResponse hentPerson(WSHentPersonRequest wsHentPersonRequest) throws HentPersonSikkerhetsbegrensning, HentPersonPersonIkkeFunnet {

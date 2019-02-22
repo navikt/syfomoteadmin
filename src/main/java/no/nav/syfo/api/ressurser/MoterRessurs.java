@@ -1,25 +1,27 @@
 package no.nav.syfo.api.ressurser;
 
-import no.nav.metrics.aspects.Count;
-import no.nav.metrics.aspects.Timed;
+import no.nav.security.oidc.context.OIDCRequestContextHolder;
+import no.nav.security.spring.oidc.validation.api.ProtectedWithClaims;
+import no.nav.syfo.api.domain.RSMote;
+import no.nav.syfo.api.domain.RSTilgang;
+import no.nav.syfo.api.domain.nyttmoterequest.RSNyttMoteRequest;
 import no.nav.syfo.domain.model.*;
+import no.nav.syfo.metric.Metrikk;
 import no.nav.syfo.repository.dao.MotedeltakerDAO;
 import no.nav.syfo.repository.dao.TidOgStedDAO;
 import no.nav.syfo.repository.model.PMotedeltakerAktorId;
 import no.nav.syfo.repository.model.PMotedeltakerArbeidsgiver;
-import no.nav.syfo.api.domain.RSMote;
-import no.nav.syfo.api.domain.RSTilgang;
-import no.nav.syfo.api.domain.nyttmoterequest.RSNyttMoteRequest;
-import no.nav.syfo.service.TilgangService;
 import no.nav.syfo.service.*;
 import no.nav.syfo.service.varselinnhold.ArbeidsgiverVarselService;
 import no.nav.syfo.service.varselinnhold.SykmeldtVarselService;
 import no.nav.syfo.service.varselinnhold.VeilederVarselService;
-import org.springframework.stereotype.Component;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
-import javax.ws.rs.*;
-import javax.ws.rs.core.Response;
+import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.ForbiddenException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,76 +30,99 @@ import static java.util.stream.Collectors.toList;
 import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static javax.ws.rs.core.Response.Status.FORBIDDEN;
 import static javax.ws.rs.core.Response.status;
-import static no.nav.syfo.domain.model.MotedeltakerStatus.SENDT;
-import static no.nav.syfo.domain.model.Varseltype.OPPRETTET;
 import static no.nav.syfo.api.mappers.RSMoteMapper.mote2rs;
 import static no.nav.syfo.api.mappers.RSNyttMoteMapper.opprett2Mote;
 import static no.nav.syfo.api.mappers.RSNyttMoteMapper.opprett2TidOgSted;
+import static no.nav.syfo.domain.model.MotedeltakerStatus.SENDT;
+import static no.nav.syfo.domain.model.Varseltype.OPPRETTET;
+import static no.nav.syfo.oidc.OIDCIssuer.INTERN;
 import static no.nav.syfo.util.MapUtil.map;
 import static no.nav.syfo.util.MapUtil.mapListe;
-import static no.nav.syfo.util.SubjectHandlerUtil.getUserId;
+import static no.nav.syfo.util.OIDCUtil.getSubjectIntern;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.util.StringUtils.isEmpty;
 
-@Component
-@Path("/moter")
-@Consumes(APPLICATION_JSON)
-@Produces(APPLICATION_JSON)
+@RestController
+@RequestMapping(value = "/api/moter")
+@ProtectedWithClaims(issuer = INTERN)
 public class MoterRessurs {
 
-    @Inject
+    private OIDCRequestContextHolder contextHolder;
+    private Metrikk metrikk;
     private AktoerService aktoerService;
-    @Inject
     private MoteService moteService;
-    @Inject
     private TidOgStedDAO tidOgStedDAO;
-    @Inject
     private HendelseService hendelseService;
-    @Inject
     private MotedeltakerDAO motedeltakerDAO;
-    @Inject
     private NorgService norgService;
-    @Inject
     private BrukerprofilService brukerprofilService;
-    @Inject
     private VeilederService veilederService;
-    @Inject
     private VeilederVarselService veilederVarselService;
-    @Inject
     private ArbeidsgiverVarselService arbeidsgiverVarselService;
-    @Inject
     private SykefravaersoppfoelgingService sykefravaersoppfoelgingService;
-    @Inject
     private SykmeldtVarselService sykmeldtVarselService;
-    @Inject
     private TilgangService tilgangService;
+
+    @Inject
+    public MoterRessurs(
+            OIDCRequestContextHolder contextHolder,
+            Metrikk metrikk,
+            AktoerService aktoerService,
+            MoteService moteService,
+            TidOgStedDAO tidOgStedDAO,
+            HendelseService hendelseService,
+            MotedeltakerDAO motedeltakerDAO,
+            NorgService norgService,
+            BrukerprofilService brukerprofilService,
+            VeilederService veilederService,
+            VeilederVarselService veilederVarselService,
+            ArbeidsgiverVarselService arbeidsgiverVarselService,
+            SykefravaersoppfoelgingService sykefravaersoppfoelgingService,
+            SykmeldtVarselService sykmeldtVarselService,
+            TilgangService tilgangService
+    ) {
+        this.contextHolder = contextHolder;
+        this.metrikk = metrikk;
+        this.aktoerService = aktoerService;
+        this.moteService = moteService;
+        this.tidOgStedDAO = tidOgStedDAO;
+        this.hendelseService = hendelseService;
+        this.motedeltakerDAO = motedeltakerDAO;
+        this.norgService = norgService;
+        this.brukerprofilService = brukerprofilService;
+        this.veilederService = veilederService;
+        this.veilederVarselService = veilederVarselService;
+        this.arbeidsgiverVarselService = arbeidsgiverVarselService;
+        this.sykefravaersoppfoelgingService = sykefravaersoppfoelgingService;
+        this.sykmeldtVarselService = sykmeldtVarselService;
+        this.tilgangService = tilgangService;
+    }
 
     /**
      * @deprecated To complex - needs to be split in at least to methods.
      * See jira task SYFOUTV-2166
      */
-    @GET
-    @Timed(name = "getMoter")
-    @Count(name = "getMoter")
     @Deprecated
-    public List<RSMote> hentMoter(@QueryParam("limit") Integer limit,
-                                  @QueryParam("fnr") String fnr,
-                                  @QueryParam("veiledersmoter") Boolean veiledersMoter,
-                                  @QueryParam("navenhet") String navenhet,
-                                  @QueryParam("henttpsdata") boolean hentTpsData) {
+    @GetMapping(produces = APPLICATION_JSON_VALUE)
+    public List<RSMote> hentMoter(@RequestParam(value = "limit", required = false) Integer limit,
+                                  @RequestParam(value = "fnr", required = false) String fnr,
+                                  @RequestParam(value = "veiledersmoter", required = false) Boolean veiledersMoter,
+                                  @RequestParam(value = "navenhet", required = false) String navenhet,
+                                  @RequestParam(value = "henttpsdata", required = false) boolean hentTpsData) {
 
         List<Mote> moter = new ArrayList<>();
         List<Mote> moterByFnr = new ArrayList<>();
 
         if (!isEmpty(fnr)) {
             boolean erBrukerSkjermet = brukerprofilService.hentBruker(fnr).skjermetBruker;
-            Response tilgangResponse = tilgangService.sjekkTilgangTilPerson(fnr);
-            if (erBrukerSkjermet || tilgangResponse.getStatus() == 403) {
+            if (erBrukerSkjermet || !tilgangService.harVeilederTilgangTilPerson(fnr)) {
                 throw new ForbiddenException(status(FORBIDDEN)
                         .entity(erBrukerSkjermet ?
                                 new RSTilgang()
                                         .harTilgang(false)
                                         .begrunnelse("KODE7")
-                                : tilgangResponse.getEntity())
+                                : new RSTilgang().harTilgang(false))
                         .type(APPLICATION_JSON)
                         .build());
             } else {
@@ -108,12 +133,12 @@ public class MoterRessurs {
 
         List<Mote> moterByVeileder = new ArrayList<>();
         if (!isEmpty(veiledersMoter) && veiledersMoter) {
-            moterByVeileder.addAll(moteService.findMoterByBrukerNavAnsatt(getUserId()));
+            moterByVeileder.addAll(moteService.findMoterByBrukerNavAnsatt(getSubjectIntern(contextHolder)));
             moter.addAll(moterByVeileder);
         }
 
         List<Mote> moterByNavEnhet = new ArrayList<>();
-        if (!isEmpty(navenhet) && norgService.hoererNavEnhetTilBruker(navenhet, getUserId())) {
+        if (!isEmpty(navenhet) && norgService.hoererNavEnhetTilBruker(navenhet, getSubjectIntern(contextHolder))) {
             moterByNavEnhet.addAll(moteService.findMoterByBrukerNavEnhet(navenhet));
             moter.addAll(moterByNavEnhet);
         }
@@ -130,7 +155,7 @@ public class MoterRessurs {
 
         moter = moter.stream()
                 .filter(mote -> !brukerprofilService.hentBruker(aktoerService.hentFnrForAktoer(mote.sykmeldt().aktorId)).skjermetBruker)
-                .filter(mote -> tilgangService.sjekkTilgangTilPerson(aktoerService.hentFnrForAktoer(mote.sykmeldt().aktorId)).getStatus() == 200)
+                .filter(mote -> tilgangService.harVeilederTilgangTilPerson(aktoerService.hentFnrForAktoer(mote.sykmeldt().aktorId)))
                 .collect(toList());
 
         if (limit != null) {
@@ -141,6 +166,8 @@ public class MoterRessurs {
         if (hentTpsData) {
             moter = populerMedTpsData(moter);
         }
+
+        metrikk.tellEndepunktKall("hent_moter");
 
         return mapListe(moter, mote2rs).stream().map(rsMote -> rsMote.sistEndret(hendelseService.sistEndretMoteStatus(rsMote.id).orElse(rsMote.opprettetTidspunkt))).collect(toList());
     }
@@ -159,11 +186,9 @@ public class MoterRessurs {
                 .collect(toList());
     }
 
-    @POST
-    @Timed(name = "opprettetMote")
-    @Count(name = "opprettetMote")
-    public void opprett(RSNyttMoteRequest nyttMoteRequest) {
-        if (brukerprofilService.hentBruker(nyttMoteRequest.fnr).skjermetBruker || tilgangService.sjekkTilgangTilPerson(nyttMoteRequest.fnr).getStatus() == 403) {
+    @PostMapping(consumes = APPLICATION_JSON_VALUE)
+    public void opprett(@RequestBody RSNyttMoteRequest nyttMoteRequest) {
+        if (brukerprofilService.hentBruker(nyttMoteRequest.fnr).skjermetBruker || !tilgangService.harVeilederTilgangTilPerson(nyttMoteRequest.fnr)) {
             throw new ForbiddenException();
         } else {
             String aktorId = aktoerService.hentAktoerIdForIdent(nyttMoteRequest.fnr);
@@ -171,7 +196,12 @@ public class MoterRessurs {
             nyttMoteRequest.navn(naermesteLeder.navn);
             nyttMoteRequest.epost(naermesteLeder.epost);
 
-            Mote Mote = moteService.opprettMote(map(nyttMoteRequest, opprett2Mote));
+            Mote nyttMote = map(nyttMoteRequest, opprett2Mote);
+            String innloggetIdent = getSubjectIntern(contextHolder);
+            nyttMote.opprettetAv(getSubjectIntern(contextHolder));
+            nyttMote.eier(innloggetIdent);
+            Mote Mote = moteService.opprettMote(nyttMote);
+
             List<TidOgSted> alternativer = nyttMoteRequest.alternativer.stream().map(nyttAlternativ -> tidOgStedDAO.create(map(nyttAlternativ, opprett2TidOgSted).moteId(Mote.id))).collect(toList());
             Mote.alternativer(alternativer);
 
@@ -194,11 +224,13 @@ public class MoterRessurs {
                     arbeidsgiver
             ));
 
-            Veileder veileder = veilederService.hentVeileder(getUserId())
+            Veileder veileder = veilederService.hentVeileder(getSubjectIntern(contextHolder))
                     .mote(Mote);
             veilederVarselService.sendVarsel(OPPRETTET, veileder);
             arbeidsgiverVarselService.sendVarsel(OPPRETTET, Mote, false);
             sykmeldtVarselService.sendVarsel(OPPRETTET, Mote);
+
+            metrikk.tellEndepunktKall("opprettet_mote");
         }
     }
 
@@ -209,4 +241,13 @@ public class MoterRessurs {
                 .collect(toList());
     }
 
+    @ExceptionHandler({IllegalArgumentException.class})
+    void handleBadRequests(HttpServletResponse response) throws IOException {
+        response.sendError(BAD_REQUEST.value(), "Vi kunne ikke tolke inndataene :/");
+    }
+
+    @ExceptionHandler({ForbiddenException.class})
+    void handleForbiddenRequests(HttpServletResponse response) throws IOException {
+        response.sendError(HttpStatus.FORBIDDEN.value(), "Handling er forbudt");
+    }
 }

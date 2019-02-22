@@ -1,10 +1,14 @@
 package no.nav.syfo.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
+import org.springframework.stereotype.Service;
+
 import javax.naming.Context;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.directory.Attributes;
-import javax.naming.directory.BasicAttributes;
 import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
 import javax.naming.ldap.InitialLdapContext;
@@ -14,31 +18,38 @@ import java.util.Hashtable;
 import java.util.List;
 import java.util.Map;
 
-import static java.lang.System.getProperty;
 import static java.util.Optional.ofNullable;
 
 //må bruke Hashtable i InitiallLdapContext dessverre.
 @SuppressWarnings({"squid:S1149"})
+@Service
 public class LdapService {
-    private static Hashtable<String, String> env = new Hashtable<>();
 
-    static {
+    private static Hashtable<String, String> env = new Hashtable<>();
+    @Value("${ldap.basedn}")
+    private String ldapBasedn;
+
+    private static String SEARCHBASE;
+
+    @Autowired
+    public LdapService(Environment springEnv) {
         env.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
-        env.put(Context.PROVIDER_URL, getProperty("LDAP_URL"));
+        env.put(Context.PROVIDER_URL, springEnv.getRequiredProperty("ldap.url"));
         env.put(Context.SECURITY_AUTHENTICATION, "simple");
-        env.put(Context.SECURITY_PRINCIPAL, getProperty("LDAP_USERNAME"));
-        env.put(Context.SECURITY_CREDENTIALS, getProperty("LDAP_PASSWORD"));
+        env.put(Context.SECURITY_PRINCIPAL, springEnv.getRequiredProperty("ldap.username"));
+        env.put(Context.SECURITY_CREDENTIALS, springEnv.getRequiredProperty("ldap.password"));
+
+        SEARCHBASE = "OU=Users,OU=NAV,OU=BusinessUnits," + springEnv.getRequiredProperty("ldap.basedn");
     }
 
     public Map hentVeilederAttributter(String veilederUid, List<String> attributter) {
         Map map = new HashMap<>();
 
         try {
-            String searchbase = "OU=Users,OU=NAV,OU=BusinessUnits," + getProperty("LDAP_BASEDN");
             SearchControls searchCtrl = new SearchControls();
             searchCtrl.setSearchScope(SearchControls.SUBTREE_SCOPE);
 
-            NamingEnumeration<SearchResult> result = ldapContext().search(searchbase, String.format("(&(objectClass=user)(CN=%s))", veilederUid), searchCtrl);
+            NamingEnumeration<SearchResult> result = ldapContext().search(SEARCHBASE, String.format("(&(objectClass=user)(CN=%s))", veilederUid), searchCtrl);
             Attributes ldapAttributes = result.next().getAttributes();
             populateAttributtMap(attributter, map, ldapAttributes);
 
@@ -56,16 +67,6 @@ public class LdapService {
                 throw new RuntimeException(e);
             }
         });
-    }
-
-    public void ping() {
-        try {
-            String searchbase = "OU=Users,OU=NAV,OU=BusinessUnits," + getProperty("LDAP_BASEDN");
-            Attributes ldapAttributes = new BasicAttributes();
-            ldapContext().search(searchbase, ldapAttributes);
-        } catch (NamingException e) {
-            throw new RuntimeException(e);
-        }
     }
 
     private static LdapContext ldapContext() throws NamingException {

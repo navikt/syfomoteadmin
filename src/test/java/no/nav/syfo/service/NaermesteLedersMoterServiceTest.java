@@ -4,6 +4,7 @@ import no.nav.syfo.domain.model.Ansatt;
 import no.nav.syfo.domain.model.Mote;
 import no.nav.syfo.domain.model.NaermesteLederStatus;
 import no.nav.syfo.domain.model.TidOgSted;
+import no.nav.syfo.oidc.OIDCIssuer;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -33,7 +34,7 @@ public class NaermesteLedersMoterServiceTest {
 
     @Test
     public void hentNaermeteLedersMoter() throws Exception {
-        when(sykefravaersoppfoelgingService.hentNaermesteLedersAnsattListe("nlAktoerId")).thenReturn(
+        when(sykefravaersoppfoelgingService.hentNaermesteLedersAnsattListe("nlAktoerId", OIDCIssuer.EKSTERN)).thenReturn(
                 new ArrayList<>(
                         asList(
                                 new Ansatt()
@@ -87,7 +88,7 @@ public class NaermesteLedersMoterServiceTest {
 
     @Test
     public void hentNaermeteLedersMoterToGamleMoter() throws Exception {
-        when(sykefravaersoppfoelgingService.hentNaermesteLedersAnsattListe("nlAktoerId")).thenReturn(
+        when(sykefravaersoppfoelgingService.hentNaermesteLedersAnsattListe("nlAktoerId", OIDCIssuer.EKSTERN)).thenReturn(
                 new ArrayList<>(
                         asList(
                                 new Ansatt()
@@ -139,19 +140,7 @@ public class NaermesteLedersMoterServiceTest {
 
     @Test
     public void hentNaermeteLedersMoterIngenAnsatte() throws Exception {
-        when(sykefravaersoppfoelgingService.hentNaermesteLedersAnsattListe("nlAktoerId")).thenReturn(emptyList());
-
-        when(moteService.findMoterByBrukerAktoerIdOgAGOrgnummer("aktoerId1", "orgnummer1")).thenReturn(
-                asList(
-                        new Mote()
-                                .id(1L),
-                        new Mote()
-                                .id(3L)));
-
-        when(moteService.findMoterByBrukerAktoerIdOgAGOrgnummer("aktoerId2", "orgnummer2")).thenReturn(
-                singletonList(
-                        new Mote()
-                                .id(2L)));
+        when(sykefravaersoppfoelgingService.hentNaermesteLedersAnsattListe("nlAktoerId", OIDCIssuer.EKSTERN)).thenReturn(emptyList());
 
         List<Mote> moter = naermesteLedersMoterService.hentNaermesteLedersMoter("nlAktoerId");
 
@@ -160,7 +149,7 @@ public class NaermesteLedersMoterServiceTest {
 
     @Test
     public void hentNaermeteLedersMoterIngenMoter() throws Exception {
-        when(sykefravaersoppfoelgingService.hentNaermesteLedersAnsattListe("nlAktoerId")).thenReturn(
+        when(sykefravaersoppfoelgingService.hentNaermesteLedersAnsattListe("nlAktoerId", OIDCIssuer.EKSTERN)).thenReturn(
                 asList(
                         new Ansatt()
                                 .aktoerId("aktoerId1")

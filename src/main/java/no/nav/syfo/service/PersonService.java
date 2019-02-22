@@ -1,27 +1,36 @@
 package no.nav.syfo.service;
 
+import lombok.extern.slf4j.Slf4j;
 import no.nav.tjeneste.virksomhet.person.v3.HentPersonPersonIkkeFunnet;
 import no.nav.tjeneste.virksomhet.person.v3.HentPersonSikkerhetsbegrensning;
 import no.nav.tjeneste.virksomhet.person.v3.PersonV3;
-import no.nav.tjeneste.virksomhet.person.v3.informasjon.*;
+import no.nav.tjeneste.virksomhet.person.v3.informasjon.WSDiskresjonskoder;
+import no.nav.tjeneste.virksomhet.person.v3.informasjon.WSNorskIdent;
+import no.nav.tjeneste.virksomhet.person.v3.informasjon.WSPerson;
+import no.nav.tjeneste.virksomhet.person.v3.informasjon.WSPersonIdent;
 import no.nav.tjeneste.virksomhet.person.v3.meldinger.WSHentPersonRequest;
-import org.slf4j.Logger;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.stereotype.Service;
 
+import javax.inject.Inject;
 import javax.ws.rs.ForbiddenException;
 
 import static java.util.Optional.ofNullable;
+import static no.nav.syfo.config.CacheConfig.CACHENAME_PERSON_PERSON;
 import static org.apache.commons.lang3.StringUtils.isBlank;
-import static org.slf4j.LoggerFactory.getLogger;
 
+@Slf4j
+@Service
 public class PersonService {
-    private static final Logger LOG = getLogger(PersonService.class);
     private static final String KODE6 = "SPSF";
     private static final String KODE7 = "SPFO";
 
-    @Autowired
     private PersonV3 personV3;
+
+    @Inject
+    public PersonService(PersonV3 personV3) {
+        this.personV3 = personV3;
+    }
 
     public boolean erPersonKode6(String fnr) {
         return KODE6.equals(hentDiskresjonskodeForFnr(fnr));
@@ -35,10 +44,10 @@ public class PersonService {
 
     }
 
-    @Cacheable(value = "person", keyGenerator = "userkeygenerator")
+    @Cacheable(value = CACHENAME_PERSON_PERSON, key = "#fnr", condition = "#fnr != null")
     public WSPerson hentPersonFraFnr(String fnr) {
         if (isBlank(fnr) || !fnr.matches("\\d{11}$")) {
-            LOG.error("Ugyldig format på fnr");
+            log.error("Ugyldig format på fnr");
             throw new IllegalArgumentException();
         }
         try {
@@ -53,13 +62,13 @@ public class PersonService {
                     .hentPerson(request)
                     .getPerson();
         } catch (HentPersonSikkerhetsbegrensning e) {
-            LOG.error("Fikk sikkerhetsbegrensing ved oppslag med fnr");
+            log.error("Fikk sikkerhetsbegrensing ved oppslag med fnr");
             throw new ForbiddenException();
         } catch (HentPersonPersonIkkeFunnet e) {
-            LOG.error("Fant ikke person");
+            log.error("Fant ikke person");
             throw new RuntimeException();
         } catch (RuntimeException e) {
-            LOG.error("Fikk RuntimeException mot TPS for person ved oppslag av person");
+            log.error("Fikk RuntimeException mot TPS for person ved oppslag av person");
             throw new RuntimeException();
         }
     }

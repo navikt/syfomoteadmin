@@ -4,22 +4,36 @@ import no.nav.melding.virksomhet.varselmedhandling.v1.varselmedhandling.AktoerId
 import no.nav.melding.virksomhet.varselmedhandling.v1.varselmedhandling.ObjectFactory;
 import no.nav.melding.virksomhet.varselmedhandling.v1.varselmedhandling.Parameter;
 import no.nav.melding.virksomhet.varselmedhandling.v1.varselmedhandling.VarselMedHandling;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jms.core.JmsTemplate;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
-import javax.inject.Named;
 
-import static java.lang.System.getProperty;
 import static no.nav.syfo.util.JAXB.marshallOppgaveVarsel;
 import static no.nav.syfo.util.JmsUtil.messageCreator;
 
+@Service
+@Transactional
 public class MqOppgaveVarselService {
-    @Inject
-    @Named("opprettvarselqueue")
-    public JmsTemplate opprettVarselQueue;
+
+    @Value("${tjenester.url}")
+    private String tjenesterUrl;
+
+    private JmsTemplate opprettVarselQueue;
+
+    private MqHenvendelseService mqHenvendelseService;
 
     @Inject
-    private MqHenvendelseService mqHenvendelseService;
+    public MqOppgaveVarselService(
+            @Qualifier("opprettVarselQueue") JmsTemplate opprettVarselQueue,
+            MqHenvendelseService mqHenvendelseService
+    ) {
+        this.opprettVarselQueue = opprettVarselQueue;
+        this.mqHenvendelseService = mqHenvendelseService;
+    }
 
     public void sendOppgaveVarsel(String aktoerId, String uuid) {
         VarselMedHandling varselMedHandling = new VarselMedHandling();
@@ -41,6 +55,6 @@ public class MqOppgaveVarselService {
     }
 
     private String makeVarselUrl(String varselbestillingsId) {
-        return getProperty("TJENESTER_URL") + "/innloggingsinfo/type/oppgave/undertype/0002/varselid/" + varselbestillingsId;
+        return tjenesterUrl + "/innloggingsinfo/type/oppgave/undertype/0002/varselid/" + varselbestillingsId;
     }
 }

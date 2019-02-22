@@ -2,57 +2,52 @@ package no.nav.syfo.api.ressurser;
 
 import no.nav.syfo.api.domain.RSAktor;
 import no.nav.syfo.service.AktoerService;
+import org.junit.Before;
 import org.junit.Test;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 
+import javax.inject.Inject;
 import javax.ws.rs.ForbiddenException;
 
+import static no.nav.syfo.testhelper.OidcTestHelper.loggInnVeileder;
+import static no.nav.syfo.testhelper.UserConstants.*;
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
+import static org.springframework.http.HttpStatus.*;
 
 public class AktoerRessursTilgangTest extends AbstractRessursTilgangTest {
 
+    @Inject
+    private AktoerRessurs aktoerRessurs;
     @Mock
     private AktoerService aktoerService;
 
-    @InjectMocks
-    private AktoerRessurs aktoerRessurs;
+    @Before
+    public void setup() {
+        loggInnVeileder(oidcRequestContextHolder, VEILEDER_ID);
+        when(aktoerService.hentFnrForAktoer(ARBEIDSTAKER_AKTORID)).thenReturn(ARBEIDSTAKER_FNR);
+    }
 
     @Test
     public void har_tilgang() {
-        when(aktoerService.hentFnrForAktoer(AKTOER_ID)).thenReturn(FNR);
-        when(tilgangskontrollResponse.getStatus()).thenReturn(200);
+        mockSvarFraTilgangTilBruker(ARBEIDSTAKER_FNR, OK);
 
-        RSAktor rsAktor = aktoerRessurs.get(AKTOER_ID);
+        RSAktor rsAktor = aktoerRessurs.get(ARBEIDSTAKER_AKTORID);
 
-        assertEquals(FNR, rsAktor.fnr);
-
-        verify(aktoerService).hentFnrForAktoer(AKTOER_ID);
-        verify(tilgangskontrollResponse, times(2)).getStatus();
+        assertEquals(ARBEIDSTAKER_FNR, rsAktor.fnr);
     }
 
     @Test(expected = ForbiddenException.class)
     public void har_ikke_tilgang() {
-        when(aktoerService.hentFnrForAktoer(AKTOER_ID)).thenReturn(FNR);
-        when(tilgangskontrollResponse.getStatus()).thenReturn(403);
+        mockSvarFraTilgangTilBruker(ARBEIDSTAKER_FNR, FORBIDDEN);
 
-        aktoerRessurs.get(AKTOER_ID);
-
-        verify(aktoerService).hentFnrForAktoer(AKTOER_ID);
-        verify(tilgangskontrollResponse).getStatus();
+        aktoerRessurs.get(ARBEIDSTAKER_AKTORID);
     }
 
     @Test(expected = RuntimeException.class)
     public void annen_tilgangsfeil() {
-        when(aktoerService.hentFnrForAktoer(AKTOER_ID)).thenReturn(FNR);
-        when(tilgangskontrollResponse.getStatus()).thenReturn(500);
-        when(tilgangskontrollResponse.getStatusInfo()).thenReturn(TAU_I_PROPELLEN);
+        mockSvarFraTilgangTilBruker(ARBEIDSTAKER_FNR, INTERNAL_SERVER_ERROR);
 
-        aktoerRessurs.get(AKTOER_ID);
-
-        verify(aktoerService).hentFnrForAktoer(AKTOER_ID);
-        verify(tilgangskontrollResponse).getStatus();
+        aktoerRessurs.get(ARBEIDSTAKER_AKTORID);
     }
-
 }

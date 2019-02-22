@@ -1,59 +1,36 @@
 package no.nav.syfo.config.consumer;
 
-import no.nav.sbl.dialogarena.common.cxf.CXFClient;
-import no.nav.sbl.dialogarena.types.Pingable;
-import no.nav.sbl.dialogarena.types.Pingable.Ping.PingMetadata;
-import no.nav.syfo.config.mocks.OrganisasjonMock;
+import no.nav.syfo.service.ws.LogErrorHandler;
+import no.nav.syfo.service.ws.STSClientConfig;
+import no.nav.syfo.service.ws.WsClient;
 import no.nav.tjeneste.virksomhet.organisasjon.v4.OrganisasjonV4;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 
-import java.util.UUID;
-
-import static java.lang.System.getProperty;
-import static no.nav.sbl.dialogarena.common.cxf.InstanceSwitcher.createMetricsProxyWithInstanceSwitcher;
-import static no.nav.sbl.dialogarena.types.Pingable.Ping.feilet;
-import static no.nav.sbl.dialogarena.types.Pingable.Ping.lyktes;
+import static java.util.Collections.singletonList;
 
 @Configuration
 public class EregConfig {
 
-    private static final String ENDEPUNKT_URL = getProperty("VIRKSOMHET_ORGANISASJON_V4_ENDPOINTURL");
-    private static final String ENDEPUNKT_NAVN = "ORGANISASJON_V4";
-    private static final boolean KRITISK = false;
+    public static final String MOCK_KEY = "ereg.withmock";
+    @Value("${virksomhet.organisasjon.v4.endpointurl}")
+    private String serviceUrl;
 
     @Bean
+    @Primary
+    @ConditionalOnProperty(value = MOCK_KEY, havingValue = "false", matchIfMissing = true)
     public OrganisasjonV4 organisasjonV4() {
-        OrganisasjonV4 prod = factory()
-                .configureStsForOnBehalfOfWithJWT()
-                .build();
-        OrganisasjonV4 mock = new OrganisasjonMock();
-
-        return createMetricsProxyWithInstanceSwitcher(ENDEPUNKT_NAVN, prod, mock, "tillatmock", OrganisasjonV4.class);
+        OrganisasjonV4 port = factory();
+        STSClientConfig.configureRequestSamlToken(port);
+        return port;
     }
 
-    @Bean
-    public Pingable organisasjonPing() {
-        PingMetadata pingMetadata = new PingMetadata(
-                UUID.randomUUID().toString(),
-                ENDEPUNKT_URL,
-                ENDEPUNKT_NAVN,
-                KRITISK
-        );
-        final OrganisasjonV4 organisasjonPing = factory()
-                .configureStsForSystemUser()
-                .build();
-        return () -> {
-            try {
-                organisasjonPing.ping();
-                return lyktes(pingMetadata);
-            } catch (Exception e) {
-                return feilet(pingMetadata, e);
-            }
-        };
-    }
-
-    private CXFClient<OrganisasjonV4> factory() {
-        return new CXFClient<>(OrganisasjonV4.class).address(ENDEPUNKT_URL);
+    @SuppressWarnings("unchecked")
+    private OrganisasjonV4 factory() {
+        return new WsClient<OrganisasjonV4>()
+                .createPort(serviceUrl, OrganisasjonV4.class, singletonList(new LogErrorHandler()));
     }
 }

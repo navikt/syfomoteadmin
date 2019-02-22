@@ -1,30 +1,46 @@
 package no.nav.syfo.service;
 
+import lombok.extern.slf4j.Slf4j;
+import no.nav.security.oidc.context.OIDCRequestContextHolder;
 import no.nav.syfo.domain.model.Ansatt;
-import org.slf4j.Logger;
+import no.nav.syfo.oidc.OIDCIssuer;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-import javax.inject.Inject;
 import javax.ws.rs.ForbiddenException;
 
-import static no.nav.syfo.util.SubjectHandlerUtil.getUserId;
-import static org.slf4j.LoggerFactory.getLogger;
+import static no.nav.syfo.util.OIDCUtil.getSubjectEkstern;
 
+@Slf4j
+@Service
 public class BrukertilgangService {
 
-    private static final Logger LOG = getLogger(BrukertilgangService.class);
+    private OIDCRequestContextHolder contextHolder;
 
-    @Inject
     private AktoerService aktoerService;
-    @Inject
+
     private PersonService personService;
-    @Inject
+
     private SykefravaersoppfoelgingService sykefravaersoppfoelgingService;
 
+    @Autowired
+    public BrukertilgangService(
+            OIDCRequestContextHolder contextHolder,
+            AktoerService aktoerService,
+            PersonService personService,
+            SykefravaersoppfoelgingService sykefravaersoppfoelgingService
+    ) {
+        this.contextHolder = contextHolder;
+        this.aktoerService = aktoerService;
+        this.personService = personService;
+        this.sykefravaersoppfoelgingService = sykefravaersoppfoelgingService;
+    }
+
     public void kastExceptionHvisIkkeTilgang(String oppslattBrukerIdent) {
-        String innloggetIdent = getUserId();
+        String innloggetIdent = getSubjectEkstern(contextHolder);
         boolean harTilgang = harTilgangTilOppslaattBruker(innloggetIdent, oppslattBrukerIdent);
         if (!harTilgang) {
-            LOG.error("Ikke tilgang");
+            log.error("Ikke tilgang");
             throw new ForbiddenException();
         }
     }
@@ -45,7 +61,7 @@ public class BrukertilgangService {
     private boolean sporInnloggetBrukerOmEnAnsatt(String innloggetIdent, String oppslaattFnr) {
         String innloggetAktoerId = aktoerService.hentAktoerIdForIdent(innloggetIdent);
         String oppslaattAktoerId = aktoerService.hentAktoerIdForIdent(oppslaattFnr);
-        return sykefravaersoppfoelgingService.hentNaermesteLedersAnsattListe(innloggetAktoerId)
+        return sykefravaersoppfoelgingService.hentNaermesteLedersAnsattListe(innloggetAktoerId, OIDCIssuer.EKSTERN)
                 .stream()
                 .map(Ansatt::aktoerId)
                 .anyMatch(oppslaattAktoerId::equals);

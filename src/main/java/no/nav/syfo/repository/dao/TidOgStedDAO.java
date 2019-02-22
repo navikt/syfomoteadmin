@@ -6,6 +6,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
@@ -22,11 +23,20 @@ import static no.nav.syfo.util.MapUtil.map;
 import static no.nav.syfo.util.MapUtil.mapListe;
 
 @Transactional
+@Repository
 public class TidOgStedDAO {
     @Inject
     private JdbcTemplate jdbcTemplate;
     @Inject
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+
+    public TidOgStedDAO(
+            NamedParameterJdbcTemplate namedParameterJdbcTemplate,
+            JdbcTemplate jdbcTemplate
+    ) {
+        this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
+        this.jdbcTemplate = jdbcTemplate;
+    }
 
     public TidOgSted finnAlternativ(long tidOgStedId) {
         return map(jdbcTemplate.queryForObject("select * from tid_sted where tid_sted_id = ?", new TidOgStedMapper(), tidOgStedId), p2TidOgSted);

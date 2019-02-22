@@ -1,24 +1,40 @@
 package no.nav.syfo.service;
 
+import no.nav.security.oidc.context.OIDCRequestContextHolder;
 import no.nav.syfo.domain.model.*;
 import no.nav.syfo.repository.dao.HendelseDAO;
 import no.nav.syfo.repository.model.PHendelseVarselMotedeltaker;
 import no.nav.syfo.repository.model.PHendelseVarselVeileder;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-import javax.inject.Inject;
 import java.time.LocalDateTime;
 import java.util.Optional;
 
 import static java.time.LocalDateTime.now;
-import static no.nav.common.auth.SubjectHandler.getIdent;
+import static java.util.Optional.ofNullable;
 import static no.nav.syfo.domain.model.HendelseVarselMotedeltaker.Resultat.OK;
 import static no.nav.syfo.domain.model.HendelsesType.MOTESTATUS_ENDRET;
 import static no.nav.syfo.domain.model.HendelsesType.VARSEL;
+import static no.nav.syfo.util.OIDCUtil.getSubjectIntern;
 
+@Service
 public class HendelseService {
 
-    @Inject
+    private final String SRV_BRUKER = "srvmoteadmin";
+
+    private OIDCRequestContextHolder contextHolder;
+
     private HendelseDAO hendelseDAO;
+
+    @Autowired
+    public HendelseService(
+            OIDCRequestContextHolder contextHolder,
+            HendelseDAO hendelseDAO
+    ) {
+        this.contextHolder = contextHolder;
+        this.hendelseDAO = hendelseDAO;
+    }
 
     public Optional<LocalDateTime> sistEndretMoteStatus(long moteId) {
         return hendelseDAO.moteStatusEndretHendelser(moteId)
@@ -28,9 +44,10 @@ public class HendelseService {
                 .findFirst();
     }
 
-    public void opprettHendelseVarselArbeidsgiver(Varseltype type, MotedeltakerArbeidsgiver arbeidsgiver) {
+    public void opprettHendelseVarselArbeidsgiver(Varseltype type, MotedeltakerArbeidsgiver arbeidsgiver, boolean erSystemKall) {
+        String opprettetAv = erSystemKall ? SRV_BRUKER : opprettetAv(contextHolder);
         hendelseDAO.create(new PHendelseVarselMotedeltaker()
-                .opprettetAv(opprettetAv())
+                .opprettetAv(opprettetAv)
                 .resultat(OK.name())
                 .varseltype(type.name())
                 .type(VARSEL.name())
@@ -42,7 +59,7 @@ public class HendelseService {
 
     public void opprettHendelseVarselVeileder(Varseltype type, Veileder veileder) {
         hendelseDAO.create(new PHendelseVarselVeileder()
-                .opprettetAv(opprettetAv())
+                .opprettetAv(opprettetAv(contextHolder))
                 .varseltype(type.name())
                 .type(VARSEL.name())
                 .kanal(Kanal.EPOST.name())
@@ -51,8 +68,8 @@ public class HendelseService {
         );
     }
 
-    private static String opprettetAv() {
-        return getIdent().orElse("srvmoteadmin");
+    private String opprettetAv(OIDCRequestContextHolder ctxHolder) {
+        return ofNullable(getSubjectIntern(ctxHolder)).orElse(SRV_BRUKER);
     }
 
     void moteStatusEndret(Mote Mote) {
@@ -60,7 +77,7 @@ public class HendelseService {
                 .type(MOTESTATUS_ENDRET)
                 .moteId(Mote.id)
                 .inntruffetdato(now())
-                .opprettetAv(opprettetAv())
+                .opprettetAv(opprettetAv(contextHolder))
                 .status(Mote.status);
         hendelseDAO.create(hendelse);
     }

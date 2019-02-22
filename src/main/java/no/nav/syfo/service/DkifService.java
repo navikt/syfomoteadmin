@@ -1,5 +1,6 @@
 package no.nav.syfo.service;
 
+import lombok.extern.slf4j.Slf4j;
 import no.nav.syfo.domain.model.Kontaktinfo;
 import no.nav.tjeneste.virksomhet.digitalkontaktinformasjon.v1.DigitalKontaktinformasjonV1;
 import no.nav.tjeneste.virksomhet.digitalkontaktinformasjon.v1.HentDigitalKontaktinformasjonKontaktinformasjonIkkeFunnet;
@@ -9,28 +10,39 @@ import no.nav.tjeneste.virksomhet.digitalkontaktinformasjon.v1.informasjon.WSEpo
 import no.nav.tjeneste.virksomhet.digitalkontaktinformasjon.v1.informasjon.WSKontaktinformasjon;
 import no.nav.tjeneste.virksomhet.digitalkontaktinformasjon.v1.informasjon.WSMobiltelefonnummer;
 import no.nav.tjeneste.virksomhet.digitalkontaktinformasjon.v1.meldinger.WSHentDigitalKontaktinformasjonRequest;
-import org.slf4j.Logger;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import java.time.OffsetDateTime;
 
 import static java.util.Optional.ofNullable;
+import static no.nav.syfo.config.CacheConfig.CACHENAME_DKIF_AKTORID;
+import static no.nav.syfo.config.CacheConfig.CACHENAME_DKIF_FNR;
 import static no.nav.syfo.domain.model.Kontaktinfo.FeilAarsak.*;
 import static org.apache.commons.lang3.StringUtils.isBlank;
-import static org.slf4j.LoggerFactory.getLogger;
 
+@Slf4j
+@Service
 public class DkifService {
-    private static final Logger LOG = getLogger(DkifService.class);
-    @Inject
+
     private DigitalKontaktinformasjonV1 dkifV1;
-    @Inject
+
     private AktoerService aktoerService;
 
-    @Cacheable(value = "dkif", keyGenerator = "userkeygenerator")
+    @Inject
+    public DkifService(
+            AktoerService aktoerService,
+            DigitalKontaktinformasjonV1 dkifV1
+    ) {
+        this.aktoerService = aktoerService;
+        this.dkifV1 = dkifV1;
+    }
+
+    @Cacheable(value = CACHENAME_DKIF_FNR, key = "#fnr", condition = "#fnr != null")
     public Kontaktinfo hentKontaktinfoFnr(String fnr) {
         if (isBlank(fnr) || !fnr.matches("\\d{11}$")) {
-            LOG.error("Forsøker å hente kontaktinfor for fnr {}", fnr);
+            log.error("Forsøker å hente kontaktinfor for fnr {}", fnr);
             throw new RuntimeException();
         }
 
@@ -55,7 +67,7 @@ public class DkifService {
         } catch (HentDigitalKontaktinformasjonPersonIkkeFunnet e) {
             return new Kontaktinfo().skalHaVarsel(false).feilAarsak(PERSON_IKKE_FUNNET);
         } catch (RuntimeException e) {
-            LOG.error("Det skjedde en uventet feil mot DKIF. Kaster feil videre");
+            log.error("Det skjedde en uventet feil mot DKIF. Kaster feil videre");
             throw e;
         }
     }
@@ -78,7 +90,7 @@ public class DkifService {
                 .isPresent();
     }
 
-    @Cacheable(value = "dkif", keyGenerator = "userkeygenerator")
+    @Cacheable(value = CACHENAME_DKIF_AKTORID, key = "#aktoerId", condition = "#aktoerId != null")
     public Kontaktinfo hentKontaktinfoAktoerId(String aktoerId) {
         return hentKontaktinfoFnr(aktoerService.hentFnrForAktoer(aktoerId));
     }

@@ -33,7 +33,6 @@ public class BrukerprofilServiceTest {
 
     @Before
     public void setup() {
-        when(aktoerService.hentFnrForAktoer(anyString())).thenReturn("123");
     }
 
     @Test

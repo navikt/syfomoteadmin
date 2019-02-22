@@ -1,46 +1,57 @@
 package no.nav.syfo.api.ressurser;
 
+import no.nav.security.spring.oidc.validation.api.ProtectedWithClaims;
 import no.nav.syfo.api.domain.RSBrukerPaaEnhet;
-import no.nav.syfo.service.TilgangService;
-import no.nav.syfo.service.AktoerService;
-import no.nav.syfo.service.BrukerprofilService;
-import no.nav.syfo.service.EgenAnsattService;
-import no.nav.syfo.service.MotedeltakerService;
-import org.springframework.stereotype.Controller;
+import no.nav.syfo.service.*;
+import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
-import javax.ws.rs.*;
+import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.ForbiddenException;
+import java.io.IOException;
 import java.util.List;
 
 import static java.util.stream.Collectors.toList;
-import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
+import static no.nav.syfo.oidc.OIDCIssuer.INTERN;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.FORBIDDEN;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
-@Controller
-@Path("/enhet")
-@Consumes(APPLICATION_JSON)
-@Produces(APPLICATION_JSON)
+@RestController
+@RequestMapping(value = "/api/enhet")
+@ProtectedWithClaims(issuer = INTERN)
 public class EnhetRessurs {
 
-    @Inject
     private MotedeltakerService motedeltakerService;
 
-    @Inject
     private AktoerService aktoerService;
 
-    @Inject
     private BrukerprofilService brukerprofilService;
 
-    @Inject
     private EgenAnsattService egenAnsattService;
 
-    @Inject
     private TilgangService tilgangService;
 
-    @GET
-    @Path("/{enhet}/moter/brukere")
-    public List<RSBrukerPaaEnhet> hentSykmeldteMedAktiveMoterForEnhet(@PathParam("enhet") String enhet) {
-        if (tilgangService.sjekkTilgangTilEnhet(enhet).getStatus() != 200)
-            throw new ForbiddenException("Innlogget bruker har ikke tilgang til denne informasjonen");
+    @Inject
+    public EnhetRessurs(
+            MotedeltakerService motedeltakerService,
+            AktoerService aktoerService,
+            BrukerprofilService brukerprofilService,
+            EgenAnsattService egenAnsattService,
+            TilgangService tilgangService
+    ) {
+        this.motedeltakerService = motedeltakerService;
+        this.aktoerService = aktoerService;
+        this.brukerprofilService = brukerprofilService;
+        this.egenAnsattService = egenAnsattService;
+        this.tilgangService = tilgangService;
+    }
+
+    @GetMapping(produces = APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/{enhet}/moter/brukere")
+    public List<RSBrukerPaaEnhet> hentSykmeldteMedAktiveMoterForEnhet(@PathVariable("enhet") String enhet) {
+        tilgangService.kastExceptionHvisIkkeVeilederHarTilgangTilEnhet(enhet);
+
         return motedeltakerService.sykmeldteMedMoteHvorBeggeHarSvart(enhet)
                 .stream()
                 .map(motedeltakerAktorId -> aktoerService.hentFnrForAktoer(motedeltakerAktorId))
@@ -54,4 +65,13 @@ public class EnhetRessurs {
         return brukerprofilService.hentBruker(fnr).skjermetBruker() || egenAnsattService.erEgenAnsatt(fnr);
     }
 
+    @ExceptionHandler({IllegalArgumentException.class})
+    void handleBadRequests(HttpServletResponse response) throws IOException {
+        response.sendError(BAD_REQUEST.value(), "Vi kunne ikke tolke inndataene :/");
+    }
+
+    @ExceptionHandler({ForbiddenException.class})
+    void handleForbiddenRequests(HttpServletResponse response) throws IOException {
+        response.sendError(FORBIDDEN.value(), "Handling er forbudt");
+    }
 }

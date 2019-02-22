@@ -1,11 +1,17 @@
 package no.nav.syfo.service;
 
+import no.nav.security.oidc.OIDCConstants;
+import no.nav.security.oidc.context.OIDCRequestContextHolder;
+import no.nav.syfo.config.consumer.SykefravaersoppfoelgingConfig;
 import no.nav.syfo.domain.model.Ansatt;
+import no.nav.syfo.oidc.OIDCIssuer;
 import no.nav.tjeneste.virksomhet.sykefravaersoppfoelging.v1.HentNaermesteLedersAnsattListeSikkerhetsbegrensning;
 import no.nav.tjeneste.virksomhet.sykefravaersoppfoelging.v1.SykefravaersoppfoelgingV1;
 import no.nav.tjeneste.virksomhet.sykefravaersoppfoelging.v1.informasjon.WSAnsatt;
 import no.nav.tjeneste.virksomhet.sykefravaersoppfoelging.v1.informasjon.WSNaermesteLederStatus;
 import no.nav.tjeneste.virksomhet.sykefravaersoppfoelging.v1.meldinger.WSHentNaermesteLedersAnsattListeResponse;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -16,6 +22,9 @@ import java.util.List;
 
 import static java.time.LocalDate.of;
 import static java.util.Arrays.asList;
+import static no.nav.syfo.testhelper.OidcTestHelper.lagOIDCValidationContextEkstern;
+import static no.nav.syfo.testhelper.OidcTestHelper.loggUtAlle;
+import static no.nav.syfo.testhelper.UserConstants.ARBEIDSTAKER_FNR;
 import static no.nav.syfo.util.TestUtil.biForEach;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.any;
@@ -23,10 +32,25 @@ import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 public class SykefravaersoppfoelgingServiceTest {
+
+    @Mock
+    private OIDCRequestContextHolder oidcRequestContextHolder;
     @Mock
     private SykefravaersoppfoelgingV1 sykefravaersoppfoelgingV1;
+    @Mock
+    private SykefravaersoppfoelgingConfig sykefravaersoppfoelgingConfig;
     @InjectMocks
     private SykefravaersoppfoelgingService sykefravaersoppfoelgingService;
+
+    @Before
+    public void setup() {
+        when(oidcRequestContextHolder.getRequestAttribute(OIDCConstants.OIDC_VALIDATION_CONTEXT)).thenReturn(lagOIDCValidationContextEkstern(ARBEIDSTAKER_FNR));
+    }
+
+    @After
+    public void cleanUp() {
+        loggUtAlle(oidcRequestContextHolder);
+    }
 
     @Test
     public void hentNaermesteLedersAnsattListe() throws Exception {
@@ -50,10 +74,10 @@ public class SykefravaersoppfoelgingServiceTest {
                                 .withAktivFom(of(2017, 1, 2))
                                 .withAktivTom(of(2017, 2, 2))));
 
-        when(sykefravaersoppfoelgingV1.hentNaermesteLedersAnsattListe(any())).thenReturn(
+        when(sykefravaersoppfoelgingConfig.hentNaermesteLedersAnsattListe(any(), any())).thenReturn(
                 new WSHentNaermesteLedersAnsattListeResponse().withAnsattListe(wsAnsatte));
 
-        List<Ansatt> ansatte = sykefravaersoppfoelgingService.hentNaermesteLedersAnsattListe("nlAktoerId");
+        List<Ansatt> ansatte = sykefravaersoppfoelgingService.hentNaermesteLedersAnsattListe("nlAktoerId", OIDCIssuer.EKSTERN);
 
         biForEach(wsAnsatte, ansatte, (wsAnsatt, ansatt) -> {
             assertThat(ansatt.aktoerId).isEqualTo(wsAnsatt.getAktoerId());
@@ -69,7 +93,7 @@ public class SykefravaersoppfoelgingServiceTest {
 
     @Test(expected = RuntimeException.class)
     public void hentNaermesteLedersAnsattListeIkkeTilgang() throws Exception {
-        when(sykefravaersoppfoelgingV1.hentNaermesteLedersAnsattListe(any())).thenThrow(new HentNaermesteLedersAnsattListeSikkerhetsbegrensning());
-        sykefravaersoppfoelgingService.hentNaermesteLedersAnsattListe("nlAktoerId");
+        when(sykefravaersoppfoelgingConfig.hentNaermesteLedersAnsattListe(any(), any())).thenThrow(new HentNaermesteLedersAnsattListeSikkerhetsbegrensning());
+        sykefravaersoppfoelgingService.hentNaermesteLedersAnsattListe("nlAktoerId", OIDCIssuer.EKSTERN);
     }
 }
