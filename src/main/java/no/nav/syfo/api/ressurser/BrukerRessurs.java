@@ -1,74 +1,84 @@
 package no.nav.syfo.api.ressurser;
 
-import no.nav.syfo.domain.model.Kontaktinfo;
+import no.nav.security.spring.oidc.validation.api.ProtectedWithClaims;
 import no.nav.syfo.api.domain.RSBruker;
 import no.nav.syfo.api.domain.RSReservasjon;
-import no.nav.syfo.service.TilgangService;
+import no.nav.syfo.domain.model.Kontaktinfo;
 import no.nav.syfo.service.AktoerService;
 import no.nav.syfo.service.BrukerprofilService;
 import no.nav.syfo.service.DkifService;
-import org.springframework.stereotype.Controller;
+import no.nav.syfo.service.TilgangService;
+import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
-import javax.ws.rs.*;
+import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.ForbiddenException;
+import java.io.IOException;
 
-import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static no.nav.syfo.domain.model.Kontaktinfo.FeilAarsak.*;
+import static no.nav.syfo.oidc.OIDCIssuer.INTERN;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.FORBIDDEN;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
-@Controller
-@Path("/brukerinfo/{ident}")
-@Consumes(APPLICATION_JSON)
-@Produces(APPLICATION_JSON)
+@RestController
+@RequestMapping(value = "/brukerinfo/{ident}")
+@ProtectedWithClaims(issuer = INTERN)
 public class BrukerRessurs {
 
-    @Inject
     private BrukerprofilService brukerprofilService;
-    @Inject
     private DkifService dkifService;
-    @Inject
     private AktoerService aktoerService;
-    @Inject
     private TilgangService tilgangService;
 
-    @GET
-    @Path("/navn")
-    public RSBruker hentBruker(@PathParam("ident") String ident) {
-        String fnr;
-        if (ident.matches("\\d{11}$")) {
-            fnr = ident;
-        } else {
-            fnr = aktoerService.hentFnrForAktoer(ident);
-        }
-
-        if (tilgangService.sjekkTilgangTilPerson(fnr).getStatus() == 200) {
-            return new RSBruker().navn(brukerprofilService.hentBruker(fnr).navn);
-        } else {
-            throw new ForbiddenException("Innlogget bruker har ikke tilgang til denne personen");
-        }
+    @Inject
+    public BrukerRessurs(
+            DkifService dkifService,
+            AktoerService aktoerService,
+            BrukerprofilService brukerprofilService,
+            TilgangService tilgangService
+    ) {
+        this.dkifService = dkifService;
+        this.aktoerService = aktoerService;
+        this.brukerprofilService = brukerprofilService;
+        this.tilgangService = tilgangService;
     }
 
-    @GET
-    public RSBruker bruker(@PathParam("ident") String ident) {
+    @GetMapping(produces = APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/api/navn")
+    public RSBruker hentBruker(@PathVariable("ident") String ident) {
         String fnr;
         if (ident.matches("\\d{11}$")) {
             fnr = ident;
         } else {
             fnr = aktoerService.hentFnrForAktoer(ident);
         }
-        if (tilgangService.sjekkTilgangTilPerson(fnr).getStatus() == 200) {
-            RSBruker rsBruker = new RSBruker();
-            Kontaktinfo kontaktinfo = dkifService.hentKontaktinfoFnr(fnr);
-            rsBruker.kontaktinfo
-                    .tlf(kontaktinfo.tlf)
-                    .epost(kontaktinfo.epost)
-                    .reservasjon(rsBruker.kontaktinfo.reservasjon
-                            .skalHaVarsel(kontaktinfo.skalHaVarsel)
-                            .feilAarsak(!kontaktinfo.skalHaVarsel ? feilAarsak(kontaktinfo.feilAarsak) : null));
-            return rsBruker
-                    .navn(brukerprofilService.hentBruker(fnr).navn);
+
+        tilgangService.kastExceptionHvisIkkeVeilederHarTilgangTilPerson(fnr);
+
+        return new RSBruker().navn(brukerprofilService.hentBruker(fnr).navn);
+    }
+
+    @GetMapping(produces = APPLICATION_JSON_VALUE)
+    public RSBruker bruker(@PathVariable("ident") String ident) {
+        String fnr;
+        if (ident.matches("\\d{11}$")) {
+            fnr = ident;
         } else {
-            throw new ForbiddenException("Innlogget bruker har ikke tilgang til denne personen");
+            fnr = aktoerService.hentFnrForAktoer(ident);
         }
+        tilgangService.kastExceptionHvisIkkeVeilederHarTilgangTilPerson(fnr);
+
+        RSBruker rsBruker = new RSBruker();
+        Kontaktinfo kontaktinfo = dkifService.hentKontaktinfoFnr(fnr);
+        rsBruker.kontaktinfo
+                .tlf(kontaktinfo.tlf)
+                .epost(kontaktinfo.epost)
+                .reservasjon(rsBruker.kontaktinfo.reservasjon
+                        .skalHaVarsel(kontaktinfo.skalHaVarsel)
+                        .feilAarsak(!kontaktinfo.skalHaVarsel ? feilAarsak(kontaktinfo.feilAarsak) : null));
+        return rsBruker
+                .navn(brukerprofilService.hentBruker(fnr).navn);
     }
 
     private RSReservasjon.KontaktInfoFeilAarsak feilAarsak(Kontaktinfo.FeilAarsak feilAarsak) {
@@ -85,5 +95,13 @@ public class BrukerRessurs {
         }
     }
 
+    @ExceptionHandler({IllegalArgumentException.class})
+    void handleBadRequests(HttpServletResponse response) throws IOException {
+        response.sendError(BAD_REQUEST.value(), "Vi kunne ikke tolke inndataene :/");
+    }
 
+    @ExceptionHandler({ForbiddenException.class})
+    void handleForbiddenRequests(HttpServletResponse response) throws IOException {
+        response.sendError(FORBIDDEN.value(), "Handling er forbudt");
+    }
 }

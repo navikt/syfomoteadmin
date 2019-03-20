@@ -10,9 +10,10 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.inject.Inject;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
@@ -22,10 +23,7 @@ import java.util.List;
 import static java.time.LocalDate.now;
 import static java.util.UUID.randomUUID;
 import static java.util.stream.Collectors.toList;
-import static no.nav.syfo.domain.model.MoteStatus.FLERE_TIDSPUNKT;
-import static no.nav.syfo.domain.model.MoteStatus.OPPRETTET;
-import static no.nav.syfo.domain.model.MoteStatus.AVBRUTT;
-import static no.nav.syfo.domain.model.MoteStatus.BEKREFTET;
+import static no.nav.syfo.domain.model.MoteStatus.*;
 import static no.nav.syfo.domain.model.MotedeltakerStatus.SVART;
 import static no.nav.syfo.repository.mapper.PMotedeltakerMapper.p2Aktoer;
 import static no.nav.syfo.repository.mapper.PMotedeltakerMapper.p2Arbeidsgiver;
@@ -34,15 +32,29 @@ import static no.nav.syfo.util.DbUtil.nesteSekvensverdi;
 import static no.nav.syfo.util.MapUtil.map;
 import static no.nav.syfo.util.MapUtil.mapListe;
 
+@Service
+@Repository
 public class MotedeltakerDAO {
-    @Inject
-    private TidOgStedDAO tidOgStedDAO;
-    @Inject
-    private MoteDAO moteDAO;
-    @Inject
+
     private JdbcTemplate jdbcTemplate;
-    @Inject
+
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+
+    private MoteDAO moteDAO;
+
+    private TidOgStedDAO tidOgStedDAO;
+
+    public MotedeltakerDAO(
+            NamedParameterJdbcTemplate namedParameterJdbcTemplate,
+            JdbcTemplate jdbcTemplate,
+            MoteDAO moteDAO,
+            TidOgStedDAO tidOgStedDAO
+    ) {
+        this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
+        this.jdbcTemplate = jdbcTemplate;
+        this.moteDAO = moteDAO;
+        this.tidOgStedDAO = tidOgStedDAO;
+    }
 
     @Transactional
     public MotedeltakerAktorId create(PMotedeltakerAktorId motedeltaker) {

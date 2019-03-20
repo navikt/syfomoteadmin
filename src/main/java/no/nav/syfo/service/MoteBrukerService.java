@@ -1,5 +1,7 @@
 package no.nav.syfo.service;
 
+import lombok.extern.slf4j.Slf4j;
+import no.nav.security.oidc.context.OIDCRequestContextHolder;
 import no.nav.syfo.api.domain.bruker.BrukerMote;
 import no.nav.syfo.api.domain.bruker.BrukerMoteSvar;
 import no.nav.syfo.api.domain.bruker.BrukerOppdaterMoteSvar;
@@ -8,7 +10,6 @@ import no.nav.syfo.domain.model.Mote;
 import no.nav.syfo.domain.model.MoteStatus;
 import no.nav.syfo.domain.model.Motedeltaker;
 import no.nav.syfo.util.Brukerkontekst;
-import org.slf4j.Logger;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
@@ -19,26 +20,44 @@ import java.util.List;
 import static java.util.stream.Collectors.toList;
 import static no.nav.syfo.api.mappers.BrukerMoteMapper.mote2BrukerMote;
 import static no.nav.syfo.util.MapUtil.mapListe;
-import static no.nav.syfo.util.SubjectHandlerUtil.getUserId;
-import static org.slf4j.LoggerFactory.getLogger;
+import static no.nav.syfo.util.OIDCUtil.getSubjectEkstern;
 
+@Slf4j
 @Service
 public class MoteBrukerService {
 
-    private static final Logger LOG = getLogger(MoteBrukerService.class);
+    private OIDCRequestContextHolder contextHolder;
+
+    private AktoerService aktoerService;
+
+    private BrukerprofilService brukerprofilService;
+
+    private BrukertilgangService brukertilgangService;
+
+    private MoteService moteService;
+
+    private MotedeltakerService motedeltakerService;
+
+    private NaermesteLedersMoterService naermesteLedersMoterService;
 
     @Inject
-    private AktoerService aktoerService;
-    @Inject
-    private BrukerprofilService brukerprofilService;
-    @Inject
-    private BrukertilgangService brukertilgangService;
-    @Inject
-    private MoteService moteService;
-    @Inject
-    private MotedeltakerService motedeltakerService;
-    @Inject
-    private NaermesteLedersMoterService naermesteLedersMoterService;
+    public MoteBrukerService(
+            OIDCRequestContextHolder contextHolder,
+            AktoerService aktoerService,
+            BrukerprofilService brukerprofilService,
+            BrukertilgangService brukertilgangService,
+            MoteService moteService,
+            MotedeltakerService motedeltakerService,
+            NaermesteLedersMoterService naermesteLedersMoterService
+    ) {
+        this.contextHolder = contextHolder;
+        this.aktoerService = aktoerService;
+        this.brukerprofilService = brukerprofilService;
+        this.brukertilgangService = brukertilgangService;
+        this.moteService = moteService;
+        this.motedeltakerService = motedeltakerService;
+        this.naermesteLedersMoterService = naermesteLedersMoterService;
+    }
 
 
     public BrukerMote hentSisteBrukerMote(String aktoerId, String brukerkontekst) {
@@ -72,7 +91,7 @@ public class MoteBrukerService {
         String brukerkontekst = Brukerkontekst.ARBEIDSTAKER.equals(brukerMoteSvar.deltakertype)
                 ? Brukerkontekst.ARBEIDSTAKER
                 : Brukerkontekst.ARBEIDSGIVER;
-        String innloggetAktorId = aktoerService.hentAktoerIdForIdent(getUserId());
+        String innloggetAktorId = aktoerService.hentAktoerIdForIdent(getSubjectEkstern(contextHolder));
         Mote mote = hentMoteByUuid(moteUuid, innloggetAktorId, brukerkontekst);
         String arbeidstakerAktorId = motedeltakerService.finnArbeidstakerAktorIdForMoteId(mote.id);
         String arbeidstakerFnr = aktoerService.hentFnrForAktoer(arbeidstakerAktorId);
@@ -107,7 +126,7 @@ public class MoteBrukerService {
         } else if (Brukerkontekst.ARBEIDSTAKER.equals(brukerkontekst)) {
             return moteService.findMoterByBrukerAktoerId(aktorId);
         } else {
-            LOG.error("Ukjent brukerkontekst " + brukerkontekst);
+            log.error("Ukjent brukerkontekst " + brukerkontekst);
             throw new RuntimeException("Ukjent brukerkontekst " + brukerkontekst);
         }
     }

@@ -3,10 +3,14 @@ package no.nav.syfo.repository.dao;
 import no.nav.syfo.domain.model.Mote;
 import no.nav.syfo.repository.model.PMotedeltakerAktorId;
 import no.nav.syfo.repository.model.PMotedeltakerArbeidsgiver;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.sql.ResultSet;
@@ -23,15 +27,29 @@ import static no.nav.syfo.util.DbUtil.convert;
 import static no.nav.syfo.util.DbUtil.nesteSekvensverdi;
 import static no.nav.syfo.util.MapUtil.map;
 
+@Service
+@Repository
 public class MoteDAO {
-    @Inject
-    private TidOgStedDAO tidOgStedDAO;
-    @Inject
-    private MotedeltakerDAO motedeltakerDAO;
-    @Inject
+
     private JdbcTemplate jdbcTemplate;
-    @Inject
+
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+
+    private MotedeltakerDAO motedeltakerDAO;
+
+    private TidOgStedDAO tidOgStedDAO;
+
+    public MoteDAO(
+            NamedParameterJdbcTemplate namedParameterJdbcTemplate,
+            JdbcTemplate jdbcTemplate,
+            @Lazy MotedeltakerDAO motedeltakerDAO,
+            TidOgStedDAO tidOgStedDAO
+    ) {
+        this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
+        this.jdbcTemplate = jdbcTemplate;
+        this.motedeltakerDAO = motedeltakerDAO;
+        this.tidOgStedDAO = tidOgStedDAO;
+    }
 
     public Mote create(Mote Mote) {
         Long nesteSekvensverdi = nesteSekvensverdi("MOTE_ID_SEQ", jdbcTemplate);

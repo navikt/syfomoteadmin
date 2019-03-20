@@ -1,5 +1,6 @@
 package no.nav.syfo.service;
 
+import lombok.extern.slf4j.Slf4j;
 import no.nav.tjeneste.virksomhet.organisasjon.v4.HentOrganisasjonOrganisasjonIkkeFunnet;
 import no.nav.tjeneste.virksomhet.organisasjon.v4.HentOrganisasjonUgyldigInput;
 import no.nav.tjeneste.virksomhet.organisasjon.v4.OrganisasjonV4;
@@ -7,21 +8,26 @@ import no.nav.tjeneste.virksomhet.organisasjon.v4.informasjon.WSUstrukturertNavn
 import no.nav.tjeneste.virksomhet.organisasjon.v4.meldinger.WSHentOrganisasjonRequest;
 import no.nav.tjeneste.virksomhet.organisasjon.v4.meldinger.WSHentOrganisasjonResponse;
 import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 
 import static java.util.stream.Collectors.joining;
-import static org.slf4j.LoggerFactory.getLogger;
+import static no.nav.syfo.config.CacheConfig.CACHENAME_EREG_NAVN;
 
+@Slf4j
+@Service
 public class OrganisasjonService {
-    private static final Logger LOG = getLogger(OrganisasjonService.class);
 
-    @Inject
     private OrganisasjonV4 organisasjonV4;
 
-    @Cacheable("ereg")
+    @Inject
+    public OrganisasjonService(OrganisasjonV4 organisasjonV4) {
+        this.organisasjonV4 = organisasjonV4;
+    }
+
+    @Cacheable(value = CACHENAME_EREG_NAVN, key = "#orgnr", condition = "#orgnr != null")
     public String hentNavn(String orgnr) {
         try {
             WSHentOrganisasjonResponse response = organisasjonV4.hentOrganisasjon(request(orgnr));
@@ -32,11 +38,11 @@ public class OrganisasjonService {
                     .collect(joining(", "));
 
         } catch (HentOrganisasjonOrganisasjonIkkeFunnet e) {
-            LOG.warn("Kunne ikke hente organisasjon for {}", orgnr, e);
+            log.warn("Kunne ikke hente organisasjon for {}", orgnr, e);
         } catch (HentOrganisasjonUgyldigInput e) {
-            LOG.warn("Ugyldig input for {}", orgnr, e);
+            log.warn("Ugyldig input for {}", orgnr, e);
         } catch (RuntimeException e) {
-            LOG.error("Feil ved henting av Organisasjon {}", orgnr, e);
+            log.error("Feil ved henting av Organisasjon {}", orgnr, e);
         }
         return "Fant ikke navn";
     }

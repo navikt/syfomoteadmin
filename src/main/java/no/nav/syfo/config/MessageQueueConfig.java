@@ -1,72 +1,132 @@
 package no.nav.syfo.config;
 
+import com.ibm.mq.jms.MQQueue;
 import com.ibm.mq.jms.MQXAConnectionFactory;
-import com.ibm.msg.client.wmq.WMQConstants;
-import com.ibm.msg.client.wmq.v6.base.internal.MQC;
-import no.nav.syfo.config.mqconfigs.HenvendelseMQConfig;
-import no.nav.syfo.config.mqconfigs.VarselMQConfig;
 import no.nav.syfo.config.mqconfigs.mq.UserCredentialsXaConnectionFactoryAdapter;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.jms.XAConnectionFactoryWrapper;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Profile;
 import org.springframework.jms.annotation.EnableJms;
-import org.springframework.jms.config.DefaultJmsListenerContainerFactory;
+import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.support.destination.DestinationResolver;
-import org.springframework.transaction.PlatformTransactionManager;
 
 import javax.jms.ConnectionFactory;
 import javax.jms.JMSException;
 import javax.jms.Queue;
 
-import static java.lang.System.getProperty;
+import static com.ibm.mq.constants.CMQC.MQENC_NATIVE;
+import static com.ibm.msg.client.jms.JmsConstants.JMS_IBM_CHARACTER_SET;
+import static com.ibm.msg.client.jms.JmsConstants.JMS_IBM_ENCODING;
+import static com.ibm.msg.client.wmq.common.CommonConstants.WMQ_CM_CLIENT;
 
 @Configuration
-@Import({
-        VarselMQConfig.class,
-        HenvendelseMQConfig.class
-})
 @EnableJms
+@Profile({"remote"})
 public class MessageQueueConfig {
     private static final int UTF_8_WITH_PUA = 1208;
 
-    private static final String MQ_HOSTNAME = "MQGATEWAY03_HOSTNAME";
-    private static final String MQ_PORT = "MQGATEWAY03_PORT";
-    private static final String MQ_NAME = "MQGATEWAY03_NAME";
-    private static final String MQ_CHANNEL = "SYFOMOTEADMIN_CHANNEL_NAME";
-    private static final String MQ_USERNAME = "srvappserver";
-    private static final String MQ_PASSOWORD = "";
+    @Value("${syfomoteadmin.channel.name}")
+    private String channelName;
+    @Value("${mqgateway03.hostname}")
+    private String gatewayHostname;
+    @Value("${mqgateway03.name}")
+    private String gatewayName;
+    @Value("${mqgateway03.port}")
+    private int gatewayPort;
+    @Value("${srvappserver.username:srvappserver}")
+    private String srvAppserverUsername;
+    @Value("${srvappserver.password:}")
+    private String srvAppserverPassword;
 
-    @Bean(name = "jmsListenerContainerFactory")
-    public DefaultJmsListenerContainerFactory jmsListenerContainerFactory(ConnectionFactory connectionFactory, DestinationResolver destinationResolver, PlatformTransactionManager transactionManager) {
-        DefaultJmsListenerContainerFactory factory = new DefaultJmsListenerContainerFactory();
-        factory.setConnectionFactory(connectionFactory);
-        factory.setDestinationResolver(destinationResolver);
-        factory.setConcurrency("3-10");
-        factory.setTransactionManager(transactionManager);
-        return factory;
+    @Bean(name = "opprettOppgaveHenvendelseDestination")
+    public Queue opprettOppgaveHenvendelseDestination(@Value("${henvendelseoppgavevarsel.queuename}") String henvendelseoppgaveQueueName) throws JMSException {
+        return new MQQueue(henvendelseoppgaveQueueName);
     }
 
-    @Bean
-    public ConnectionFactory connectionFactory() throws JMSException {
-        MQXAConnectionFactory connectionFactory = new MQXAConnectionFactory();
-        connectionFactory.setHostName(getProperty(MQ_HOSTNAME));
-        connectionFactory.setPort(Integer.valueOf(getProperty(MQ_PORT)));
-        connectionFactory.setChannel(getProperty(MQ_CHANNEL));
-        connectionFactory.setQueueManager(getProperty(MQ_NAME));
-        connectionFactory.setTransportType(WMQConstants.WMQ_CM_CLIENT);
-        connectionFactory.setCCSID(UTF_8_WITH_PUA);
-        connectionFactory.setIntProperty(WMQConstants.JMS_IBM_ENCODING, MQC.MQENC_NATIVE);
-        connectionFactory.setIntProperty(WMQConstants.JMS_IBM_CHARACTER_SET, UTF_8_WITH_PUA);
-        UserCredentialsXaConnectionFactoryAdapter adapter = new UserCredentialsXaConnectionFactoryAdapter();
-        adapter.setTargetConnectionFactory(connectionFactory);
-        adapter.setUsername(MQ_USERNAME);
-        adapter.setPassword(MQ_PASSOWORD);
-        return adapter;
+    @Bean(name = "oppgavehenvendelsequeue")
+    public JmsTemplate oppgaveHenvendelseQueue(
+            @Autowired @Qualifier("opprettOppgaveHenvendelseDestination") Queue opprettOppgaveHenvendelseDestination,
+            ConnectionFactory connectionFactory
+    ) {
+        JmsTemplate jmsTemplate = new JmsTemplate();
+        jmsTemplate.setDefaultDestination(opprettOppgaveHenvendelseDestination);
+        jmsTemplate.setConnectionFactory(connectionFactory);
+        return jmsTemplate;
+    }
+
+    @Bean(name = "oppgaveVarselDestination")
+    public Queue oppgaveVarselDestination(@Value("${bestvarselmhandling.queuename}") String bestvarselmhandlingQueueName) throws JMSException {
+        return new MQQueue(bestvarselmhandlingQueueName);
+    }
+
+    @Bean(name = "stoppVarselDestination")
+    public Queue stoppVarselDestination(@Value("${stopprevarsel.queuename}") String stopprevarselQueueName) throws JMSException {
+        return new MQQueue(stopprevarselQueueName);
+    }
+
+    @Bean(name = "serviceVarselDestination")
+    public Queue serviceVarselDestination(@Value("${servicevarsel.queuename}") String servicevarselQueueName) throws JMSException {
+        return new MQQueue(servicevarselQueueName);
+    }
+
+    @Bean(name = "opprettVarselQueue")
+    public JmsTemplate opprettVarselQueue(
+            @Autowired @Qualifier("oppgaveVarselDestination") Queue oppgaveVarselDestination,
+            ConnectionFactory connectionFactory
+    ) {
+        JmsTemplate jmsTemplate = new JmsTemplate();
+        jmsTemplate.setDefaultDestination(oppgaveVarselDestination);
+        jmsTemplate.setConnectionFactory(connectionFactory);
+        return jmsTemplate;
+    }
+
+    @Bean(name = "stoppvarselqueue")
+    public JmsTemplate stoppvarselqueue(
+            @Autowired @Qualifier("stoppVarselDestination") Queue stoppVarselDestination,
+            ConnectionFactory connectionFactory
+    ) {
+        JmsTemplate jmsTemplate = new JmsTemplate();
+        jmsTemplate.setDefaultDestination(stoppVarselDestination);
+        jmsTemplate.setConnectionFactory(connectionFactory);
+        return jmsTemplate;
+    }
+
+    @Bean(name = "servicevarselqueue")
+    public JmsTemplate servicevarselqueue(
+            @Autowired @Qualifier("serviceVarselDestination") Queue serviceVarselDestination,
+            ConnectionFactory connectionFactory
+    ) {
+        JmsTemplate jmsTemplate = new JmsTemplate();
+        jmsTemplate.setDefaultDestination(serviceVarselDestination);
+        jmsTemplate.setConnectionFactory(connectionFactory);
+        return jmsTemplate;
     }
 
     @Bean
     public DestinationResolver destinationResolver(ApplicationContext context) {
         return (session, destinationName, pubSubDomain) -> context.getBean(destinationName, Queue.class);
+    }
+
+    @Bean
+    public ConnectionFactory connectionFactory(XAConnectionFactoryWrapper xaConnectionFactoryWrapper) throws Exception {
+        MQXAConnectionFactory connectionFactory = new MQXAConnectionFactory();
+        connectionFactory.setHostName(gatewayHostname);
+        connectionFactory.setPort(gatewayPort);
+        connectionFactory.setChannel(channelName);
+        connectionFactory.setQueueManager(gatewayName);
+        connectionFactory.setTransportType(WMQ_CM_CLIENT);
+        connectionFactory.setCCSID(UTF_8_WITH_PUA);
+        connectionFactory.setIntProperty(JMS_IBM_ENCODING, MQENC_NATIVE);
+        connectionFactory.setIntProperty(JMS_IBM_CHARACTER_SET, UTF_8_WITH_PUA);
+        UserCredentialsXaConnectionFactoryAdapter adapter = new UserCredentialsXaConnectionFactoryAdapter();
+        adapter.setTargetConnectionFactory(connectionFactory);
+        adapter.setUsername(srvAppserverUsername);
+        adapter.setPassword(srvAppserverPassword);
+        return xaConnectionFactoryWrapper.wrapConnectionFactory(adapter);
     }
 }

@@ -1,39 +1,56 @@
 package no.nav.syfo.api.ressurser;
 
-import no.nav.syfo.domain.model.Mote;
+import no.nav.security.spring.oidc.validation.api.ProtectedWithClaims;
 import no.nav.syfo.api.domain.RSHistorikk;
-import no.nav.syfo.service.HistorikkService;
-import no.nav.syfo.service.TilgangService;
+import no.nav.syfo.domain.model.Mote;
 import no.nav.syfo.service.AktoerService;
+import no.nav.syfo.service.HistorikkService;
 import no.nav.syfo.service.MoteService;
-import org.springframework.stereotype.Component;
+import no.nav.syfo.service.TilgangService;
+import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
-import javax.ws.rs.*;
+import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.ForbiddenException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 import static java.time.LocalDateTime.now;
 import static java.util.Collections.singletonList;
-import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
+import static no.nav.syfo.oidc.OIDCIssuer.INTERN;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.FORBIDDEN;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
-@Component
-@Path("/historikk")
-@Consumes(APPLICATION_JSON)
-@Produces(APPLICATION_JSON)
+@RestController
+@RequestMapping(value = "/api/historikk")
+@ProtectedWithClaims(issuer = INTERN)
 public class HistorikkRessurs {
 
-    @Inject
     private TilgangService tilgangService;
-    @Inject
+
     private AktoerService aktoerService;
-    @Inject
+
     private MoteService moteService;
-    @Inject
+
     private HistorikkService historikkService;
 
-    @GET
-    public List<RSHistorikk> hentHistorikk(@QueryParam("fnr") String fnr) {
+    @Inject
+    public HistorikkRessurs(
+            TilgangService tilgangService,
+            AktoerService aktoerService,
+            MoteService moteService,
+            HistorikkService historikkService
+    ) {
+        this.tilgangService = tilgangService;
+        this.aktoerService = aktoerService;
+        this.moteService = moteService;
+        this.historikkService = historikkService;
+    }
+
+    @GetMapping(produces = APPLICATION_JSON_VALUE)
+    public List<RSHistorikk> hentHistorikk(@RequestParam(value = "fnr") String fnr) {
         if ("true".equals(System.getProperty("LOCAL_MOCK"))) {
             return singletonList(
                     new RSHistorikk()
@@ -42,17 +59,24 @@ public class HistorikkRessurs {
             );
         }
 
-        if (tilgangService.sjekkTilgangTilPerson(fnr).getStatus() == 200) {
-            List<Mote> moter = moteService.findMoterByBrukerAktoerId(aktoerService.hentAktoerIdForIdent(fnr));
-            List<RSHistorikk> historikk = new ArrayList<>();
-            historikk.addAll(historikkService.opprettetHistorikk(moter));
-            historikk.addAll(historikkService.flereTidspunktHistorikk(moter));
-            historikk.addAll(historikkService.avbruttHistorikk(moter));
-            historikk.addAll(historikkService.bekreftetHistorikk(moter));
-            return historikk;
-        } else {
-            throw new ForbiddenException("Innlogget bruker har ikke tilgang til denne informasjonen");
-        }
+        tilgangService.kastExceptionHvisIkkeVeilederHarTilgangTilPerson(fnr);
+
+        List<Mote> moter = moteService.findMoterByBrukerAktoerId(aktoerService.hentAktoerIdForIdent(fnr));
+        List<RSHistorikk> historikk = new ArrayList<>();
+        historikk.addAll(historikkService.opprettetHistorikk(moter));
+        historikk.addAll(historikkService.flereTidspunktHistorikk(moter));
+        historikk.addAll(historikkService.avbruttHistorikk(moter));
+        historikk.addAll(historikkService.bekreftetHistorikk(moter));
+        return historikk;
     }
 
+    @ExceptionHandler({IllegalArgumentException.class})
+    void handleBadRequests(HttpServletResponse response) throws IOException {
+        response.sendError(BAD_REQUEST.value(), "Vi kunne ikke tolke inndataene :/");
+    }
+
+    @ExceptionHandler({ForbiddenException.class})
+    void handleForbiddenRequests(HttpServletResponse response) throws IOException {
+        response.sendError(FORBIDDEN.value(), "Handling er forbudt");
+    }
 }

@@ -9,9 +9,10 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.inject.Inject;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
@@ -22,11 +23,22 @@ import static no.nav.syfo.util.DbUtil.convert;
 import static no.nav.syfo.util.DbUtil.nesteSekvensverdi;
 import static no.nav.syfo.util.MapUtil.mapListe;
 
+@Service
+@Transactional
+@Repository
 public class HendelseDAO {
-    @Inject
+
     private JdbcTemplate jdbcTemplate;
-    @Inject
+
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+
+    public HendelseDAO(
+            NamedParameterJdbcTemplate namedParameterJdbcTemplate,
+            JdbcTemplate jdbcTemplate
+    ) {
+        this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
+        this.jdbcTemplate = jdbcTemplate;
+    }
 
     @Transactional
     public long create(HendelseMoteStatusEndret hendelse) {

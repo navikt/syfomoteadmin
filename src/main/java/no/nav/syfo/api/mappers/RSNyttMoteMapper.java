@@ -14,7 +14,6 @@ import java.util.function.Function;
 
 import static no.nav.syfo.domain.model.MoteStatus.OPPRETTET;
 import static no.nav.syfo.util.MapUtil.mapListe;
-import static no.nav.syfo.util.SubjectHandlerUtil.getUserId;
 
 public class RSNyttMoteMapper {
     public static Function<RSNyttAlternativ, TidOgSted> opprett2TidOgSted = rsTidOgSted ->
@@ -26,8 +25,6 @@ public class RSNyttMoteMapper {
             new Mote()
                     .navEnhet(nyttMoteRequest.navEnhet)
                     .status(OPPRETTET)
-                    .opprettetAv(getUserId())
-                    .eier(getUserId())
                     .motedeltakere(Arrays.asList(
                             new MotedeltakerArbeidsgiver().orgnummer(nyttMoteRequest.orgnummer).epost(nyttMoteRequest.epost).navn(nyttMoteRequest.navn),
                             new MotedeltakerAktorId().fnr(nyttMoteRequest.fnr).motedeltakertype("Bruker")

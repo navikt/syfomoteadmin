@@ -1,79 +1,92 @@
 package no.nav.syfo.api.ressurser;
 
-import no.nav.brukerdialog.security.context.SubjectRule;
-import no.nav.brukerdialog.security.domain.IdentType;
-import no.nav.common.auth.SsoToken;
-import no.nav.common.auth.Subject;
+import no.nav.security.oidc.context.OIDCRequestContextHolder;
+import no.nav.syfo.LocalApplication;
+import no.nav.syfo.oidc.OIDCIssuer;
 import no.nav.syfo.service.TilgangService;
-import org.glassfish.jersey.message.internal.Statuses;
+import org.junit.After;
 import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Rule;
 import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.powermock.core.classloader.annotations.PrepareForTest;
-import org.powermock.modules.junit4.PowerMockRunner;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.web.client.MockRestServiceServer;
+import org.springframework.web.client.RestTemplate;
 
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.Invocation;
-import javax.ws.rs.client.WebTarget;
-import javax.ws.rs.core.Response;
+import javax.inject.Inject;
 
-import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.Mockito.*;
-import static org.powermock.api.mockito.PowerMockito.mockStatic;
+import static no.nav.syfo.service.TilgangService.TILGANG_TIL_BRUKER_PATH;
+import static no.nav.syfo.service.TilgangService.TILGANG_TIL_ENHET_PATH;
+import static no.nav.syfo.testhelper.OidcTestHelper.loggUtAlle;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.test.web.client.ExpectedCount.manyTimes;
+import static org.springframework.test.web.client.match.MockRestRequestMatchers.*;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withStatus;
+import static org.springframework.web.util.UriComponentsBuilder.fromHttpUrl;
 
 /**
  * Hensikten her er å samle koden som mock svar fra syfo-tilgangskontroll.
  * Subklasser arver tilgangskontrollResponse, som de kan sette opp til å returnere 200 OK, 403 Forbidden eller
  * 500-feil.
  */
-@RunWith(PowerMockRunner.class)
-@PrepareForTest(ClientBuilder.class)
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes = LocalApplication.class)
+@DirtiesContext
 public abstract class AbstractRessursTilgangTest {
 
-    static final String FNR = "12345678910";
-    static final String AKTOER_ID = "123456789";
-    static final Response.StatusType TAU_I_PROPELLEN = Statuses.from(500, "Tau i propellen");
+    @Value("${tilgangskontrollapi.url}")
+    private String tilgangskontrollUrl;
 
-    private static Client client;
-    private static TilgangService tilgangService;
-    private static final SsoToken SSO_TOKEN = SsoToken.oidcToken("TestToken");
+    @Value("${dev}")
+    private String dev;
 
-    @Mock
-    Response tilgangskontrollResponse;
+    @Inject
+    public OIDCRequestContextHolder oidcRequestContextHolder;
 
-    @Rule
-    public SubjectRule subjectRule = new SubjectRule();
+    @Inject
+    private RestTemplate restTemplate;
 
-    @BeforeClass
-    public static void initialize() {
-        mockStatic(ClientBuilder.class);
-        client = mock(Client.class);
-        when(ClientBuilder.newClient()).thenReturn(client);
-        tilgangService = spy(new TilgangService());
-    }
+    private MockRestServiceServer mockRestServiceServer;
 
     @Before
     public void setUp() {
-        // Mock REST-klienten
-        Invocation.Builder builderMock = mock(Invocation.Builder.class);
-        when(builderMock.get()).thenReturn(tilgangskontrollResponse);
-        when(builderMock.header(anyString(), anyString())).thenReturn(builderMock);
-
-        final WebTarget webTargetMock = mock(WebTarget.class);
-        when(webTargetMock.request(APPLICATION_JSON)).thenReturn(builderMock);
-        when(webTargetMock.queryParam(anyString(), anyString())).thenReturn(webTargetMock);
-
-        when(client.target(anyString())).thenReturn(webTargetMock);
-
-        gittBrukerMedOidcAssertation();
+        this.mockRestServiceServer = MockRestServiceServer.bindTo(restTemplate).build();
     }
 
-    private void gittBrukerMedOidcAssertation() {
-        Subject subject = new Subject(FNR, IdentType.InternBruker, SSO_TOKEN);
-        subjectRule.setSubject(subject);
+    @After
+    public void tearDown() {
+        mockRestServiceServer.verify();
+        loggUtAlle(oidcRequestContextHolder);
+    }
+
+    public void mockSvarFraTilgangTilBruker(String fnr, HttpStatus status) {
+        String uriString = fromHttpUrl(tilgangskontrollUrl)
+                .path(TILGANG_TIL_BRUKER_PATH)
+                .queryParam(TilgangService.FNR, fnr)
+                .toUriString();
+
+        String idToken = oidcRequestContextHolder.getOIDCValidationContext().getToken(OIDCIssuer.INTERN).getIdToken();
+
+        mockRestServiceServer.expect(manyTimes(), requestTo(uriString))
+                .andExpect(method(HttpMethod.GET))
+                .andExpect(header(AUTHORIZATION, "Bearer " + idToken))
+                .andRespond(withStatus(status));
+    }
+
+    public void mockSvarFraTilgangTilEnhet(String enhet, HttpStatus status) {
+        String uriString = fromHttpUrl(tilgangskontrollUrl)
+                .path(TILGANG_TIL_ENHET_PATH)
+                .queryParam(TilgangService.ENHET, enhet)
+                .toUriString();
+
+        String idToken = oidcRequestContextHolder.getOIDCValidationContext().getToken(OIDCIssuer.INTERN).getIdToken();
+
+        mockRestServiceServer.expect(manyTimes(), requestTo(uriString))
+                .andExpect(method(HttpMethod.GET))
+                .andExpect(header(AUTHORIZATION, "Bearer " + idToken))
+                .andRespond(withStatus(status));
     }
 }

@@ -4,14 +4,22 @@ import no.nav.syfo.domain.model.Mote;
 import no.nav.syfo.domain.model.MotedeltakerAktorId;
 import no.nav.syfo.domain.model.MotedeltakerArbeidsgiver;
 import no.nav.syfo.repository.dao.MotedeltakerDAO;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-import javax.inject.Inject;
 import java.util.List;
 
+@Service
 public class MotedeltakerService {
 
-    @Inject
     private MotedeltakerDAO motedeltakerDAO;
+
+    @Autowired
+    public MotedeltakerService(
+            MotedeltakerDAO motedeltakerDAO
+    ) {
+        this.motedeltakerDAO = motedeltakerDAO;
+    }
 
     public List<MotedeltakerArbeidsgiver> findMotedeltakereSomIkkeHarSvartSisteDognet(int antallDagerBakoverEkstra) {
         return motedeltakerDAO.findMotedeltakereSomIkkeHarSvartSisteDognet(antallDagerBakoverEkstra);

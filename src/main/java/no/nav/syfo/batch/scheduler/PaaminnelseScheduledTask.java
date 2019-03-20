@@ -1,45 +1,63 @@
 package no.nav.syfo.batch.scheduler;
 
+import lombok.extern.slf4j.Slf4j;
 import no.nav.syfo.service.MoteService;
 import no.nav.syfo.service.MotedeltakerService;
 import no.nav.syfo.service.varselinnhold.ArbeidsgiverVarselService;
 import no.nav.syfo.util.DatoService;
-import org.slf4j.Logger;
+import no.nav.syfo.util.Toggle;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.time.LocalDate;
 
 import static no.nav.syfo.domain.model.Varseltype.PAAMINNELSE;
-import static no.nav.syfo.util.ToggleUtil.toggleBatchPaaminelse;
 import static no.nav.syfo.util.time.HelgedagUtil.erHelgedag;
 import static no.nav.syfo.util.time.NorskeHelligDagerUtil.erNorskHelligDag;
-import static org.slf4j.LoggerFactory.getLogger;
 
-public class PaaminnelseScheduledTask implements ScheduledTask {
+@Slf4j
+@Component
+public class PaaminnelseScheduledTask {
 
-    private static final Logger LOG = getLogger(PaaminnelseScheduledTask.class);
-
-    @Inject
     private MotedeltakerService motedeltakerService;
-    @Inject
+
     private MoteService moteService;
-    @Inject
+
     private ArbeidsgiverVarselService varselService;
-    @Inject
+
     private DatoService datoService;
 
+    private Toggle toggle;
+
+    @Inject
+    public PaaminnelseScheduledTask(
+            MotedeltakerService motedeltakerService,
+            MoteService moteService,
+            ArbeidsgiverVarselService varselService,
+            DatoService datoService,
+            Toggle toggle
+    ) {
+        this.motedeltakerService = motedeltakerService;
+        this.moteService = moteService;
+        this.varselService = varselService;
+        this.datoService = datoService;
+        this.toggle = toggle;
+    }
+
     @Transactional
-    @Override
+//    @Scheduled(cron = "0 * * * * *")
+    @Scheduled(cron = "0 0 8 * * *")
     public void run() {
-        if (toggleBatchPaaminelse()) {
-            LOG.info("TRACEBATCH: run {}", this.getClass().getName());
+        if (toggle.toggleBatchPaaminelse()) {
+            log.info("TRACEBATCH: run {}", this.getClass().getName());
 
             int antallDagerBakoverEkstra = 0;
             LocalDate dato = datoService.dagensDato();
 
             if (erHelgedag(dato) || erNorskHelligDag(dato)) {
-                LOG.info("Sender ikke påminnelser i dag");
+                log.info("Sender ikke påminnelser i dag");
                 return;
             }
             dato = dato.minusDays(1);
@@ -48,7 +66,7 @@ public class PaaminnelseScheduledTask implements ScheduledTask {
                 dato = dato.minusDays(1);
             }
 
-            LOG.info("Sender påminnelser");
+            log.info("Sender påminnelser");
             motedeltakerService.findMotedeltakereSomIkkeHarSvartSisteDognet(antallDagerBakoverEkstra)
                     .stream()
                     .map(motedeltaker -> moteService.findMoteByMotedeltakerUuid(motedeltaker.uuid))

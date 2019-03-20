@@ -3,6 +3,7 @@ package no.nav.syfo.service;
 import no.nav.syfo.repository.dao.EpostDAO;
 import no.nav.syfo.repository.model.PEpost;
 import no.nav.syfo.repository.model.PEpostVedlegg;
+import no.nav.syfo.util.Toggle;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -10,31 +11,27 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessagePreparator;
 
-import static java.lang.System.setProperty;
 import static java.util.Arrays.asList;
 import static org.assertj.core.api.Java6Assertions.assertThat;
 import static org.mockito.ArgumentCaptor.forClass;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
+//@SpringBootTest(classes = LocalApplication.class)
 public class EpostServiceTest {
 
     @Mock
-    private JavaMailSender javaMailSender;
-    @Mock
     private EpostDAO epostDAO;
+    @Mock
+    private Toggle toggle;
     @InjectMocks
     private EpostService epostService;
 
     @Before
-    public void setup() {
-        setProperty("TOGGLE_SEND_EPOST", "true");
+    public void setUp() {
+        when(toggle.toggleSendeEpost()).thenReturn(true);
     }
-
 
     @Test
     public void lagrerVedleggene() {
@@ -53,17 +50,5 @@ public class EpostServiceTest {
         verify(epostDAO, times(1)).create(request.capture());
         assertThat(request.getValue().vedlegg.get(0).innhold).isEqualTo("innhold");
         assertThat(request.getValue().vedlegg.get(0).type).isEqualTo("ICS");
-    }
-
-
-    @Test
-    public void senderEpost() {
-        ArgumentCaptor<MimeMessagePreparator> request = forClass(MimeMessagePreparator.class);
-
-        epostService.send(new PEpost()
-                .emne("emne")
-                .innhold("innhold")
-                .mottaker("til@nav.no"));
-        verify(javaMailSender, times(1)).send(request.capture());
     }
 }

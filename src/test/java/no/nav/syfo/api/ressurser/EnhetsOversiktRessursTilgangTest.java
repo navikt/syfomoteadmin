@@ -1,58 +1,58 @@
 package no.nav.syfo.api.ressurser;
 
+import no.nav.syfo.LocalApplication;
 import no.nav.syfo.api.domain.RSBrukerPaaEnhet;
 import no.nav.syfo.service.MotedeltakerService;
+import no.nav.syfo.service.TilgangService;
 import org.junit.Test;
+import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.ws.rs.ForbiddenException;
 import java.util.List;
 
 import static java.util.Collections.emptyList;
+import static no.nav.syfo.testhelper.UserConstants.NAV_ENHET;
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.when;
 
-public class EnhetsOversiktRessursTilgangTest extends AbstractRessursTilgangTest {
+@RunWith(SpringRunner.class)
+@SpringBootTest(classes = LocalApplication.class)
+@DirtiesContext
+public class EnhetsOversiktRessursTilgangTest {
 
     @Mock
     private MotedeltakerService motedeltakerService;
-
+    @Mock
+    private TilgangService tilgangService;
     @InjectMocks
     private EnhetRessurs enhetRessurs;
 
-    private static final String ENHET_ID = "1234";
-
     @Test
     public void har_tilgang() {
-        when(tilgangskontrollResponse.getStatus()).thenReturn(200);
-        when(motedeltakerService.sykmeldteMedMoteHvorBeggeHarSvart(ENHET_ID)).thenReturn(emptyList());
+        when(motedeltakerService.sykmeldteMedMoteHvorBeggeHarSvart(NAV_ENHET)).thenReturn(emptyList());
 
-        List<RSBrukerPaaEnhet> brukerePaaEnhet = enhetRessurs.hentSykmeldteMedAktiveMoterForEnhet(ENHET_ID);
+        List<RSBrukerPaaEnhet> brukerePaaEnhet = enhetRessurs.hentSykmeldteMedAktiveMoterForEnhet(NAV_ENHET);
 
         assertEquals(emptyList(), brukerePaaEnhet);
-
-        verify(tilgangskontrollResponse, times(2)).getStatus();
     }
 
     @Test(expected = ForbiddenException.class)
     public void har_ikke_tilgang() {
-        when(tilgangskontrollResponse.getStatus()).thenReturn(403);
+        doThrow(new ForbiddenException()).when(tilgangService).kastExceptionHvisIkkeVeilederHarTilgangTilEnhet(NAV_ENHET);
 
-        enhetRessurs.hentSykmeldteMedAktiveMoterForEnhet(ENHET_ID);
-
-        verify(tilgangskontrollResponse).getStatus();
+        enhetRessurs.hentSykmeldteMedAktiveMoterForEnhet(NAV_ENHET);
     }
 
     @Test(expected = RuntimeException.class)
     public void annen_tilgangsfeil() {
-        when(tilgangskontrollResponse.getStatus()).thenReturn(500);
-        when(tilgangskontrollResponse.getStatusInfo()).thenReturn(TAU_I_PROPELLEN);
+        doThrow(new RuntimeException()).when(tilgangService).kastExceptionHvisIkkeVeilederHarTilgangTilEnhet(NAV_ENHET);
 
-        enhetRessurs.hentSykmeldteMedAktiveMoterForEnhet(ENHET_ID);
-
-        verify(tilgangskontrollResponse).getStatus();
+        enhetRessurs.hentSykmeldteMedAktiveMoterForEnhet(NAV_ENHET);
     }
-
-
 }

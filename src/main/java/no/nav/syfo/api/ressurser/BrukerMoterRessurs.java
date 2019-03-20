@@ -1,5 +1,7 @@
 package no.nav.syfo.api.ressurser;
 
+import no.nav.security.oidc.context.OIDCRequestContextHolder;
+import no.nav.security.spring.oidc.validation.api.ProtectedWithClaims;
 import no.nav.syfo.api.domain.bruker.BrukerMote;
 import no.nav.syfo.api.domain.bruker.BrukerMoteSvar;
 import no.nav.syfo.api.domain.bruker.BrukerOppdaterMoteSvar;
@@ -7,48 +9,60 @@ import no.nav.syfo.service.AktoerService;
 import no.nav.syfo.service.BrukertilgangService;
 import no.nav.syfo.service.MoteBrukerService;
 import no.nav.syfo.util.Brukerkontekst;
-import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.ConstraintViolationException;
-import javax.ws.rs.*;
+import javax.ws.rs.ForbiddenException;
+import javax.ws.rs.NotFoundException;
 import java.io.IOException;
 import java.util.List;
 
-import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
-import static no.nav.syfo.util.SubjectHandlerUtil.getUserId;
+import static no.nav.syfo.oidc.OIDCIssuer.EKSTERN;
+import static no.nav.syfo.util.OIDCUtil.getSubjectEkstern;
 import static org.springframework.http.HttpStatus.*;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
-@Component
-@Path("/bruker")
-@Consumes(APPLICATION_JSON)
-@Produces(APPLICATION_JSON)
-@Controller
+@RestController
+@RequestMapping(value = "/api/bruker")
+@ProtectedWithClaims(issuer = EKSTERN)
 public class BrukerMoterRessurs {
 
-    @Inject
+    private OIDCRequestContextHolder contextHolder;
+
     private AktoerService aktoerService;
-    @Inject
+
     private BrukertilgangService brukertilgangService;
-    @Inject
+
     private MoteBrukerService moteBrukerService;
 
-    @GET
-    @Path("/arbeidsgiver/moter")
+    @Inject
+    public BrukerMoterRessurs(
+            OIDCRequestContextHolder contextHolder,
+            AktoerService aktoerService,
+            BrukertilgangService brukertilgangService,
+            MoteBrukerService moteBrukerService
+    ) {
+        this.contextHolder = contextHolder;
+        this.aktoerService = aktoerService;
+        this.brukertilgangService = brukertilgangService;
+        this.moteBrukerService = moteBrukerService;
+    }
+
+    @GetMapping(produces = APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/arbeidsgiver/moter")
     public List<BrukerMote> hentMoter() {
-        String innloggetIdent = getUserId();
+        String innloggetIdent = getSubjectEkstern(contextHolder);
         String innloggetAktorId = aktoerService.hentAktoerIdForIdent(innloggetIdent);
 
         return moteBrukerService.hentBrukerMoteListe(innloggetAktorId, Brukerkontekst.ARBEIDSGIVER);
     }
 
-    @GET
-    @Path("/arbeidstaker/moter/siste")
+    @GetMapping(produces = APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/arbeidstaker/moter/siste")
     public BrukerMote hentSisteMote() {
-        String innloggetIdent = getUserId();
+        String innloggetIdent = getSubjectEkstern(contextHolder);
         String innloggetAktorId = aktoerService.hentAktoerIdForIdent(innloggetIdent);
 
         brukertilgangService.kastExceptionHvisIkkeTilgang(innloggetIdent);
@@ -56,9 +70,12 @@ public class BrukerMoterRessurs {
         return moteBrukerService.hentSisteBrukerMote(innloggetAktorId, Brukerkontekst.ARBEIDSTAKER);
     }
 
-    @POST
-    @Path("/moter/{moteUuid}/send")
-    public BrukerOppdaterMoteSvar oppdaterMotedeltaker(@PathParam("moteUuid") final String moteUuid, BrukerMoteSvar motesvar) throws Exception {
+    @PostMapping(consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/moter/{moteUuid}/send")
+    public BrukerOppdaterMoteSvar oppdaterMotedeltaker(
+            @PathVariable("moteUuid") final String moteUuid,
+            @RequestBody BrukerMoteSvar motesvar
+    ) {
         return moteBrukerService.sendSvar(moteUuid, motesvar);
     }
 

@@ -1,23 +1,35 @@
 package no.nav.syfo.service;
 
+import no.nav.syfo.api.domain.RSHistorikk;
 import no.nav.syfo.domain.model.Mote;
 import no.nav.syfo.domain.model.MoteStatus;
 import no.nav.syfo.domain.model.Motedeltaker;
 import no.nav.syfo.domain.model.MotedeltakerAktorId;
 import no.nav.syfo.repository.dao.HendelseDAO;
-import no.nav.syfo.api.domain.RSHistorikk;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
-import javax.inject.Inject;
 import java.util.Collection;
 import java.util.List;
 
 import static java.util.stream.Collectors.toList;
 
+@Service
 public class HistorikkService {
-    @Inject
+
     private BrukerprofilService brukerprofilService;
-    @Inject
+
     private HendelseDAO hendelseDAO;
+
+    @Autowired
+    public HistorikkService(
+            BrukerprofilService brukerprofilService,
+            HendelseDAO hendelseDAO
+
+    ) {
+        this.brukerprofilService = brukerprofilService;
+        this.hendelseDAO = hendelseDAO;
+    }
 
 
     public List<RSHistorikk> opprettetHistorikk(List<Mote> moter) {

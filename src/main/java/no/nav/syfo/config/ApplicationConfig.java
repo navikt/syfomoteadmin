@@ -1,67 +1,35 @@
 package no.nav.syfo.config;
 
-import no.nav.apiapp.ApiApplication;
-import no.nav.apiapp.config.ApiAppConfigurator;
-import no.nav.metrics.aspects.CountAspect;
-import no.nav.metrics.aspects.TimerAspect;
-import no.nav.syfo.batch.config.ScheduledTaskConfig;
-import no.nav.syfo.batch.scheduler.SchedulingConfigurerImpl;
-import no.nav.syfo.config.cache.CacheConfig;
-import no.nav.syfo.config.consumer.LdapConfig;
-import no.nav.syfo.api.system.AuthorizationFilter;
-import org.springframework.context.annotation.*;
-import org.springframework.transaction.annotation.Transactional;
+import org.flywaydb.core.Flyway;
+import org.springframework.boot.autoconfigure.flyway.FlywayMigrationStrategy;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
+import org.springframework.http.client.ClientHttpRequestInterceptor;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.transaction.jta.JtaTransactionManager;
+import org.springframework.web.client.RestTemplate;
 
-import javax.inject.Inject;
-import javax.servlet.DispatcherType;
-import javax.servlet.ServletContext;
-import javax.sql.DataSource;
-
-import static java.util.EnumSet.allOf;
+import static java.util.Arrays.asList;
 
 @Configuration
+@EnableTransactionManagement
+@EnableScheduling
 @EnableAspectJAutoProxy
-@ComponentScan("no.nav.syfo")
-@Import({
-        ConsumerConfig.class,
-        DatabaseConfig.class,
-        ServiceConfig.class,
-        CacheConfig.class,
-        MessageQueueConfig.class,
-        LdapConfig.class,
-        ScheduledTaskConfig.class,
-        SchedulingConfigurerImpl.class
-})
-public class ApplicationConfig implements ApiApplication.NaisApiApplication {
-    public static final String APPLICATION_NAME = "syfomoteadmin";
-    public static final String VEILARBLOGIN_REDIRECT_URL_URL = "VEILARBLOGIN_REDIRECT_URL_URL";
+public class ApplicationConfig {
 
+    // Sørger for at flyway migrering skjer etter at JTA transaction manager er ferdig satt opp av Spring.
+    // Forhindrer WARNING: transaction manager not running? loggspam fra Atomikos.
     @Bean
-    public TimerAspect timerAspect() {
-        return new TimerAspect();
+    FlywayMigrationStrategy flywayMigrationStrategy(final JtaTransactionManager jtaTransactionManager) {
+        return Flyway::migrate;
     }
 
     @Bean
-    public CountAspect countAspect() {
-        return new CountAspect();
-    }
-
-    @Inject
-    private DataSource dataSource;
-
-    @Transactional
-    @Override
-    public void startup(ServletContext servletContext) {
-        servletContext.addFilter(AuthorizationFilter.class.getSimpleName(), new AuthorizationFilter())
-                .addMappingForUrlPatterns(allOf(DispatcherType.class), false, "/api/system/*");
-    }
-
-    @Override
-    public void configure(ApiAppConfigurator apiAppConfigurator) {
-        apiAppConfigurator
-                .addPublicPath("/api/system/.*")
-                .issoLogin()
-                .azureADB2CLogin()
-                .sts();
+    public RestTemplate restTemplate(ClientHttpRequestInterceptor... interceptors) {
+        RestTemplate template = new RestTemplate();
+        template.setInterceptors(asList(interceptors));
+        return template;
     }
 }

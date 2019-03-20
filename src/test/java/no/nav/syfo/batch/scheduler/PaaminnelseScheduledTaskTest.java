@@ -2,7 +2,7 @@ package no.nav.syfo.batch.scheduler;
 
 import no.nav.syfo.service.MotedeltakerService;
 import no.nav.syfo.util.DatoService;
-import org.junit.After;
+import no.nav.syfo.util.Toggle;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -11,7 +11,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import static java.lang.System.setProperty;
 import static java.time.LocalDate.of;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.*;
@@ -23,17 +22,14 @@ public class PaaminnelseScheduledTaskTest {
     private MotedeltakerService motedeltakerService;
     @Mock
     private DatoService datoService;
+    @Mock
+    private Toggle toggle;
     @InjectMocks
     private PaaminnelseScheduledTask paaminnelseScheduledTask;
 
     @Before
     public void setup() {
-        setProperty("TOGGLE_ENABLE_BATCH_PAAMINNELSE", "true");
-    }
-
-    @After
-    public void cleanUp() {
-        setProperty("TOGGLE_ENABLE_BATCH_PAAMINNELSE", "");
+        when(toggle.toggleBatchPaaminelse()).thenReturn(true);
     }
 
     @Test

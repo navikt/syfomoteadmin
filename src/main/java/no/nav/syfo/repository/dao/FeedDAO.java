@@ -5,8 +5,10 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.inject.Inject;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
@@ -16,12 +18,22 @@ import static java.time.LocalDateTime.now;
 import static no.nav.syfo.util.DbUtil.convert;
 import static no.nav.syfo.util.DbUtil.nesteSekvensverdi;
 
+@Service
+@Transactional
+@Repository
 public class FeedDAO {
 
-    @Inject
     private JdbcTemplate jdbcTemplate;
-    @Inject
+
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+
+    public FeedDAO(
+            NamedParameterJdbcTemplate namedParameterJdbcTemplate,
+            JdbcTemplate jdbcTemplate
+    ) {
+        this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
+        this.jdbcTemplate = jdbcTemplate;
+    }
 
     public List<PFeedHendelse> hendelserEtterTidspunkt(LocalDateTime timestamp) {
         return jdbcTemplate.query("select * from FEED where created > ?", new FeedHendelseMapper(), convert(timestamp));

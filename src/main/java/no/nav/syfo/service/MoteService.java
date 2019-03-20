@@ -1,6 +1,8 @@
 package no.nav.syfo.service;
 
+import no.nav.security.oidc.context.OIDCRequestContextHolder;
 import no.nav.syfo.domain.model.*;
+import no.nav.syfo.metric.Metrikk;
 import no.nav.syfo.repository.dao.FeedDAO;
 import no.nav.syfo.repository.dao.MoteDAO;
 import no.nav.syfo.repository.dao.TidOgStedDAO;
@@ -9,9 +11,10 @@ import no.nav.syfo.service.mq.MqStoppRevarslingService;
 import no.nav.syfo.service.varselinnhold.ArbeidsgiverVarselService;
 import no.nav.syfo.service.varselinnhold.SykmeldtVarselService;
 import no.nav.syfo.service.varselinnhold.VeilederVarselService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.inject.Inject;
 import javax.ws.rs.ForbiddenException;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -25,36 +28,58 @@ import static no.nav.syfo.repository.model.PFeedHendelse.FeedHendelseType.ALLE_S
 import static no.nav.syfo.service.MotedeltakerService.finnAktoerIMote;
 import static no.nav.syfo.util.MoterUtil.filtrerBortAlternativerSomAlleredeErLagret;
 import static no.nav.syfo.util.MoterUtil.hentSisteSvartidspunkt;
-import static no.nav.syfo.util.SubjectHandlerUtil.getUserId;
+import static no.nav.syfo.util.OIDCUtil.getSubjectIntern;
 
+@Service
 public class MoteService {
 
-    @Inject
+    private OIDCRequestContextHolder contextHolder;
     private MoteDAO moteDAO;
-    @Inject
     private FeedDAO feedDAO;
-    @Inject
     private TidOgStedDAO tidOgStedDAO;
-    @Inject
     private HendelseService hendelseService;
-    @Inject
     private VeilederService veilederService;
-    @Inject
-    private MetricsService metricsService;
-    @Inject
+    private Metrikk metrikk;
     private ArbeidsgiverVarselService arbeidsgiverVarselService;
-    @Inject
     private VeilederVarselService veilederVarselService;
-    @Inject
     private SykmeldtVarselService sykmeldtVarselService;
-    @Inject
     private NorgService norgService;
-    @Inject
     private MqStoppRevarslingService mqStoppRevarslingService;
-    @Inject
     private DkifService dkifService;
-    @Inject
     private FeedService feedService;
+
+    @Autowired
+    public MoteService(
+            OIDCRequestContextHolder contextHolder,
+            MoteDAO moteDAO,
+            FeedDAO feedDAO,
+            TidOgStedDAO tidOgStedDAO,
+            HendelseService hendelseService,
+            VeilederService veilederService,
+            Metrikk metrikk,
+            ArbeidsgiverVarselService arbeidsgiverVarselService,
+            VeilederVarselService veilederVarselService,
+            SykmeldtVarselService sykmeldtVarselService,
+            NorgService norgService,
+            MqStoppRevarslingService mqStoppRevarslingService,
+            DkifService dkifService,
+            FeedService feedService
+    ) {
+        this.contextHolder = contextHolder;
+        this.moteDAO = moteDAO;
+        this.feedDAO = feedDAO;
+        this.tidOgStedDAO = tidOgStedDAO;
+        this.hendelseService = hendelseService;
+        this.veilederService = veilederService;
+        this.metrikk = metrikk;
+        this.arbeidsgiverVarselService = arbeidsgiverVarselService;
+        this.veilederVarselService = veilederVarselService;
+        this.sykmeldtVarselService = sykmeldtVarselService;
+        this.norgService = norgService;
+        this.mqStoppRevarslingService = mqStoppRevarslingService;
+        this.dkifService = dkifService;
+        this.feedService = feedService;
+    }
 
     public List<Mote> findMoterByBrukerAktoerId(String aktorId) {
         return moteDAO.findMoterByBrukerAktoerId(aktorId);
@@ -88,15 +113,15 @@ public class MoteService {
         if (feedService.skalOppretteFeedHendelse(Mote, PFeedHendelse.FeedHendelseType.AVBRUTT)) {
             opprettFeedHendelseAvTypen(PFeedHendelse.FeedHendelseType.AVBRUTT, Mote);
         }
-        metricsService.reportAntallDagerSiden(hentSisteSvartidspunkt(Mote).orElse(Mote.opprettetTidspunkt), "antallDagerVeilederSvar");
+        metrikk.reportAntallDagerSiden(hentSisteSvartidspunkt(Mote).orElse(Mote.opprettetTidspunkt), "antallDagerVeilederSvar");
     }
 
     @Transactional
     public void bekreftMote(String moteUuid, Long tidOgStedId, String userId) {
         Mote Mote = moteDAO.findMoteByUUID(moteUuid);
 
-        metricsService.reportAntallDagerSiden(Mote.opprettetTidspunkt, "antallDagerForSvar");
-        metricsService.reportAntallDagerSiden(hentSisteSvartidspunkt(Mote).orElse(Mote.opprettetTidspunkt), "antallDagerVeilederSvar");
+        metrikk.reportAntallDagerSiden(Mote.opprettetTidspunkt, "antallDagerForSvar");
+        metrikk.reportAntallDagerSiden(hentSisteSvartidspunkt(Mote).orElse(Mote.opprettetTidspunkt), "antallDagerVeilederSvar");
 
         moteDAO.bekreftMote(Mote.id, tidOgStedId);
         Mote.valgtTidOgSted(Mote.alternativer.stream().filter(tidOgSted -> tidOgSted.id.equals(tidOgStedId)).findFirst().orElseThrow(() -> new RuntimeException("Fant ikke tidspunktet!")));
@@ -133,7 +158,7 @@ public class MoteService {
         if (feedService.skalOppretteFeedHendelse(Mote, PFeedHendelse.FeedHendelseType.FLERE_TIDSPUNKT)) {
             opprettFeedHendelseAvTypen(PFeedHendelse.FeedHendelseType.FLERE_TIDSPUNKT, Mote);
         }
-        metricsService.reportAntallDagerSiden(hentSisteSvartidspunkt(Mote).orElse(Mote.opprettetTidspunkt), "antallDagerVeilederSvar");
+        metrikk.reportAntallDagerSiden(hentSisteSvartidspunkt(Mote).orElse(Mote.opprettetTidspunkt), "antallDagerVeilederSvar");
     }
 
     public void overforMoteTil(String moteUuid, String mottakerUserId) {
@@ -163,9 +188,9 @@ public class MoteService {
     private boolean sisteSvarErIkkeReservertBruk(Mote Mote, boolean skalSykmeldtHaVarsler) {
         return !skalSykmeldtHaVarsler &&
                 Mote.motedeltakere.stream()
-                .filter(motedeltaker -> motedeltaker.svartTidspunkt != null)
-                .sorted((o1, o2) -> o2.svartTidspunkt.compareTo(o1.svartTidspunkt))
-                .findFirst().get().motedeltakertype.equals("Bruker");
+                        .filter(motedeltaker -> motedeltaker.svartTidspunkt != null)
+                        .sorted((o1, o2) -> o2.svartTidspunkt.compareTo(o1.svartTidspunkt))
+                        .findFirst().get().motedeltakertype.equals("Bruker");
     }
 
     private Predicate<Motedeltaker> erIkkeReservertSykmeldt(boolean skalSykmeldtHaVarsler) {
@@ -182,9 +207,9 @@ public class MoteService {
 
         if ("Bruker".equals(brukerSomSvarte.motedeltakertype)) {
             mqStoppRevarslingService.stoppReVarsel(brukerSomSvarte.uuid);
-            metricsService.reportAntallDagerSiden(Mote.opprettetTidspunkt, "antallDagerBrukerSvar");
+            metrikk.reportAntallDagerSiden(Mote.opprettetTidspunkt, "antallDagerBrukerSvar");
         } else if ("arbeidsgiver".equals(brukerSomSvarte.motedeltakertype)) {
-            metricsService.reportAntallDagerSiden(Mote.opprettetTidspunkt, "antallDagerArbeidsgiverSvar");
+            metrikk.reportAntallDagerSiden(Mote.opprettetTidspunkt, "antallDagerArbeidsgiverSvar");
         }
 
         if (harAlleSvartPaaSisteForespoersel(Mote)) {
@@ -211,7 +236,7 @@ public class MoteService {
 
     private void opprettFeedHendelseAvTypen(PFeedHendelse.FeedHendelseType type, Mote Mote) {
         feedDAO.createFeedHendelse(new PFeedHendelse()
-                .sistEndretAv(getUserId())
+                .sistEndretAv(getSubjectIntern(contextHolder))
                 .uuid(feedService.finnNyesteFeedUuidiMote(Mote))
                 .type(type.name())
                 .moteId(Mote.id)

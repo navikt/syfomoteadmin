@@ -1,62 +1,76 @@
 package no.nav.syfo.service;
 
-import no.nav.common.auth.SsoToken;
-import no.nav.common.auth.SubjectHandler;
-import org.springframework.cache.annotation.Cacheable;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
-import javax.ws.rs.NotAuthorizedException;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.client.Client;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import javax.ws.rs.ForbiddenException;
+import java.net.URI;
 
-import static java.lang.System.getProperty;
-import static javax.ws.rs.client.ClientBuilder.newClient;
-import static javax.ws.rs.core.HttpHeaders.AUTHORIZATION;
+import static java.util.Collections.singletonMap;
+import static org.springframework.web.util.UriComponentsBuilder.fromHttpUrl;
 
+@Service
 public class TilgangService {
 
-    private Client client = newClient();
+    public static final String FNR = "fnr";
+    public static final String ENHET = "enhet";
+    public static final String TILGANG_TIL_BRUKER_PATH = "/tilgangtilbruker";
+    public static final String TILGANG_TIL_ENHET_PATH = "/tilgangtilenhet";
+    private static final String FNR_PLACEHOLDER = "{" + FNR + "}";
+    private static final String ENHET_PLACEHOLDER = "{" + ENHET + "}";
+    private final RestTemplate template;
+    private final UriComponentsBuilder tilgangTilBrukerUriTemplate;
+    private final UriComponentsBuilder tilgangTilEnhetUriTemplate;
 
-    private static final String TILGANGSKONTROLL_API_NOKKEL = "TILGANGSKONTROLLAPI_URL";
-    private static final String TILGANG_TIL_BRUKER_PATH = "/tilgangtilbruker";
-    private static final String TILGANG_TIL_ENHETPATH = "/tilgangtilenhet";
-
-    @Cacheable(value = "tilgang", keyGenerator = "userkeygenerator")
-    public Response sjekkTilgangTilPerson(String fnr) {
-        String ssoToken = SubjectHandler.getSsoToken(SsoToken.Type.OIDC)
-                .orElseThrow((() -> new NotAuthorizedException("Finner ikke token")));
-        Response response = client.target(hentTilgangskontrollUrl(TILGANG_TIL_BRUKER_PATH))
-                .queryParam("fnr", fnr)
-                .request(MediaType.APPLICATION_JSON)
-                .header(AUTHORIZATION, "Bearer " + ssoToken)
-                .get();
-
-        final int status = response.getStatus();
-        if (200 != status && 403 != status) {
-            throw new WebApplicationException(response);
-        }
-        return response;
+    public TilgangService(
+            @Value("${tilgangskontrollapi.url}") String tilgangskontrollUrl, RestTemplate template
+    ) {
+        tilgangTilBrukerUriTemplate = fromHttpUrl(tilgangskontrollUrl)
+                .path(TILGANG_TIL_BRUKER_PATH)
+                .queryParam(FNR, FNR_PLACEHOLDER);
+        tilgangTilEnhetUriTemplate = fromHttpUrl(tilgangskontrollUrl)
+                .path(TILGANG_TIL_ENHET_PATH)
+                .queryParam(ENHET, ENHET_PLACEHOLDER);
+        this.template = template;
     }
 
-    @Cacheable(value = "tilgang", keyGenerator = "userkeygenerator")
-    public Response sjekkTilgangTilEnhet(String enhet) {
-        String ssoToken = SubjectHandler.getSsoToken(SsoToken.Type.OIDC)
-                .orElseThrow((() -> new NotAuthorizedException("Finner ikke token")));
-        Response response = client.target(hentTilgangskontrollUrl(TILGANG_TIL_ENHETPATH))
-                .queryParam("enhet", enhet)
-                .request(MediaType.APPLICATION_JSON)
-                .header(AUTHORIZATION, "Bearer " + ssoToken)
-                .get();
-
-        final int status = response.getStatus();
-        if (200 != status && 403 != status) {
-            throw new WebApplicationException(response);
+    public void kastExceptionHvisIkkeVeilederHarTilgangTilPerson(String fnr) {
+        boolean harTilgang = harVeilederTilgangTilPerson(fnr);
+        if (!harTilgang) {
+            throw new ForbiddenException();
         }
-        return response;
     }
 
-    private String hentTilgangskontrollUrl(String url) {
-        return getProperty(TILGANGSKONTROLL_API_NOKKEL) + url;
+    public boolean harVeilederTilgangTilPerson(String fnr) {
+        URI tilgangTilBrukerUriMedFnr = tilgangTilBrukerUriTemplate.build(singletonMap(FNR, fnr));
+        return kallUriMedTemplate(tilgangTilBrukerUriMedFnr);
+    }
+
+    public void kastExceptionHvisIkkeVeilederHarTilgangTilEnhet(String enhet) {
+        boolean harTilgang = harVeilederTilgangTilEnhet(enhet);
+        if (!harTilgang) {
+            throw new ForbiddenException();
+        }
+    }
+
+    public boolean harVeilederTilgangTilEnhet(String enhet) {
+        URI tilgangTilEnhetUriMedFnr = tilgangTilEnhetUriTemplate.build(singletonMap(ENHET, enhet));
+        return kallUriMedTemplate(tilgangTilEnhetUriMedFnr);
+    }
+
+    private boolean kallUriMedTemplate(URI uri) {
+        try {
+            template.getForObject(uri, Object.class);
+            return true;
+        } catch (HttpClientErrorException e) {
+            if (e.getRawStatusCode() == 403) {
+                return false;
+            } else {
+                throw e;
+            }
+        }
     }
 }

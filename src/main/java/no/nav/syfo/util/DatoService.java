@@ -1,5 +1,7 @@
 package no.nav.syfo.util;
 
+import org.springframework.stereotype.Service;
+
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.EnumSet;
@@ -7,6 +9,7 @@ import java.util.Set;
 
 import static java.time.LocalDate.now;
 
+@Service
 public class DatoService {
 
     //for å forenkle testing

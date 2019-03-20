@@ -1,62 +1,75 @@
 package no.nav.syfo.api.ressurser.actions;
 
-import no.nav.metrics.aspects.Count;
-import no.nav.metrics.aspects.Timed;
+import no.nav.security.oidc.context.OIDCRequestContextHolder;
+import no.nav.security.spring.oidc.validation.api.ProtectedWithClaims;
 import no.nav.syfo.api.domain.nyttmoterequest.RSNyttAlternativ;
+import no.nav.syfo.metric.Metrikk;
 import no.nav.syfo.service.ArenaService;
 import no.nav.syfo.service.MoteService;
-import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
-import javax.ws.rs.*;
 import java.util.List;
 
-import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
 import static no.nav.syfo.api.mappers.RSNyttMoteMapper.opprett2TidOgSted;
+import static no.nav.syfo.oidc.OIDCIssuer.INTERN;
 import static no.nav.syfo.util.MapUtil.mapListe;
-import static no.nav.syfo.util.SubjectHandlerUtil.getUserId;
+import static no.nav.syfo.util.OIDCUtil.getSubjectIntern;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
-@Controller
-@Path("/moter/{moteUuid}")
-@Consumes(APPLICATION_JSON)
-@Produces(APPLICATION_JSON)
+@RestController
+@RequestMapping(value = "/api/moter/{moteUuid}")
+@ProtectedWithClaims(issuer = INTERN)
 public class MoteActions {
 
-    @Inject
+    private OIDCRequestContextHolder contextHolder;
+
+    private Metrikk metrikk;
+
     private MoteService moteService;
 
-    @Inject
     private ArenaService arenaService;
 
-    @POST
-    @Timed(name = "avbrytMote")
-    @Count(name = "avbrytMote")
-    @Path("/avbryt")
-    public void avbryt(@PathParam("moteUuid") String moteUuid, @QueryParam("varsle") boolean varsle) {
-        moteService.avbrytMote(moteUuid, varsle, getUserId());
+    @Inject
+    public MoteActions(
+            OIDCRequestContextHolder contextHolder,
+            Metrikk metrikk,
+            MoteService moteService,
+            ArenaService arenaService
+    ) {
+        this.contextHolder = contextHolder;
+        this.metrikk = metrikk;
+        this.moteService = moteService;
+        this.arenaService = arenaService;
     }
 
-    @POST
-    @Timed(name = "bekreftMote")
-    @Count(name = "bekreftMote")
-    @Path("/bekreft")
-    public void bekreft(@PathParam("moteUuid") String moteUuid, @QueryParam("valgtAlternativId") Long tidOgStedId) {
-        moteService.bekreftMote(moteUuid, tidOgStedId, getUserId());
+    @PostMapping(consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/avbryt")
+    public void avbryt(@PathVariable("moteUuid") String moteUuid, @RequestParam(value = "varsle") boolean varsle) {
+        moteService.avbrytMote(moteUuid, varsle, getSubjectIntern(contextHolder));
+
+        metrikk.tellEndepunktKall("avbryt_mote");
     }
 
-    @POST
-    @Timed(name = "nyeAlternativer")
-    @Count(name = "nyeAlternativer")
-    @Path("/nyealternativer")
-    public void nyeAlternativer(@PathParam("moteUuid") String moteUuid, List<RSNyttAlternativ> alternativer) {
-        moteService.nyeAlternativer(moteUuid, mapListe(alternativer, opprett2TidOgSted), getUserId());
+    @PostMapping(consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/bekreft")
+    public void bekreft(@PathVariable("moteUuid") String moteUuid, @RequestParam(value = "valgtAlternativId") Long tidOgStedId) {
+        moteService.bekreftMote(moteUuid, tidOgStedId, getSubjectIntern(contextHolder));
+
+        metrikk.tellEndepunktKall("bekreft_mote");
     }
 
-    @POST
-    @Timed(name = "opprettSanksjonsoppgave")
-    @Count(name = "opprettSanksjonsoppgave")
-    @Path("/opprettSanksjonsoppgave")
-    public void opprettSanksjonsoppgave(@PathParam("moteUuid") String moteUuid) {
+    @PostMapping(consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/nyealternativer")
+    public void nyeAlternativer(@PathVariable("moteUuid") String moteUuid, @RequestBody List<RSNyttAlternativ> alternativer) {
+        moteService.nyeAlternativer(moteUuid, mapListe(alternativer, opprett2TidOgSted), getSubjectIntern(contextHolder));
+
+        metrikk.tellEndepunktKall("nye_alternativer");
+    }
+
+    @PostMapping(consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
+    @RequestMapping(value = "/opprettSanksjonsoppgave")
+    public void opprettSanksjonsoppgave(@PathVariable("moteUuid") String moteUuid) {
         arenaService.bestillOppgave(moteUuid);
     }
 }

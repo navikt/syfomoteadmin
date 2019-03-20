@@ -6,9 +6,10 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.stereotype.Repository;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.inject.Inject;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
@@ -16,11 +17,22 @@ import java.util.List;
 import static java.util.stream.Collectors.toList;
 import static no.nav.syfo.util.DbUtil.nesteSekvensverdi;
 
+@Service
+@Transactional
+@Repository
 public class EpostDAO {
-    @Inject
+
     private JdbcTemplate jdbcTemplate;
-    @Inject
+
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
+
+    public EpostDAO(
+            NamedParameterJdbcTemplate namedParameterJdbcTemplate,
+            JdbcTemplate jdbcTemplate
+    ) {
+        this.namedParameterJdbcTemplate = namedParameterJdbcTemplate;
+        this.jdbcTemplate = jdbcTemplate;
+    }
 
     public List<PEpost> finnEposterForSending() {
         return jdbcTemplate.query("select * from EPOST", new EpostMapper())

@@ -1,5 +1,6 @@
 package no.nav.syfo.service;
 
+import lombok.extern.slf4j.Slf4j;
 import no.nav.syfo.domain.model.TpsPerson;
 import no.nav.tjeneste.virksomhet.brukerprofil.v3.BrukerprofilV3;
 import no.nav.tjeneste.virksomhet.brukerprofil.v3.HentKontaktinformasjonOgPreferanserPersonIdentErUtgaatt;
@@ -8,24 +9,33 @@ import no.nav.tjeneste.virksomhet.brukerprofil.v3.HentKontaktinformasjonOgPrefer
 import no.nav.tjeneste.virksomhet.brukerprofil.v3.informasjon.WSNorskIdent;
 import no.nav.tjeneste.virksomhet.brukerprofil.v3.informasjon.WSPerson;
 import no.nav.tjeneste.virksomhet.brukerprofil.v3.meldinger.WSHentKontaktinformasjonOgPreferanserRequest;
-import org.slf4j.Logger;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.stereotype.Service;
 
-import javax.inject.Inject;
-
+import static no.nav.syfo.config.CacheConfig.CACHENAME_TPS_BRUKER;
+import static no.nav.syfo.config.CacheConfig.CACHENAME_TPS_NAVN;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 import static org.apache.commons.lang3.text.WordUtils.capitalize;
-import static org.slf4j.LoggerFactory.getLogger;
 
+@Slf4j
+@Service
 public class BrukerprofilService {
-    private static final Logger LOG = getLogger(BrukerprofilService.class);
 
-    @Inject
     private BrukerprofilV3 brukerprofilV3;
-    @Inject
+
     private AktoerService aktoerService;
 
-    @Cacheable(value = "tpsnavn", keyGenerator = "userkeygenerator")
+    @Autowired
+    public BrukerprofilService(
+            BrukerprofilV3 brukerprofilV3,
+            AktoerService aktoerService
+    ) {
+        this.brukerprofilV3 = brukerprofilV3;
+        this.aktoerService = aktoerService;
+    }
+
+    @Cacheable(value = CACHENAME_TPS_NAVN, key = "#aktoerId", condition = "#aktoerId != null")
     public String finnBrukerPersonnavnByAktoerId(String aktoerId) {
         return finnBrukerPersonnavnByFnr(aktoerService.hentFnrForAktoer(aktoerId));
     }
@@ -34,10 +44,10 @@ public class BrukerprofilService {
         return hentBruker(fnr).navn;
     }
 
-    @Cacheable(value = "tpsbruker", keyGenerator = "userkeygenerator")
+    @Cacheable(value = CACHENAME_TPS_BRUKER, key = "#fnr", condition = "#fnr != null")
     public TpsPerson hentBruker(String fnr) {
         if (isBlank(fnr) || !fnr.matches("\\d{11}$")) {
-            LOG.error("Forsøker å hente brukerinfo for fnr {}", fnr);
+            log.error("Forsøker å hente brukerinfo for fnr {}", fnr);
             throw new RuntimeException();
         }
         try {
@@ -60,13 +70,11 @@ public class BrukerprofilService {
             String navnFraTps = wsPerson.getPersonnavn().getFornavn() + " " + mellomnavn + wsPerson.getPersonnavn().getEtternavn();
             return new TpsPerson().navn(capitalize(navnFraTps.toLowerCase(), '-', ' '));
         } catch (HentKontaktinformasjonOgPreferanserPersonIdentErUtgaatt | HentKontaktinformasjonOgPreferanserSikkerhetsbegrensning | HentKontaktinformasjonOgPreferanserPersonIkkeFunnet e) {
-            LOG.warn("Exception mot TPS med ident {}", fnr, e);
+            log.warn("Exception mot TPS med ident {}", fnr, e);
             return new TpsPerson().navn("Vi fant ikke navnet");
         } catch (RuntimeException e) {
-            LOG.error("Runtimefeil mot TPS. Kaster videre istedenfor å håndtere fordi bruker kan være kode 6.", e);
+            log.error("Runtimefeil mot TPS. Kaster videre istedenfor å håndtere fordi bruker kan være kode 6.", e);
             throw e;
         }
     }
-
-
 }

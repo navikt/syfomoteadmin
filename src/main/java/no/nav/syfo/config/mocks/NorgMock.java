@@ -1,7 +1,13 @@
 package no.nav.syfo.config.mocks;
 
 import no.nav.tjeneste.virksomhet.organisasjon.ressurs.enhet.v1.*;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Service;
 
+import static no.nav.syfo.config.consumer.NorgConfig.MOCK_KEY;
+
+@Service
+@ConditionalOnProperty(value = MOCK_KEY, havingValue = "true")
 public class NorgMock implements OrganisasjonRessursEnhetV1 {
 
     @Override

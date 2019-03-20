@@ -6,17 +6,20 @@ replicas:
   max: 1
   cpuThresholdPercentage: 80
 port: 8080
-webproxy: true
 healthcheck:
   liveness:
-    path: syfomoteadmin/internal/isAlive
-    initialDelay: 60
+    path: /syfomoteadmin/internal/isAlive
+    initialDelay: 120
+    timeout: 1
+    periodSeconds: 10
+    failureThreshold: 3
   readiness:
-    path: syfomoteadmin/internal/isAlive
-    initialDelay: 60
+    path: /syfomoteadmin/internal/isReady
+    initialDelay: 120
+    timeout: 1
 prometheus:
   enabled: true
-  path: syfomoteadmin/internal/metrics
+  path: /syfomoteadmin/internal/prometheus
 resources:
   limits:
     cpu: 3000m
@@ -49,6 +52,10 @@ fasitResources:
     resourceType: applicationproperties
   - alias: moteadminDB
     resourceType: datasource
+    propertyMap:
+      url: SPRING_DATASOURCE_URL
+      username: SPRING_DATASOURCE_USERNAME
+      password: SPRING_DATASOURCE_PASSWORD
   - alias: syfoveilederoppgaver.systemapi
     resourceType: credential
   - alias: smtpServer
@@ -77,20 +84,36 @@ fasitResources:
     resourceType: queuemanager
   - alias: syfomoteadmin_channel
     resourceType: channel
-  - alias: VARSELPRODUKSJON.VARSLINGER
+  - alias: "VARSELPRODUKSJON.VARSLINGER"
     resourceType: queue
-  - alias: VARSELPRODUKSJON.BEST_VARSEL_M_HANDLING
+    propertyMap:
+      queueName: SERVICEVARSEL_QUEUENAME
+  - alias: "VARSELPRODUKSJON.BEST_VARSEL_M_HANDLING"
     resourceType: queue
-  - alias: VARSELPRODUKSJON.STOPP_VARSEL_UTSENDING
+    propertyMap:
+      queueName: BESTVARSELMHANDLING_QUEUENAME
+  - alias: "VARSELPRODUKSJON.STOPP_VARSEL_UTSENDING"
     resourceType: queue
-  - alias: henvendelse_OPPGAVE.HENVENDELSE
+    propertyMap:
+      queueName: STOPPREVARSEL_QUEUENAME
+  - alias: "henvendelse_OPPGAVE.HENVENDELSE"
     resourceType: queue
+    propertyMap:
+      queueName: HENVENDELSEOPPGAVEVARSEL_QUEUENAME
 
   # OIDC med AzureAD B2C
   - alias: aad_b2c_clientid
     resourceType: credential
+    propertyMap:
+      username: NO_NAV_SECURITY_OIDC_ISSUER_SELVBETJENING_ACCEPTEDAUDIENCE
   - alias: aad_b2c_discovery
     resourceType: baseurl
+    propertyMap:
+      url: NO_NAV_SECURITY_OIDC_ISSUER_SELVBETJENING_DISCOVERYURL
+  - alias: opam_oidc_discovery
+    resourceType: baseurl
+    propertyMap:
+      url: NO_NAV_SECURITY_OIDC_ISSUER_INTERN_DISCOVERYURL
   - alias: isso-host
     resourceType: baseurl
   - alias: isso-jwks

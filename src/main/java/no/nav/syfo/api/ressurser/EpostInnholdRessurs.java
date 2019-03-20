@@ -1,83 +1,99 @@
 package no.nav.syfo.api.ressurser;
 
+import no.nav.security.spring.oidc.validation.api.ProtectedWithClaims;
+import no.nav.syfo.api.domain.RSEpostInnhold;
 import no.nav.syfo.domain.model.*;
 import no.nav.syfo.repository.model.PEpost;
-import no.nav.syfo.api.domain.RSEpostInnhold;
-import no.nav.syfo.service.TilgangService;
 import no.nav.syfo.service.AktoerService;
 import no.nav.syfo.service.MoteService;
+import no.nav.syfo.service.TilgangService;
 import no.nav.syfo.service.varselinnhold.ArbeidsgiverVarselService;
 import no.nav.syfo.util.ServiceVarselInnholdUtil;
-import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
-import javax.ws.rs.*;
+import javax.servlet.http.HttpServletResponse;
+import javax.ws.rs.ForbiddenException;
+import java.io.IOException;
 
-import static javax.ws.rs.core.MediaType.APPLICATION_JSON;
+import static no.nav.syfo.oidc.OIDCIssuer.INTERN;
 import static no.nav.syfo.util.ServiceVarselInnholdUtil.*;
+import static org.springframework.http.HttpStatus.BAD_REQUEST;
+import static org.springframework.http.HttpStatus.FORBIDDEN;
+import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
-@Controller
-@Path("/epostinnhold/{varseltype}")
-@Consumes(APPLICATION_JSON)
-@Produces("application/json;charset=UTF-8")
+@RestController
+@RequestMapping(value = "/api/epostinnhold/{varseltype}")
+@ProtectedWithClaims(issuer = INTERN)
 public class EpostInnholdRessurs {
 
     static final String BRUKER = "Bruker";
     static final String BEKREFTET = "BEKREFTET";
     private static final String AVBRUTT = "AVBRUTT";
 
-    @Inject
     private MoteService moteService;
-    @Inject
+
     private TilgangService tilgangService;
-    @Inject
+
     private AktoerService aktoerService;
-    @Inject
+
     private ArbeidsgiverVarselService arbeidsgiverVarselService;
 
-    @GET
-    public RSEpostInnhold genererEpostInnholdForFrontend(@PathParam("varseltype") String varseltype,
-                                                         @QueryParam("motedeltakeruuid") String motedeltakeruuid,
-                                                         @QueryParam("valgtAlternativId") String valgtAlternativId) {
+    @Inject
+    public EpostInnholdRessurs(
+            MoteService moteService,
+            TilgangService tilgangService,
+            AktoerService aktoerService,
+            ArbeidsgiverVarselService arbeidsgiverVarselService
+    ) {
+        this.moteService = moteService;
+        this.tilgangService = tilgangService;
+        this.aktoerService = aktoerService;
+        this.arbeidsgiverVarselService = arbeidsgiverVarselService;
+    }
+
+    @GetMapping(produces = APPLICATION_JSON_VALUE)
+    public RSEpostInnhold genererEpostInnholdForFrontend(@PathVariable(value = "varseltype") String varseltype,
+                                                         @RequestParam(value = "motedeltakeruuid") String motedeltakeruuid,
+                                                         @RequestParam(value = "valgtAlternativId", required = false) String valgtAlternativId) {
         Mote Mote = moteService.findMoteByMotedeltakerUuid(motedeltakeruuid);
         String sykmeldtFnr = aktoerService.hentFnrForAktoer(Mote.sykmeldt().aktorId);
-        if (tilgangService.sjekkTilgangTilPerson(sykmeldtFnr).getStatus() == 200) {
-            Motedeltaker motedeltaker = Mote.motedeltakere.stream()
-                    .filter(m -> m.uuid.equals(motedeltakeruuid))
+
+        tilgangService.kastExceptionHvisIkkeVeilederHarTilgangTilPerson(sykmeldtFnr);
+
+        Motedeltaker motedeltaker = Mote.motedeltakere.stream()
+                .filter(m -> m.uuid.equals(motedeltakeruuid))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("Fant ikke møtedeltakeren!"));
+
+        if (valgtAlternativId != null) {
+            TidOgSted valgtTidOgSted = motedeltaker.tidOgStedAlternativer.stream()
+                    .filter(tidOgSted -> Long.toString(tidOgSted.id).equals(valgtAlternativId))
                     .findFirst()
-                    .orElseThrow(() -> new RuntimeException("Fant ikke møtedeltakeren!"));
-
-            if (valgtAlternativId != null) {
-                TidOgSted valgtTidOgSted = motedeltaker.tidOgStedAlternativer.stream()
-                        .filter(tidOgSted -> Long.toString(tidOgSted.id).equals(valgtAlternativId))
-                        .findFirst()
-                        .orElseThrow(() -> new RuntimeException("Fant ikke det valgte tidogsted-alternativet!!"));
-                Mote.valgtTidOgSted(valgtTidOgSted);
-            }
-
-            if (BRUKER.equals(motedeltaker.motedeltakertype)) {
-                if (AVBRUTT.equals(varseltype)) {
-                    if (Mote.status.equals(MoteStatus.BEKREFTET)) {
-                        ServiceVarselInnholdUtil.ServiceVarsel avbrytEpost = avbrytBekreftetEpost();
-                        return new RSEpostInnhold().innhold(avbrytEpost.innhold).emne(avbrytEpost.emne);
-                    }
-                    ServiceVarselInnholdUtil.ServiceVarsel avbrytEpost = avbrytEpost();
-                    return new RSEpostInnhold().innhold(avbrytEpost.innhold).emne(avbrytEpost.emne);
-                } else if (BEKREFTET.equals(varseltype)) {
-                    ServiceVarselInnholdUtil.ServiceVarsel bekreftetEpost = bekreftetEpost(Mote);
-                    return new RSEpostInnhold().innhold(bekreftetEpost.innhold).emne(bekreftetEpost.emne);
-                }
-            }
-
-            Varseltype type = Varseltype.valueOf(String.valueOf(varseltype.toUpperCase()));
-            if (type.equals(Varseltype.AVBRUTT) && Mote.status.equals(MoteStatus.BEKREFTET)) {
-                type = Varseltype.AVBRUTT_BEKREFTET;
-            }
-            PEpost epost = arbeidsgiverVarselService.varselinnhold(type, Mote, false);
-            return new RSEpostInnhold().emne(epost.emne).innhold(finnInnholdIHTMLTag(epost.innhold));
-        } else {
-            throw new ForbiddenException("Innlogget bruker har ikke tilgang til denne informasjonen");
+                    .orElseThrow(() -> new RuntimeException("Fant ikke det valgte tidogsted-alternativet!!"));
+            Mote.valgtTidOgSted(valgtTidOgSted);
         }
+
+        if (BRUKER.equals(motedeltaker.motedeltakertype)) {
+            if (AVBRUTT.equals(varseltype)) {
+                if (Mote.status.equals(MoteStatus.BEKREFTET)) {
+                    ServiceVarselInnholdUtil.ServiceVarsel avbrytEpost = avbrytBekreftetEpost();
+                    return new RSEpostInnhold().innhold(avbrytEpost.innhold).emne(avbrytEpost.emne);
+                }
+                ServiceVarselInnholdUtil.ServiceVarsel avbrytEpost = avbrytEpost();
+                return new RSEpostInnhold().innhold(avbrytEpost.innhold).emne(avbrytEpost.emne);
+            } else if (BEKREFTET.equals(varseltype)) {
+                ServiceVarselInnholdUtil.ServiceVarsel bekreftetEpost = bekreftetEpost(Mote);
+                return new RSEpostInnhold().innhold(bekreftetEpost.innhold).emne(bekreftetEpost.emne);
+            }
+        }
+
+        Varseltype type = Varseltype.valueOf(String.valueOf(varseltype.toUpperCase()));
+        if (type.equals(Varseltype.AVBRUTT) && Mote.status.equals(MoteStatus.BEKREFTET)) {
+            type = Varseltype.AVBRUTT_BEKREFTET;
+        }
+        PEpost epost = arbeidsgiverVarselService.varselinnhold(type, Mote, false);
+        return new RSEpostInnhold().emne(epost.emne).innhold(finnInnholdIHTMLTag(epost.innhold));
     }
 
     //vil helst ikke dra inn XPath bare for dette. Bør vurderes om det blir mer slikt.
@@ -85,5 +101,15 @@ public class EpostInnholdRessurs {
         innhold = innhold.split("<html>")[1];
         innhold = innhold.split("</html>")[0];
         return innhold;
+    }
+
+    @ExceptionHandler({IllegalArgumentException.class})
+    void handleBadRequests(HttpServletResponse response) throws IOException {
+        response.sendError(BAD_REQUEST.value(), "Vi kunne ikke tolke inndataene :/");
+    }
+
+    @ExceptionHandler({ForbiddenException.class})
+    void handleForbiddenRequests(HttpServletResponse response) throws IOException {
+        response.sendError(FORBIDDEN.value(), "Handling er forbudt");
     }
 }
