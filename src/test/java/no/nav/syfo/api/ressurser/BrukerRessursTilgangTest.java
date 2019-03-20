@@ -3,11 +3,13 @@ package no.nav.syfo.api.ressurser;
 import no.nav.syfo.api.domain.RSBruker;
 import no.nav.syfo.domain.model.Kontaktinfo;
 import no.nav.syfo.domain.model.TpsPerson;
+import no.nav.syfo.oidc.OIDCIssuer;
 import no.nav.syfo.service.BrukerprofilService;
 import no.nav.syfo.service.DkifService;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
+import org.springframework.boot.test.mock.mockito.MockBean;
 
 import javax.inject.Inject;
 import javax.ws.rs.ForbiddenException;
@@ -25,9 +27,9 @@ public class BrukerRessursTilgangTest extends AbstractRessursTilgangTest {
             .skjermetBruker(false);
     @Inject
     private BrukerRessurs brukerRessurs;
-    @Mock
+    @MockBean
     private BrukerprofilService brukerprofilService;
-    @Mock
+    @MockBean
     private DkifService dkifService;
 
     @Before
@@ -64,7 +66,7 @@ public class BrukerRessursTilgangTest extends AbstractRessursTilgangTest {
         mockSvarFraTilgangTilBruker(ARBEIDSTAKER_FNR, OK);
 
         Kontaktinfo kontaktinfo = new Kontaktinfo().tlf("12345678").skalHaVarsel(true);
-        when(dkifService.hentKontaktinfoFnr(ARBEIDSTAKER_FNR)).thenReturn(kontaktinfo);
+        when(dkifService.hentKontaktinfoFnr(ARBEIDSTAKER_FNR, OIDCIssuer.INTERN)).thenReturn(kontaktinfo);
 
         RSBruker bruker = brukerRessurs.bruker(ARBEIDSTAKER_FNR);
 

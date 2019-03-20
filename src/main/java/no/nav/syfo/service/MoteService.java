@@ -3,6 +3,7 @@ package no.nav.syfo.service;
 import no.nav.security.oidc.context.OIDCRequestContextHolder;
 import no.nav.syfo.domain.model.*;
 import no.nav.syfo.metric.Metrikk;
+import no.nav.syfo.oidc.OIDCIssuer;
 import no.nav.syfo.repository.dao.FeedDAO;
 import no.nav.syfo.repository.dao.MoteDAO;
 import no.nav.syfo.repository.dao.TidOgStedDAO;
@@ -174,8 +175,8 @@ public class MoteService {
     }
 
 
-    public boolean harAlleSvartPaaSisteForespoersel(Mote Mote) {
-        boolean skalSykmeldtHaVarsler = dkifService.hentKontaktinfoAktoerId(Mote.sykmeldt().aktorId).skalHaVarsel;
+    public boolean harAlleSvartPaaSisteForespoersel(Mote Mote, String oidcIssuer) {
+        boolean skalSykmeldtHaVarsler = dkifService.hentKontaktinfoAktoerId(Mote.sykmeldt().aktorId, oidcIssuer).skalHaVarsel;
         LocalDateTime nyesteAlternativOpprettetTidspunkt = Mote.alternativer.stream().sorted((o1, o2) -> o2.created.compareTo(o1.created)).findFirst().get().created;
 
         return Mote.motedeltakere.stream()
@@ -212,7 +213,7 @@ public class MoteService {
             metrikk.reportAntallDagerSiden(Mote.opprettetTidspunkt, "antallDagerArbeidsgiverSvar");
         }
 
-        if (harAlleSvartPaaSisteForespoersel(Mote)) {
+        if (harAlleSvartPaaSisteForespoersel(Mote, OIDCIssuer.EKSTERN)) {
             feedDAO.createFeedHendelse(new PFeedHendelse()
                     .sistEndretAv(Mote.eier)
                     .type(ALLE_SVAR_MOTTATT.name())

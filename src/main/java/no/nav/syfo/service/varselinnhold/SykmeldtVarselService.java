@@ -3,6 +3,7 @@ package no.nav.syfo.service.varselinnhold;
 import no.nav.syfo.domain.model.Kontaktinfo;
 import no.nav.syfo.domain.model.Mote;
 import no.nav.syfo.domain.model.Varseltype;
+import no.nav.syfo.oidc.OIDCIssuer;
 import no.nav.syfo.service.DkifService;
 import no.nav.syfo.service.ServiceVarselService;
 import no.nav.syfo.service.mq.MqOppgaveVarselService;
@@ -32,7 +33,7 @@ public class SykmeldtVarselService {
     }
 
     public void sendVarsel(Varseltype varseltype, Mote mote) {
-        Kontaktinfo kontaktinfo = dkifService.hentKontaktinfoAktoerId(mote.sykmeldt().aktorId);
+        Kontaktinfo kontaktinfo = dkifService.hentKontaktinfoAktoerId(mote.sykmeldt().aktorId, OIDCIssuer.INTERN);
         if (!kontaktinfo.skalHaVarsel) {
             return;
         }
