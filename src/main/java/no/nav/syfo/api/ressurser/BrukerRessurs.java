@@ -4,6 +4,7 @@ import no.nav.security.spring.oidc.validation.api.ProtectedWithClaims;
 import no.nav.syfo.api.domain.RSBruker;
 import no.nav.syfo.api.domain.RSReservasjon;
 import no.nav.syfo.domain.model.Kontaktinfo;
+import no.nav.syfo.oidc.OIDCIssuer;
 import no.nav.syfo.service.AktoerService;
 import no.nav.syfo.service.BrukerprofilService;
 import no.nav.syfo.service.DkifService;
@@ -22,7 +23,7 @@ import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController
-@RequestMapping(value = "/brukerinfo/{ident}")
+@RequestMapping(value = "/api/brukerinfo/{ident}")
 @ProtectedWithClaims(issuer = INTERN)
 public class BrukerRessurs {
 
@@ -45,7 +46,7 @@ public class BrukerRessurs {
     }
 
     @GetMapping(produces = APPLICATION_JSON_VALUE)
-    @RequestMapping(value = "/api/navn")
+    @RequestMapping(value = "/navn")
     public RSBruker hentBruker(@PathVariable("ident") String ident) {
         String fnr;
         if (ident.matches("\\d{11}$")) {
@@ -70,7 +71,7 @@ public class BrukerRessurs {
         tilgangService.kastExceptionHvisIkkeVeilederHarTilgangTilPerson(fnr);
 
         RSBruker rsBruker = new RSBruker();
-        Kontaktinfo kontaktinfo = dkifService.hentKontaktinfoFnr(fnr);
+        Kontaktinfo kontaktinfo = dkifService.hentKontaktinfoFnr(fnr, OIDCIssuer.INTERN);
         rsBruker.kontaktinfo
                 .tlf(kontaktinfo.tlf)
                 .epost(kontaktinfo.epost)

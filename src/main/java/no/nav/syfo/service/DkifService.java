@@ -1,6 +1,8 @@
 package no.nav.syfo.service;
 
 import lombok.extern.slf4j.Slf4j;
+import no.nav.security.oidc.context.OIDCRequestContextHolder;
+import no.nav.syfo.config.consumer.DkifConfig;
 import no.nav.syfo.domain.model.Kontaktinfo;
 import no.nav.tjeneste.virksomhet.digitalkontaktinformasjon.v1.DigitalKontaktinformasjonV1;
 import no.nav.tjeneste.virksomhet.digitalkontaktinformasjon.v1.HentDigitalKontaktinformasjonKontaktinformasjonIkkeFunnet;
@@ -20,34 +22,40 @@ import static java.util.Optional.ofNullable;
 import static no.nav.syfo.config.CacheConfig.CACHENAME_DKIF_AKTORID;
 import static no.nav.syfo.config.CacheConfig.CACHENAME_DKIF_FNR;
 import static no.nav.syfo.domain.model.Kontaktinfo.FeilAarsak.*;
+import static no.nav.syfo.util.OIDCUtil.getIssuerToken;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
 @Slf4j
 @Service
 public class DkifService {
 
-    private DigitalKontaktinformasjonV1 dkifV1;
-
     private AktoerService aktoerService;
+    private DkifConfig dkifConfig;
+    private OIDCRequestContextHolder contextHolder;
 
     @Inject
     public DkifService(
             AktoerService aktoerService,
-            DigitalKontaktinformasjonV1 dkifV1
+            DkifConfig dkifConfig,
+            OIDCRequestContextHolder contextHolder
     ) {
         this.aktoerService = aktoerService;
-        this.dkifV1 = dkifV1;
+        this.dkifConfig = dkifConfig;
+        this.contextHolder = contextHolder;
     }
 
     @Cacheable(value = CACHENAME_DKIF_FNR, key = "#fnr", condition = "#fnr != null")
-    public Kontaktinfo hentKontaktinfoFnr(String fnr) {
+    public Kontaktinfo hentKontaktinfoFnr(String fnr, String oidcIssuer) {
         if (isBlank(fnr) || !fnr.matches("\\d{11}$")) {
             log.error("Forsøker å hente kontaktinfor for fnr {}", fnr);
             throw new RuntimeException();
         }
 
         try {
-            WSKontaktinformasjon response = dkifV1.hentDigitalKontaktinformasjon(new WSHentDigitalKontaktinformasjonRequest().withPersonident(fnr)).getDigitalKontaktinformasjon();
+            String oidcToken = getIssuerToken(this.contextHolder, oidcIssuer);
+            WSHentDigitalKontaktinformasjonRequest request = new WSHentDigitalKontaktinformasjonRequest().withPersonident(fnr);
+            WSKontaktinformasjon response = dkifConfig.hentDigitalKontaktinformasjon(request, oidcToken).getDigitalKontaktinformasjon();
+
             if ("true".equalsIgnoreCase(response.getReservasjon())) {
                 return new Kontaktinfo().skalHaVarsel(false).feilAarsak(RESERVERT);
             }
@@ -91,7 +99,7 @@ public class DkifService {
     }
 
     @Cacheable(value = CACHENAME_DKIF_AKTORID, key = "#aktoerId", condition = "#aktoerId != null")
-    public Kontaktinfo hentKontaktinfoAktoerId(String aktoerId) {
-        return hentKontaktinfoFnr(aktoerService.hentFnrForAktoer(aktoerId));
+    public Kontaktinfo hentKontaktinfoAktoerId(String aktoerId, String oidcIssuer) {
+        return hentKontaktinfoFnr(aktoerService.hentFnrForAktoer(aktoerId), oidcIssuer);
     }
 }
