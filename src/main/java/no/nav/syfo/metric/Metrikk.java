@@ -27,12 +27,12 @@ public class Metrikk {
         ).increment();
     }
 
-    public void tellHttpFeil(int feilkode) {
+    public void tellHttpKall(int kode) {
         registry.counter(
                 addPrefix("httpstatus"),
                 Tags.of(
                         "type", "info",
-                        "kode", String.valueOf(feilkode)
+                        "kode", String.valueOf(kode)
                 )
         ).increment();
     }
