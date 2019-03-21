@@ -1,14 +1,10 @@
-FROM docker.adeo.no:5000/pus/maven as builder
-ADD / /source
-WORKDIR /source
-RUN mvn package -DskipTests
-
-FROM navikt/java:8
-LABEL maintainer="Team Sykefravaer-veden"
-COPY --from=builder /source/target/syfomoteadmin-*.jar app.jar
+FROM navikt/java:8-appdynamics
+ENV APPD_ENABLED=true
+COPY target/app.jar /app/
 
 ENV JAVA_OPTS="-Djava.security.egd=file:/dev/./urandom \
-               -Dspring.profiles.active=remote \
-               -Dhttps.proxyHost=webproxy-nais.nav.no \
-               -Dhttps.proxyPort=8088 \
-               -Dhttp.nonProxyHosts=*.adeo.no|*.preprod.local|*oera-q.local|*.oera.no"
+          -Dspring.profiles.active=remote \
+          -Dhttps.proxyHost=webproxy-nais.nav.no \
+          -Dhttps.proxyPort=8088 \
+          -Dhttp.nonProxyHosts=*.adeo.no|*.preprod.local|*oera-q.local|*.oera.no"
+
