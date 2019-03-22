@@ -2,26 +2,16 @@ package no.nav.syfo.api.ressurser;
 
 import no.nav.security.oidc.context.OIDCRequestContextHolder;
 import no.nav.security.spring.oidc.validation.api.ProtectedWithClaims;
-import no.nav.syfo.api.domain.bruker.BrukerMote;
-import no.nav.syfo.api.domain.bruker.BrukerMoteSvar;
-import no.nav.syfo.api.domain.bruker.BrukerOppdaterMoteSvar;
-import no.nav.syfo.service.AktoerService;
-import no.nav.syfo.service.BrukertilgangService;
-import no.nav.syfo.service.MoteBrukerService;
+import no.nav.syfo.api.domain.bruker.*;
+import no.nav.syfo.service.*;
 import no.nav.syfo.util.Brukerkontekst;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
-import javax.servlet.http.HttpServletResponse;
-import javax.validation.ConstraintViolationException;
-import javax.ws.rs.ForbiddenException;
-import javax.ws.rs.NotFoundException;
-import java.io.IOException;
 import java.util.List;
 
 import static no.nav.syfo.oidc.OIDCIssuer.EKSTERN;
 import static no.nav.syfo.util.OIDCUtil.getSubjectEkstern;
-import static org.springframework.http.HttpStatus.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController
@@ -77,20 +67,5 @@ public class BrukerMoterRessurs {
             @RequestBody BrukerMoteSvar motesvar
     ) {
         return moteBrukerService.sendSvar(moteUuid, motesvar);
-    }
-
-    @ExceptionHandler({IllegalArgumentException.class, ConstraintViolationException.class})
-    void handleBadRequests(HttpServletResponse response) throws IOException {
-        response.sendError(BAD_REQUEST.value(), "Vi kunne ikke tolke inndataene :/");
-    }
-
-    @ExceptionHandler({NotFoundException.class})
-    void handleNotFoundRequests(HttpServletResponse response) throws IOException {
-        response.sendError(NOT_FOUND.value(), "Fant ikke møte");
-    }
-
-    @ExceptionHandler({ForbiddenException.class})
-    void handleForbiddenRequests(HttpServletResponse response) throws IOException {
-        response.sendError(FORBIDDEN.value(), "Handling er forbudt");
     }
 }

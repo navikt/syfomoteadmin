@@ -4,22 +4,15 @@ import no.nav.security.spring.oidc.validation.api.ProtectedWithClaims;
 import no.nav.syfo.api.domain.RSEpostInnhold;
 import no.nav.syfo.domain.model.*;
 import no.nav.syfo.repository.model.PEpost;
-import no.nav.syfo.service.AktoerService;
-import no.nav.syfo.service.MoteService;
-import no.nav.syfo.service.TilgangService;
+import no.nav.syfo.service.*;
 import no.nav.syfo.service.varselinnhold.ArbeidsgiverVarselService;
 import no.nav.syfo.util.ServiceVarselInnholdUtil;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
-import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.ForbiddenException;
-import java.io.IOException;
 
 import static no.nav.syfo.oidc.OIDCIssuer.INTERN;
 import static no.nav.syfo.util.ServiceVarselInnholdUtil.*;
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
-import static org.springframework.http.HttpStatus.FORBIDDEN;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController
@@ -101,15 +94,5 @@ public class EpostInnholdRessurs {
         innhold = innhold.split("<html>")[1];
         innhold = innhold.split("</html>")[0];
         return innhold;
-    }
-
-    @ExceptionHandler({IllegalArgumentException.class})
-    void handleBadRequests(HttpServletResponse response) throws IOException {
-        response.sendError(BAD_REQUEST.value(), "Vi kunne ikke tolke inndataene :/");
-    }
-
-    @ExceptionHandler({ForbiddenException.class})
-    void handleForbiddenRequests(HttpServletResponse response) throws IOException {
-        response.sendError(FORBIDDEN.value(), "Handling er forbudt");
     }
 }

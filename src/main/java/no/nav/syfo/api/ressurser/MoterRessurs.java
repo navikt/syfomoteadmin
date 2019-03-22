@@ -12,16 +12,11 @@ import no.nav.syfo.repository.dao.TidOgStedDAO;
 import no.nav.syfo.repository.model.PMotedeltakerAktorId;
 import no.nav.syfo.repository.model.PMotedeltakerArbeidsgiver;
 import no.nav.syfo.service.*;
-import no.nav.syfo.service.varselinnhold.ArbeidsgiverVarselService;
-import no.nav.syfo.service.varselinnhold.SykmeldtVarselService;
-import no.nav.syfo.service.varselinnhold.VeilederVarselService;
-import org.springframework.http.HttpStatus;
+import no.nav.syfo.service.varselinnhold.*;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
-import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.ForbiddenException;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,7 +34,6 @@ import static no.nav.syfo.oidc.OIDCIssuer.INTERN;
 import static no.nav.syfo.util.MapUtil.map;
 import static no.nav.syfo.util.MapUtil.mapListe;
 import static no.nav.syfo.util.OIDCUtil.getSubjectIntern;
-import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.util.StringUtils.isEmpty;
 
@@ -239,15 +233,5 @@ public class MoterRessurs {
                 .filter(rsMote1 -> liste1.stream()
                         .anyMatch(rsMote2 -> rsMote2.id.equals(rsMote1.id)))
                 .collect(toList());
-    }
-
-    @ExceptionHandler({IllegalArgumentException.class})
-    void handleBadRequests(HttpServletResponse response) throws IOException {
-        response.sendError(BAD_REQUEST.value(), "Vi kunne ikke tolke inndataene :/");
-    }
-
-    @ExceptionHandler({ForbiddenException.class})
-    void handleForbiddenRequests(HttpServletResponse response) throws IOException {
-        response.sendError(HttpStatus.FORBIDDEN.value(), "Handling er forbudt");
     }
 }
