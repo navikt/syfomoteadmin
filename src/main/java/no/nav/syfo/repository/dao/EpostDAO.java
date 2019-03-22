@@ -10,6 +10,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.inject.Inject;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
@@ -23,9 +24,9 @@ import static no.nav.syfo.util.DbUtil.nesteSekvensverdi;
 public class EpostDAO {
 
     private JdbcTemplate jdbcTemplate;
-
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
+    @Inject
     public EpostDAO(
             NamedParameterJdbcTemplate namedParameterJdbcTemplate,
             JdbcTemplate jdbcTemplate

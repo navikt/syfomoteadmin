@@ -25,11 +25,11 @@ import static no.nav.syfo.util.MapUtil.mapListe;
 @Transactional
 @Repository
 public class TidOgStedDAO {
-    @Inject
+
     private JdbcTemplate jdbcTemplate;
-    @Inject
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
+    @Inject
     public TidOgStedDAO(
             NamedParameterJdbcTemplate namedParameterJdbcTemplate,
             JdbcTemplate jdbcTemplate

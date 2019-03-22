@@ -14,6 +14,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.inject.Inject;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
@@ -37,13 +38,12 @@ import static no.nav.syfo.util.MapUtil.mapListe;
 public class MotedeltakerDAO {
 
     private JdbcTemplate jdbcTemplate;
-
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
     private MoteDAO moteDAO;
-
     private TidOgStedDAO tidOgStedDAO;
 
+    @Inject
     public MotedeltakerDAO(
             NamedParameterJdbcTemplate namedParameterJdbcTemplate,
             JdbcTemplate jdbcTemplate,

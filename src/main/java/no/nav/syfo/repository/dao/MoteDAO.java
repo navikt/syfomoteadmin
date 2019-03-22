@@ -32,13 +32,12 @@ import static no.nav.syfo.util.MapUtil.map;
 public class MoteDAO {
 
     private JdbcTemplate jdbcTemplate;
-
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
     private MotedeltakerDAO motedeltakerDAO;
-
     private TidOgStedDAO tidOgStedDAO;
 
+    @Inject
     public MoteDAO(
             NamedParameterJdbcTemplate namedParameterJdbcTemplate,
             JdbcTemplate jdbcTemplate,

@@ -2,9 +2,7 @@ package no.nav.syfo.repository.dao;
 
 import no.nav.syfo.domain.model.HendelseMoteStatusEndret;
 import no.nav.syfo.domain.model.HendelsesType;
-import no.nav.syfo.repository.model.PHendelseMoteStatusEndret;
-import no.nav.syfo.repository.model.PHendelseVarselMotedeltaker;
-import no.nav.syfo.repository.model.PHendelseVarselVeileder;
+import no.nav.syfo.repository.model.*;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -13,6 +11,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.inject.Inject;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
@@ -29,9 +28,9 @@ import static no.nav.syfo.util.MapUtil.mapListe;
 public class HendelseDAO {
 
     private JdbcTemplate jdbcTemplate;
-
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
 
+    @Inject
     public HendelseDAO(
             NamedParameterJdbcTemplate namedParameterJdbcTemplate,
             JdbcTemplate jdbcTemplate
