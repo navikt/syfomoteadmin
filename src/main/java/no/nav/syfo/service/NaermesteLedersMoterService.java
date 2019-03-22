@@ -1,8 +1,6 @@
 package no.nav.syfo.service;
 
-import no.nav.syfo.domain.model.Ansatt;
-import no.nav.syfo.domain.model.Mote;
-import no.nav.syfo.domain.model.TidOgSted;
+import no.nav.syfo.domain.model.*;
 import no.nav.syfo.oidc.OIDCIssuer;
 import org.springframework.stereotype.Service;
 

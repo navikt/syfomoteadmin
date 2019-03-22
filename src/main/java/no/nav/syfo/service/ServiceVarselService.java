@@ -1,13 +1,8 @@
 package no.nav.syfo.service;
 
-import no.nav.melding.virksomhet.varsel.v1.varsel.XMLAktoerId;
-import no.nav.melding.virksomhet.varsel.v1.varsel.XMLParameter;
-import no.nav.melding.virksomhet.varsel.v1.varsel.XMLVarsel;
-import no.nav.melding.virksomhet.varsel.v1.varsel.XMLVarslingstyper;
+import no.nav.melding.virksomhet.varsel.v1.varsel.*;
 import no.nav.syfo.domain.model.Mote;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.*;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Service;
 

@@ -1,8 +1,6 @@
 package no.nav.syfo.service;
 
-import no.nav.syfo.domain.model.Mote;
-import no.nav.syfo.domain.model.MotedeltakerAktorId;
-import no.nav.syfo.domain.model.MotedeltakerArbeidsgiver;
+import no.nav.syfo.domain.model.*;
 import no.nav.syfo.repository.dao.MotedeltakerDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

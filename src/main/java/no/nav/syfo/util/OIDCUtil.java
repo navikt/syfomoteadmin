@@ -2,10 +2,7 @@ package no.nav.syfo.util;
 
 import com.nimbusds.jwt.JWTClaimsSet;
 import no.nav.security.oidc.OIDCConstants;
-import no.nav.security.oidc.context.OIDCClaims;
-import no.nav.security.oidc.context.OIDCRequestContextHolder;
-import no.nav.security.oidc.context.OIDCValidationContext;
-import no.nav.security.oidc.context.TokenContext;
+import no.nav.security.oidc.context.*;
 import no.nav.syfo.oidc.OIDCIssuer;
 import no.nav.syfo.service.ws.OnBehalfOfOutInterceptor;
 import org.apache.cxf.endpoint.Client;

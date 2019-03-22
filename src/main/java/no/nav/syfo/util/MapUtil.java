@@ -15,15 +15,24 @@ public class MapUtil {
     }
 
     public static <T, R, S extends R> S mapNullable(T fra, S til, BiConsumer<T, R> exp) {
-        return ofNullable(fra).map(f -> {exp.accept(f, til); return til;}).orElse(null);
+        return ofNullable(fra).map(f -> {
+            exp.accept(f, til);
+            return til;
+        }).orElse(null);
     }
 
     public static <T, R, S extends R> S mapNullable(T fra, S til, BiConsumer<T, R> exp, S other) {
-        return ofNullable(fra).map(f -> {exp.accept(f, til); return til;}).orElse(other);
+        return ofNullable(fra).map(f -> {
+            exp.accept(f, til);
+            return til;
+        }).orElse(other);
     }
 
     public static <T, R, S extends R> S map(T fra, S til, BiConsumer<T, R> exp) {
-        return of(fra).map(f -> {exp.accept(f, til); return til;}).orElseThrow(() -> new RuntimeException("Resultatet fra exp ble null"));
+        return of(fra).map(f -> {
+            exp.accept(f, til);
+            return til;
+        }).orElseThrow(() -> new RuntimeException("Resultatet fra exp ble null"));
     }
 
     public static <T, U extends T, R, S extends R> List<S> mapListe(List<U> fra, Supplier<S> til, BiConsumer<T, R> exp) {
@@ -35,7 +44,11 @@ public class MapUtil {
     }
 
     public static <T, U extends T, R, S extends R> Stream<S> mapStream(Stream<U> fra, Supplier<S> til, BiConsumer<T, R> exp) {
-        return ofNullable(fra).map(f -> f.map(f1 -> {S s = til.get(); exp.accept(f1, s); return s;})).orElse(empty());
+        return ofNullable(fra).map(f -> f.map(f1 -> {
+            S s = til.get();
+            exp.accept(f1, s);
+            return s;
+        })).orElse(empty());
     }
 
     public static <T, U extends T, R, S extends R> List<S> mapListe(List<U> fra, Function<U, S> til, BiConsumer<T, R> exp) {
@@ -47,7 +60,11 @@ public class MapUtil {
     }
 
     public static <T, U extends T, R, S extends R> Stream<S> mapStream(Stream<U> fra, Function<U, S> til, BiConsumer<T, R> exp) {
-        return ofNullable(fra).map(f -> f.map(f1 -> {S s = map(f1, til); exp.accept(f1, s); return s;})).orElse(empty());
+        return ofNullable(fra).map(f -> f.map(f1 -> {
+            S s = map(f1, til);
+            exp.accept(f1, s);
+            return s;
+        })).orElse(empty());
     }
 
     public static <T, R> R mapNullable(T fra, Function<T, R> exp) {

@@ -5,15 +5,9 @@ import no.nav.security.oidc.context.OIDCRequestContextHolder;
 import no.nav.syfo.config.consumer.SykefravaersoppfoelgingConfig;
 import no.nav.syfo.domain.model.Ansatt;
 import no.nav.syfo.domain.model.NaermesteLeder;
-import no.nav.tjeneste.virksomhet.sykefravaersoppfoelging.v1.HentNaermesteLederSikkerhetsbegrensning;
-import no.nav.tjeneste.virksomhet.sykefravaersoppfoelging.v1.HentNaermesteLedersAnsattListeSikkerhetsbegrensning;
-import no.nav.tjeneste.virksomhet.sykefravaersoppfoelging.v1.SykefravaersoppfoelgingV1;
-import no.nav.tjeneste.virksomhet.sykefravaersoppfoelging.v1.meldinger.WSHentNaermesteLederRequest;
-import no.nav.tjeneste.virksomhet.sykefravaersoppfoelging.v1.meldinger.WSHentNaermesteLedersAnsattListeRequest;
-import no.nav.tjeneste.virksomhet.sykefravaersoppfoelging.v1.meldinger.WSHentNaermesteLedersAnsattListeResponse;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
+import no.nav.tjeneste.virksomhet.sykefravaersoppfoelging.v1.*;
+import no.nav.tjeneste.virksomhet.sykefravaersoppfoelging.v1.meldinger.*;
+import org.springframework.beans.factory.annotation.*;
 import org.springframework.stereotype.Service;
 
 import javax.ws.rs.ForbiddenException;

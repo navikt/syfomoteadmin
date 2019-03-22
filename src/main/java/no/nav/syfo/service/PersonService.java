@@ -1,13 +1,8 @@
 package no.nav.syfo.service;
 
 import lombok.extern.slf4j.Slf4j;
-import no.nav.tjeneste.virksomhet.person.v3.HentPersonPersonIkkeFunnet;
-import no.nav.tjeneste.virksomhet.person.v3.HentPersonSikkerhetsbegrensning;
-import no.nav.tjeneste.virksomhet.person.v3.PersonV3;
-import no.nav.tjeneste.virksomhet.person.v3.informasjon.WSDiskresjonskoder;
-import no.nav.tjeneste.virksomhet.person.v3.informasjon.WSNorskIdent;
-import no.nav.tjeneste.virksomhet.person.v3.informasjon.WSPerson;
-import no.nav.tjeneste.virksomhet.person.v3.informasjon.WSPersonIdent;
+import no.nav.tjeneste.virksomhet.person.v3.*;
+import no.nav.tjeneste.virksomhet.person.v3.informasjon.*;
 import no.nav.tjeneste.virksomhet.person.v3.meldinger.WSHentPersonRequest;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;

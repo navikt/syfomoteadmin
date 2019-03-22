@@ -1,15 +1,9 @@
 package no.nav.syfo.service.varselinnhold;
 
 import no.nav.security.oidc.context.OIDCRequestContextHolder;
-import no.nav.syfo.domain.model.Mote;
-import no.nav.syfo.domain.model.NaermesteLeder;
-import no.nav.syfo.domain.model.TidOgSted;
-import no.nav.syfo.domain.model.Varseltype;
+import no.nav.syfo.domain.model.*;
 import no.nav.syfo.repository.model.PEpost;
-import no.nav.syfo.service.EpostService;
-import no.nav.syfo.service.HendelseService;
-import no.nav.syfo.service.SykefravaersoppfoelgingService;
-import no.nav.syfo.service.VeilederService;
+import no.nav.syfo.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;

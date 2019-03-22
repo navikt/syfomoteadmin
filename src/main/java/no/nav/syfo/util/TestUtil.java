@@ -4,7 +4,8 @@ import java.util.List;
 import java.util.function.BiConsumer;
 
 public class TestUtil {
-    private TestUtil() {}
+    private TestUtil() {
+    }
 
     public static <T, U> void biForEach(List<T> c1, List<U> c2, BiConsumer<T, U> consumer) {
         biForEach(c1, c2, 0, consumer);

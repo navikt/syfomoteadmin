@@ -1,8 +1,6 @@
 package no.nav.syfo.service.varselinnhold;
 
-import no.nav.syfo.domain.model.Kontaktinfo;
-import no.nav.syfo.domain.model.Mote;
-import no.nav.syfo.domain.model.Varseltype;
+import no.nav.syfo.domain.model.*;
 import no.nav.syfo.oidc.OIDCIssuer;
 import no.nav.syfo.service.DkifService;
 import no.nav.syfo.service.ServiceVarselService;

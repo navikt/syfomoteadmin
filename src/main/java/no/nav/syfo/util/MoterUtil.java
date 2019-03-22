@@ -1,9 +1,6 @@
 package no.nav.syfo.util;
 
-import no.nav.syfo.domain.model.Mote;
-import no.nav.syfo.domain.model.Motedeltaker;
-import no.nav.syfo.domain.model.MotedeltakerAktorId;
-import no.nav.syfo.domain.model.TidOgSted;
+import no.nav.syfo.domain.model.*;
 
 import java.time.LocalDateTime;
 import java.util.List;

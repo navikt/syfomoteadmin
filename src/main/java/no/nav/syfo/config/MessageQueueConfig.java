@@ -3,21 +3,15 @@ package no.nav.syfo.config;
 import com.ibm.mq.jms.MQQueue;
 import com.ibm.mq.jms.MQXAConnectionFactory;
 import no.nav.syfo.config.mqconfigs.mq.UserCredentialsXaConnectionFactoryAdapter;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.*;
 import org.springframework.boot.jms.XAConnectionFactoryWrapper;
 import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
+import org.springframework.context.annotation.*;
 import org.springframework.jms.annotation.EnableJms;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.jms.support.destination.DestinationResolver;
 
-import javax.jms.ConnectionFactory;
-import javax.jms.JMSException;
-import javax.jms.Queue;
+import javax.jms.*;
 
 import static com.ibm.mq.constants.CMQC.MQENC_NATIVE;
 import static com.ibm.msg.client.jms.JmsConstants.JMS_IBM_CHARACTER_SET;

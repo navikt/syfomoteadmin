@@ -2,9 +2,7 @@ package no.nav.syfo.service;
 
 import lombok.extern.slf4j.Slf4j;
 import no.nav.syfo.service.exceptions.MoteException;
-import no.nav.tjeneste.virksomhet.aktoer.v2.AktoerV2;
-import no.nav.tjeneste.virksomhet.aktoer.v2.HentAktoerIdForIdentPersonIkkeFunnet;
-import no.nav.tjeneste.virksomhet.aktoer.v2.HentIdentForAktoerIdPersonIkkeFunnet;
+import no.nav.tjeneste.virksomhet.aktoer.v2.*;
 import no.nav.tjeneste.virksomhet.aktoer.v2.meldinger.WSHentAktoerIdForIdentRequest;
 import no.nav.tjeneste.virksomhet.aktoer.v2.meldinger.WSHentIdentForAktoerIdRequest;
 import org.springframework.beans.factory.annotation.Autowired;

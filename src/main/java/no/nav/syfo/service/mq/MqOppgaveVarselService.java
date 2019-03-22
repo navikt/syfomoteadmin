@@ -1,9 +1,6 @@
 package no.nav.syfo.service.mq;
 
-import no.nav.melding.virksomhet.varselmedhandling.v1.varselmedhandling.AktoerId;
-import no.nav.melding.virksomhet.varselmedhandling.v1.varselmedhandling.ObjectFactory;
-import no.nav.melding.virksomhet.varselmedhandling.v1.varselmedhandling.Parameter;
-import no.nav.melding.virksomhet.varselmedhandling.v1.varselmedhandling.VarselMedHandling;
+import no.nav.melding.virksomhet.varselmedhandling.v1.varselmedhandling.*;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jms.core.JmsTemplate;
