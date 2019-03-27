@@ -86,8 +86,6 @@ public class STSClientConfig {
         stsClient.setEnableAppliesTo(false);
         stsClient.setAllowRenewing(false);
         stsClient.setLocation(location);
-        // For debugging
-        // stsClient.setFeatures(new ArrayList<Feature>(Arrays.asList(new LoggingFeature())));
 
         HashMap<String, Object> properties = new HashMap<>();
         properties.put(org.apache.cxf.rt.security.SecurityConstants.USERNAME, username);
