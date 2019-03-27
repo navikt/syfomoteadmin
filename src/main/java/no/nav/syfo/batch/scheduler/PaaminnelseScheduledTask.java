@@ -47,7 +47,6 @@ public class PaaminnelseScheduledTask {
     }
 
     @Transactional
-//    @Scheduled(cron = "0 * * * * *")
     @Scheduled(cron = "0 0 8 * * *")
     public void run() {
         if (toggle.toggleBatchPaaminelse()) {
