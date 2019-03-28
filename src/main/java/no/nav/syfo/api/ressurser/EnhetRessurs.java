@@ -2,6 +2,7 @@ package no.nav.syfo.api.ressurser;
 
 import no.nav.security.spring.oidc.validation.api.ProtectedWithClaims;
 import no.nav.syfo.api.domain.RSBrukerPaaEnhet;
+import no.nav.syfo.domain.model.TpsPerson;
 import no.nav.syfo.service.*;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,6 +12,7 @@ import java.util.List;
 import static java.util.stream.Collectors.toList;
 import static no.nav.syfo.oidc.OIDCIssuer.INTERN;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static no.nav.syfo.api.domain.RSBrukerPaaEnhet.Skjermingskode.*;
 
 @RestController
 @RequestMapping(value = "/api/enhet")
@@ -50,13 +52,17 @@ public class EnhetRessurs {
         return motedeltakerService.sykmeldteMedMoteHvorBeggeHarSvart(enhet)
                 .stream()
                 .map(motedeltakerAktorId -> aktoerService.hentFnrForAktoer(motedeltakerAktorId))
+                .filter(sykmeldtFnr -> tilgangService.harVeilederTilgangTilPerson(sykmeldtFnr))
                 .map(sykmeldtFnr -> new RSBrukerPaaEnhet()
                         .fnr(sykmeldtFnr)
-                        .skjermetEllerEgenAnsatt(sykmeldtErDiskresjonsmerketEllerEgenAnsatt(sykmeldtFnr)))
+                        .skjermetEllerEgenAnsatt(hentBrukersSkjermingskode(sykmeldtFnr)))
                 .collect(toList());
     }
 
-    private boolean sykmeldtErDiskresjonsmerketEllerEgenAnsatt(String fnr) {
-        return brukerprofilService.hentBruker(fnr).skjermetBruker() || egenAnsattService.erEgenAnsatt(fnr);
+    private RSBrukerPaaEnhet.Skjermingskode hentBrukersSkjermingskode(String fnr) {
+        TpsPerson bruker = brukerprofilService.hentBruker(fnr);
+        if (bruker.skjermetBruker())
+            return bruker.erKode6() ? KODE_6 : KODE_7;
+        return egenAnsattService.erEgenAnsatt(fnr) ? EGEN_ANSATT : INGEN;
     }
 }
