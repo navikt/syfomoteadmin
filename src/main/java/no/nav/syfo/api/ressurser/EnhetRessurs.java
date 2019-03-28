@@ -11,6 +11,7 @@ import java.util.List;
 import static java.util.stream.Collectors.toList;
 import static no.nav.syfo.oidc.OIDCIssuer.INTERN;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
+import static no.nav.syfo.api.domain.RSBrukerPaaEnhet.Skjermingskode.*;
 
 @RestController
 @RequestMapping(value = "/api/enhet")
@@ -50,13 +51,18 @@ public class EnhetRessurs {
         return motedeltakerService.sykmeldteMedMoteHvorBeggeHarSvart(enhet)
                 .stream()
                 .map(motedeltakerAktorId -> aktoerService.hentFnrForAktoer(motedeltakerAktorId))
+                .filter(sykmeldtFnr -> tilgangService.harVeilederTilgangTilPerson(sykmeldtFnr))
                 .map(sykmeldtFnr -> new RSBrukerPaaEnhet()
                         .fnr(sykmeldtFnr)
-                        .skjermetEllerEgenAnsatt(sykmeldtErDiskresjonsmerketEllerEgenAnsatt(sykmeldtFnr)))
+                        .skjermingskode(hentBrukersSkjermingskode(sykmeldtFnr)))
                 .collect(toList());
     }
 
-    private boolean sykmeldtErDiskresjonsmerketEllerEgenAnsatt(String fnr) {
-        return brukerprofilService.hentBruker(fnr).skjermetBruker() || egenAnsattService.erEgenAnsatt(fnr);
+    private RSBrukerPaaEnhet.Skjermingskode hentBrukersSkjermingskode(String fnr) {
+        if (brukerprofilService.hentBruker(fnr).skjermetBruker())
+            return DISKRESJONSMERKET;
+        if (egenAnsattService.erEgenAnsatt(fnr))
+            return EGEN_ANSATT;
+        return INGEN;
     }
 }
