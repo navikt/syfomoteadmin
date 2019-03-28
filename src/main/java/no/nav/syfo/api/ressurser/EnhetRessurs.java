@@ -60,9 +60,10 @@ public class EnhetRessurs {
     }
 
     private RSBrukerPaaEnhet.Skjermingskode hentBrukersSkjermingskode(String fnr) {
-        TpsPerson bruker = brukerprofilService.hentBruker(fnr);
-        if (bruker.skjermetBruker())
-            return bruker.erKode6() ? KODE_6 : KODE_7;
-        return egenAnsattService.erEgenAnsatt(fnr) ? EGEN_ANSATT : INGEN;
+        if (brukerprofilService.hentBruker(fnr).skjermetBruker())
+            return DISKRESJONSMERKET;
+        if (egenAnsattService.erEgenAnsatt(fnr))
+            return EGEN_ANSATT;
+        return INGEN;
     }
 }
