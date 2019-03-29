@@ -58,6 +58,11 @@ fasitResources:
       password: SPRING_DATASOURCE_PASSWORD
   - alias: syfoveilederoppgaver.systemapi
     resourceType: credential
+  - alias: loginservice_oidc
+    resourceType: azureoidc
+    propertyMap:
+      discoveryUri: NO_NAV_SECURITY_OIDC_ISSUER_VEILEDER_DISCOVERYURL
+      clientId: NO_NAV_SECURITY_OIDC_ISSUER_VEILEDER_ACCEPTEDAUDIENCE
   - alias: smtpServer
     resourceType: Smtpserver
   - alias: Aktoer_v2

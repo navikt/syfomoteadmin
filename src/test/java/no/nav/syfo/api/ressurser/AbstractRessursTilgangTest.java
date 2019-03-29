@@ -19,6 +19,7 @@ import org.springframework.web.client.RestTemplate;
 import javax.inject.Inject;
 
 import static no.nav.syfo.service.TilgangService.TILGANG_TIL_BRUKER_PATH;
+import static no.nav.syfo.service.TilgangService.TILGANG_TIL_BRUKER_VIA_AZURE_PATH;
 import static no.nav.syfo.service.TilgangService.TILGANG_TIL_ENHET_PATH;
 import static no.nav.syfo.testhelper.OidcTestHelper.loggUtAlle;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
@@ -75,6 +76,21 @@ public abstract class AbstractRessursTilgangTest {
                 .andExpect(header(AUTHORIZATION, "Bearer " + idToken))
                 .andRespond(withStatus(status));
     }
+
+    public void mockSvarFraTilgangTilBrukerViaAzure(String fnr, HttpStatus status) {
+        String uriString = fromHttpUrl(tilgangskontrollUrl)
+                .path(TILGANG_TIL_BRUKER_VIA_AZURE_PATH)
+                .queryParam(TilgangService.FNR, fnr)
+                .toUriString();
+
+        String idToken = oidcRequestContextHolder.getOIDCValidationContext().getToken(OIDCIssuer.AZURE).getIdToken();
+
+        mockRestServiceServer.expect(manyTimes(), requestTo(uriString))
+                .andExpect(method(HttpMethod.GET))
+                .andExpect(header(AUTHORIZATION, "Bearer " + idToken))
+                .andRespond(withStatus(status));
+    }
+
 
     public void mockSvarFraTilgangTilEnhet(String enhet, HttpStatus status) {
         String uriString = fromHttpUrl(tilgangskontrollUrl)
