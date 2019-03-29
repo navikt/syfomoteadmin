@@ -2,7 +2,6 @@ package no.nav.syfo.api.ressurser;
 
 import no.nav.security.spring.oidc.validation.api.ProtectedWithClaims;
 import no.nav.syfo.api.domain.RSBrukerPaaEnhet;
-import no.nav.syfo.domain.model.TpsPerson;
 import no.nav.syfo.service.*;
 import org.springframework.web.bind.annotation.*;
 
@@ -55,7 +54,7 @@ public class EnhetRessurs {
                 .filter(sykmeldtFnr -> tilgangService.harVeilederTilgangTilPerson(sykmeldtFnr))
                 .map(sykmeldtFnr -> new RSBrukerPaaEnhet()
                         .fnr(sykmeldtFnr)
-                        .skjermetEllerEgenAnsatt(hentBrukersSkjermingskode(sykmeldtFnr)))
+                        .skjermingskode(hentBrukersSkjermingskode(sykmeldtFnr)))
                 .collect(toList());
     }
 
