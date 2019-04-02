@@ -9,13 +9,13 @@ import javax.inject.Inject;
 import java.util.List;
 
 import static java.util.stream.Collectors.toList;
-import static no.nav.syfo.oidc.OIDCIssuer.INTERN;
+import static no.nav.syfo.oidc.OIDCIssuer.AZURE;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static no.nav.syfo.api.domain.RSBrukerPaaEnhet.Skjermingskode.*;
 
 @RestController
 @RequestMapping(value = "/api/enhet")
-@ProtectedWithClaims(issuer = INTERN)
+@ProtectedWithClaims(issuer = AZURE)
 public class EnhetRessurs {
 
     private MotedeltakerService motedeltakerService;
