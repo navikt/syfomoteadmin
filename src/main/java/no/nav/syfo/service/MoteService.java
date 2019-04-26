@@ -14,8 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.ws.rs.ForbiddenException;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 import java.util.function.Predicate;
 
 import static java.time.LocalDateTime.now;
@@ -170,6 +169,12 @@ public class MoteService {
         moteDAO.oppdaterMoteEier(moteUuid, mottakerUserId);
     }
 
+    private boolean harDeltakerSvartTidligereEnnNyesteOpprettet(Motedeltaker motedeltaker, LocalDateTime nyesteAlternativOpprettetTidspunkt) {
+        return Optional.ofNullable(motedeltaker.svartTidspunkt)
+                .map(svartTidspunkt -> svartTidspunkt.isBefore(nyesteAlternativOpprettetTidspunkt))
+                .orElse(true);
+    }
+
 
     public boolean harAlleSvartPaaSisteForespoersel(Mote Mote, String oidcIssuer) {
         boolean skalSykmeldtHaVarsler = dkifService.hentKontaktinfoAktoerId(Mote.sykmeldt().aktorId, oidcIssuer).skalHaVarsel;
@@ -177,8 +182,7 @@ public class MoteService {
 
         return Mote.motedeltakere.stream()
                 .filter(erIkkeReservertSykmeldt(skalSykmeldtHaVarsler))
-                .noneMatch(deltaker -> deltaker.svartTidspunkt == null ||
-                        deltaker.svartTidspunkt.isBefore(nyesteAlternativOpprettetTidspunkt) ||
+                .noneMatch(deltaker -> harDeltakerSvartTidligereEnnNyesteOpprettet(deltaker, nyesteAlternativOpprettetTidspunkt) ||
                         sisteSvarErIkkeReservertBruk(Mote, skalSykmeldtHaVarsler));
     }
 
@@ -194,27 +198,27 @@ public class MoteService {
         return motedeltaker -> skalSykmeldtHaVarsler || !motedeltaker.motedeltakertype().equals("Bruker");
     }
 
-    public void svarMottatt(String motedeltakerSomSvarteUuid, Mote Mote) {
-        Motedeltaker brukerSomSvarte = Mote.motedeltakere.stream()
+    public void svarMottatt(String motedeltakerSomSvarteUuid, Mote mote) {
+        Motedeltaker brukerSomSvarte = mote.motedeltakere.stream()
                 .filter(deltaker -> deltaker.uuid.equals(motedeltakerSomSvarteUuid))
                 .findFirst().get();
-        Mote.motedeltakere = Mote.motedeltakere.stream()
+        mote.motedeltakere = mote.motedeltakere.stream()
                 .map(motedeltaker -> motedeltaker.uuid.equals(brukerSomSvarte.uuid) ? motedeltaker.svartTidspunkt(now()) : motedeltaker)
                 .collect(toList());
 
         if ("Bruker".equals(brukerSomSvarte.motedeltakertype)) {
             mqStoppRevarslingService.stoppReVarsel(brukerSomSvarte.uuid);
-            metrikk.reportAntallDagerSiden(Mote.opprettetTidspunkt, "antallDagerBrukerSvar");
+            metrikk.reportAntallDagerSiden(mote.opprettetTidspunkt, "antallDagerBrukerSvar");
         } else if ("arbeidsgiver".equals(brukerSomSvarte.motedeltakertype)) {
-            metrikk.reportAntallDagerSiden(Mote.opprettetTidspunkt, "antallDagerArbeidsgiverSvar");
+            metrikk.reportAntallDagerSiden(mote.opprettetTidspunkt, "antallDagerArbeidsgiverSvar");
         }
 
-        if (harAlleSvartPaaSisteForespoersel(Mote, OIDCIssuer.EKSTERN)) {
+        if (harAlleSvartPaaSisteForespoersel(mote, OIDCIssuer.EKSTERN)) {
             feedDAO.createFeedHendelse(new PFeedHendelse()
-                    .sistEndretAv(Mote.eier)
+                    .sistEndretAv(mote.eier)
                     .type(ALLE_SVAR_MOTTATT.name())
                     .uuid(UUID.randomUUID().toString())
-                    .moteId(Mote.id)
+                    .moteId(mote.id)
             );
         }
     }
