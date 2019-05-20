@@ -10,9 +10,12 @@ import static no.nav.syfo.config.consumer.NorgConfig.MOCK_KEY;
 @ConditionalOnProperty(value = MOCK_KEY, havingValue = "true")
 public class NorgMock implements OrganisasjonRessursEnhetV1 {
 
+    private static final String NAV_ENHET = "0330";
+    public static final String NAV_ENHET_NAVN = "navEnhet";
+
     @Override
     public WSHentEnhetListeResponse hentEnhetListe(WSHentEnhetListeRequest request) throws HentEnhetListeUgyldigInput, HentEnhetListeRessursIkkeFunnet {
-        return new WSHentEnhetListeResponse().withEnhetListe(new WSEnhet().withEnhetId("0330").withNavn("navEnhet"));
+        return new WSHentEnhetListeResponse().withEnhetListe(new WSEnhet().withEnhetId(NAV_ENHET).withNavn(NAV_ENHET_NAVN));
     }
 
     @Override
