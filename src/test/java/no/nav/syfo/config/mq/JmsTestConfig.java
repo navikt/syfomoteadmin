@@ -31,4 +31,9 @@ public class JmsTestConfig {
     public JmsTemplate servicevarselqueue() {
         return new JmsTemplateMock("servicevarselqueue");
     }
+
+    @Bean(name = "tredjepartsvarselqueue")
+    public JmsTemplate tredjepartsvarselqueue() {
+        return new JmsTemplateMock("tredjepartsvarselqueue");
+    }
 }

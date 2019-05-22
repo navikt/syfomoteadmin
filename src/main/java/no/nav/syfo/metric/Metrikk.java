@@ -37,6 +37,11 @@ public class Metrikk {
         ).increment();
     }
 
+    public void tellTredjepartVarselSendt(String type) {
+        registry.counter(addPrefix("tredjepartvarsler_sendt"), Tags.of("type", "info", "varseltype", type))
+                .increment();
+    }
+
     public void reportAntallDagerSiden(LocalDateTime tidspunkt, String navn) {
         int dagerIMellom = dagerMellom(tidspunkt.toLocalDate(), now());
 

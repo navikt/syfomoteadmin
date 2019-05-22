@@ -218,6 +218,12 @@
             <version>1.0.0</version>
             <classifier>jaxb</classifier>
         </dependency>
+        <dependency>
+            <groupId>no.nav.meldinger.virksomhet</groupId>
+            <artifactId>nav-virksomhet-servicemeldingMedKontaktinformasjon-v1-meldingsdefinisjon</artifactId>
+            <version>1.0.0</version>
+            <classifier>jaxb</classifier>
+        </dependency>
 
         <!-- Metric -->
         <dependency>

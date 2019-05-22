@@ -3,17 +3,13 @@ package no.nav.syfo.util;
 import no.nav.syfo.domain.model.Mote;
 import no.nav.syfo.domain.model.TidOgSted;
 import no.nav.syfo.repository.model.PEpost;
-import no.nav.syfo.repository.model.PEpostVedlegg;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
 import static java.util.Arrays.asList;
-import static java.util.Optional.empty;
 import static java.util.stream.Collectors.toList;
 import static no.nav.syfo.util.time.DateUtil.tilLangDatoMedKlokkeslettPostfixDagPrefix;
-import static no.nav.syfo.util.OutlookEventUtil.IcsStatus.TENTATIVE;
-import static no.nav.syfo.util.OutlookEventUtil.icsInnhold;
 
 public class EpostInnholdUtil {
 
@@ -30,13 +26,20 @@ public class EpostInnholdUtil {
     private static String arbeidsgiverPaaminnelseMoteInnhold(String navn, String veiledernavn, String url, String dato) {
         return TOPP +
                 "<p>Til " + navn.trim() + ", </p>" +
-                "<p>Vi venter på svar fra deg om dialogmøte som vi sendte deg en forespørsel om " + dato + ". " +
-                "Du kan klikke på denne <a href=" + url + ">lenken</a> " +
-                "og oppgi hvilke tidspunkt som passer. </p>" +
+                "<p>Vi venter på svar fra deg om tidspunkt for dialogmøte.</p> " +
+
+                "<p>Du kan svare på hvilke tidspunkt som passer ved å logge inn på " +
+                "www.nav.no/dinesykmeldte eller følg denne lenken" + url + ". Da vil du også se hvem det gjelder.</p>" +
+
+                "<p>Vennligst svar så raskt som mulig.</p> /p>" +
 
                 harDuSporsmal() +
                 vennligHilsen(veiledernavn) +
                 BUNN;
+    }
+
+    private static String avlystMoteTidspunktOverskrift() {
+        return "<p style=\"font-weight:bold\">Opprinnelig tidspunkt for møtet:</p>";
     }
 
     private static String harDuSporsmal() {
@@ -64,8 +67,10 @@ public class EpostInnholdUtil {
                 "en av dine ansatte er sykmeldt. Av hensyn til personvernet kan vi ikke oppgi navnet på den " +
                 "sykmeldte i en e-post.</p>" +
 
-                "<p>Klikk på denne <a href=\"" + url + "\">lenken</a> og oppgi hvilke tidspunkt som passer. " +
-                "Vi ønsker svar så raskt som mulig og senest innen tre virkedager. </p>" +
+                "<p>Du kan svare på hvilke tidspunkt som passer ved å logge inn på " +
+                "www.nav.no/dinesykmeldte eller følg denne lenken" + url + ". Da vil du også se hvem det gjelder.</p>" +
+
+                "<p>Vi ønsker svar så raskt som mulig og senest innen tre virkedager.</p>" +
 
                 harDuSporsmal() +
                 vennligHilsen(veiledernavn) +
@@ -85,33 +90,26 @@ public class EpostInnholdUtil {
     }
 
     private static String arbeidsgiverAvbrytMoteEmne() {
-        return "Dialogmøte med NAV avbrutt";
+        return "Dialogmøte med NAV avlyst";
     }
 
     private static String arbeidsgiverAvbrytMoteInnhold(String navn, String veiledernavn, Mote Mote) {
         return TOPP +
                 "<p>Til " + navn.trim() + ", </p>" +
-                "<p>Du har tidligere mottatt en møteforespørsel på flere tidspunkter for et dialogmøte med en av dine sykmeldte. " +
-                "Møteforespørselen er kansellert.</p>" +
+                "<p>Du har tidligere fått en forespørsel om dialogmøte. Dette møtet vil likevel ikke bli avholdt. " +
+                "Ta gjerne kontakt hvis du trenger å vite mer om grunnen.</p>" +
 
-                motetidspunker(Mote.alternativer) +
-                motested(Mote.alternativer.get(0).sted) +
+                avlystMoteTidspunktOverskrift() +
+
+                motetidspunkt(Mote.alternativer) +
 
                 harDuSporsmal() +
                 vennligHilsen(veiledernavn) +
                 BUNN;
     }
 
-    private static String motetidspunker(List<TidOgSted> alternativer) {
+    public static String motetidspunkt(List<TidOgSted> alternativer) {
         StringBuilder builder = new StringBuilder();
-
-        if (alternativer.isEmpty()) {
-            return "";
-        } else if (alternativer.size() == 1) {
-            builder.append("<p style=\"font-weight:bold\">Møtetidspunktet det gjelder:</p>");
-        } else {
-            builder.append("<p style=\"font-weight:bold\">Møteforespørsel og tidspunkter det gjelder:</p>");
-        }
 
         alternativer = alternativer.stream().sorted((o1, o2) -> o2.tid.compareTo(o1.tid)).collect(toList());
 
@@ -124,7 +122,7 @@ public class EpostInnholdUtil {
         return builder.toString();
     }
 
-    private static String motested(String sted) {
+    public static String motested(String sted) {
         StringBuilder builder = new StringBuilder();
         builder.append("<p style=\"font-weight:bold\">Møtested</p>");
         builder.append("<p>" + sted + "</p>");
@@ -134,44 +132,48 @@ public class EpostInnholdUtil {
     private static String arbeidsgiverAvbrytBekreftetMoteInnhold(String navn, String veiledernavn, Mote Mote) {
         return TOPP +
                 "<p>Til " + navn.trim() + ", </p>" +
-                "<p>Du har tidligere mottatt en bekreftelse på et tidspunkt for et dialogmøte med en av dine sykmeldte. " +
-                "Møteforespørselen er kansellert og du kan se bort fra henvendelsen.</p>" +
+                "<p>Du har tidligere fått bekreftelse på tidspunktet for dialogmøte med en av dine sykmeldte. " +
+                "Møtet vil likevel ikke bli avholdt, og du kan se bort fra henvendelsen. " +
+                "Ta gjerne kontakt hvis du trenger å vite mer om grunnen.</p>" +
 
-                motetidspunker(asList(Mote.valgtTidOgSted)) +
-                motested(Mote.valgtTidOgSted.sted) +
+                avlystMoteTidspunktOverskrift() +
+                motetidspunkt(asList(Mote.valgtTidOgSted)) +
                 harDuSporsmal() +
                 vennligHilsen(veiledernavn) +
                 BUNN;
     }
 
-    public static PEpost bekreftelseEpost(String navn, String uuid, String sted, LocalDateTime dato, String veiledernavn) {
-        String epostInnhold = bekreftelsePEpost(navn, dato, veiledernavn);
+    public static PEpost bekreftelseEpost(String navn, String url, String sted, LocalDateTime dato, String veiledernavn) {
+        String epostInnhold = bekreftelsePEpost(navn, url, sted, dato, veiledernavn);
         return new PEpost()
                 .emne(bekreftelseEpostEmne())
-                .innhold(epostInnhold)
-                .vedlegg(asList(new PEpostVedlegg()
-                        .innhold(bekreftelseEpostIcs(uuid, sted, dato))
-                        .type("ICS")
-                ));
+                .innhold(epostInnhold);
     }
 
     private static String bekreftelseEpostEmne() {
         return "Bekreftelse på møte med NAV";
     }
 
-    private static String bekreftelsePEpost(String navn, LocalDateTime dato, String veiledernavn) {
+    private static String bekreftelsePEpost(String navn, String url, String sted, LocalDateTime dato, String veiledernavn) {
         return TOPP +
                 "<p>Til " + navn.trim() + ", </p>" +
-                "<p>Vi bekrefter møtetidspunkt " + tilLangDatoMedKlokkeslettPostfixDagPrefix(dato).toLowerCase()
-                + ". Du vil om kort tid få en innkalling i posten med mer informasjon om dialogmøtet.</p>" +
+
+                "<p>Vi bekrefter tidspunkt for dialogmøte med NAV. "+
+                "Av hensyn til personvernet kan vi ikke oppgi navnet til arbeidstakeren i en e-post. " +
+                "Ønsker du å se hvem det gjelder, kan du logge inn på www.nav.no/dinesykmeldte eller følg denne lenken " +
+                url +
+
+                "<p style=\"font-weight:bold\">Møtetidspunkt</p>" +
+                tilLangDatoMedKlokkeslettPostfixDagPrefix(dato).toLowerCase() +
+
+                motested(sted) +
+
+                "<p>Du vil om kort tid få en innkalling i posten med mer informasjon om dialogmøtet.</p>" +
                 harDuSporsmal() +
                 vennligHilsen(veiledernavn) +
                 BUNN;
     }
 
-    private static String bekreftelseEpostIcs(String uuid, String sted, LocalDateTime dato) {
-        return icsInnhold(uuid, dato, bekreftelseEpostEmne(), sted, empty(), TENTATIVE);
-    }
 
     public static PEpost arbeidsgiverNyeTidspunkt(String navn, String url, String veiledernavn) {
         return new PEpost()
@@ -186,10 +188,12 @@ public class EpostInnholdUtil {
     private static String arbeidsgiverNyeTidspunktInnhold(String navn, String url, String veiledernavn) {
         return TOPP +
                 "<p>Til " + navn.trim() + ", </p>" +
-                "<p>Vi har lagt til flere mulige tidspunkt i møteinnkallelsen du tidligere har mottatt.</p>" +
+                "<p>Vi har foreslått nytt tidspunkt for dialogmøte.</p>" +
 
-                "<p>Klikk på denne <a href=\"" + url + "\">lenken</a> og oppgi hvilke tidspunkt som passer. " +
-                "Vi ønsker svar så raskt som mulig og senest innen tre virkedager. </p>" +
+                "<p>Oppgi hvilke tidspunkt som passer ved å logge inn på " +
+                "www.nav.no/dinesykmeldte eller følg denne lenken" + url + ". Da vil du også se hvem det gjelder.</p>" +
+
+                "<p>Vi ønsker svar så raskt som mulig og senest innen tre virkedager.</p>" +
 
                 harDuSporsmal() +
                 vennligHilsen(veiledernavn) +

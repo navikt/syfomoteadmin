@@ -95,5 +95,6 @@ henvendelse.oppgave.henvendelse.queuename: mqhenvendelseoppgave
 varselproduksjon.best.varsel.m.handling.queuename: mqbestbarsel
 varselproduksjon.topp.varsel.utsending.queuename: mqstoppvarsel
 varselproduksjon.varslinger.queuename: mqvarslinger
+tredjepartsvarsel.queuename: mqtredjepartsvarsel
 
 tjenester.url: https://tjenester-q1.nav.no

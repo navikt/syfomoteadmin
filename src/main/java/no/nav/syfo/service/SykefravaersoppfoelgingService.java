@@ -62,6 +62,16 @@ public class SykefravaersoppfoelgingService {
         }
     }
 
+    public NaermesteLeder finnAktorsLederForOrg(String aktorId, String orgnummer, boolean erSystemKall) {
+        NaermesteLeder naermesteLeder;
+        if (erSystemKall) {
+            naermesteLeder = hentNaermesteLederSomSystembruker(aktorId, orgnummer);
+        } else {
+            naermesteLeder = hentNaermesteLederSomBruker(aktorId, orgnummer);
+        }
+        return naermesteLeder;
+    }
+
     public NaermesteLeder hentNaermesteLederSomBruker(String aktoerId, String orgnummer) {
         return hentNaermesteLeder(aktoerId, orgnummer, sykefravaersoppfoelgingV1SystemBruker);
     }

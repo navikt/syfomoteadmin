@@ -68,6 +68,11 @@ public class MessageQueueConfig {
         return new MQQueue(servicevarselQueueName);
     }
 
+    @Bean(name = "tredjepartsvarselVarselDestination")
+    public Queue tredjepartsVarselDestination(@Value("${tredjepartsvarsel.queuename}") String tredjepartsvarselQueueName) throws JMSException {
+        return new MQQueue(tredjepartsvarselQueueName);
+    }
+
     @Bean(name = "opprettVarselQueue")
     public JmsTemplate opprettVarselQueue(
             @Autowired @Qualifier("oppgaveVarselDestination") Queue oppgaveVarselDestination,
@@ -97,6 +102,17 @@ public class MessageQueueConfig {
     ) {
         JmsTemplate jmsTemplate = new JmsTemplate();
         jmsTemplate.setDefaultDestination(serviceVarselDestination);
+        jmsTemplate.setConnectionFactory(connectionFactory);
+        return jmsTemplate;
+    }
+
+    @Bean(name = "tredjepartsvarselqueue")
+    public JmsTemplate tredjepartsvarselqueue(
+            @Autowired @Qualifier("tredjepartsvarselVarselDestination") Queue tredjepartsvarselVarselDestination,
+            ConnectionFactory connectionFactory
+    ) {
+        JmsTemplate jmsTemplate = new JmsTemplate();
+        jmsTemplate.setDefaultDestination(tredjepartsvarselVarselDestination);
         jmsTemplate.setConnectionFactory(connectionFactory);
         return jmsTemplate;
     }

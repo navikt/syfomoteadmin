@@ -105,6 +105,10 @@ fasitResources:
     resourceType: queue
     propertyMap:
       queueName: HENVENDELSEOPPGAVEVARSEL_QUEUENAME
+  - alias: VARSELPRODUKSJON.BEST_SRVMLD_M_KONTAKT
+    resourceType: queue
+    propertyMap:
+      queueName: TREDJEPARTSVARSEL_QUEUENAME
 
   # OIDC med AzureAD B2C
   - alias: aad_b2c_clientid
