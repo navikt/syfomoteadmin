@@ -66,8 +66,6 @@ public class MoterRessursTilgangTest {
     @Mock
     private VeilederService veilederService;
     @Mock
-    private VeilederVarselService veilederVarselService;
-    @Mock
     private ArbeidsgiverVarselService arbeidsgiverVarselService;
     @Mock
     private SykefravaersoppfoelgingService sykefravaersoppfoelgingService;

@@ -52,7 +52,6 @@ public class MoterRessurs {
     private NorgService norgService;
     private BrukerprofilService brukerprofilService;
     private VeilederService veilederService;
-    private VeilederVarselService veilederVarselService;
     private ArbeidsgiverVarselService arbeidsgiverVarselService;
     private SykefravaersoppfoelgingService sykefravaersoppfoelgingService;
     private SykmeldtVarselService sykmeldtVarselService;
@@ -70,7 +69,6 @@ public class MoterRessurs {
             NorgService norgService,
             BrukerprofilService brukerprofilService,
             VeilederService veilederService,
-            VeilederVarselService veilederVarselService,
             ArbeidsgiverVarselService arbeidsgiverVarselService,
             SykefravaersoppfoelgingService sykefravaersoppfoelgingService,
             SykmeldtVarselService sykmeldtVarselService,
@@ -86,7 +84,6 @@ public class MoterRessurs {
         this.norgService = norgService;
         this.brukerprofilService = brukerprofilService;
         this.veilederService = veilederService;
-        this.veilederVarselService = veilederVarselService;
         this.arbeidsgiverVarselService = arbeidsgiverVarselService;
         this.sykefravaersoppfoelgingService = sykefravaersoppfoelgingService;
         this.sykmeldtVarselService = sykmeldtVarselService;
@@ -218,9 +215,6 @@ public class MoterRessurs {
                     arbeidsgiver
             ));
 
-            Veileder veileder = veilederService.hentVeileder(getSubjectIntern(contextHolder))
-                    .mote(Mote);
-            veilederVarselService.sendVarsel(OPPRETTET, veileder);
             arbeidsgiverVarselService.sendVarsel(OPPRETTET, Mote, false);
             sykmeldtVarselService.sendVarsel(OPPRETTET, Mote);
 
