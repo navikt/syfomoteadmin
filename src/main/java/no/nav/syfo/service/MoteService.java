@@ -37,7 +37,6 @@ public class MoteService {
     private VeilederService veilederService;
     private Metrikk metrikk;
     private ArbeidsgiverVarselService arbeidsgiverVarselService;
-    private VeilederVarselService veilederVarselService;
     private SykmeldtVarselService sykmeldtVarselService;
     private NorgService norgService;
     private MqStoppRevarslingService mqStoppRevarslingService;
@@ -54,7 +53,6 @@ public class MoteService {
             VeilederService veilederService,
             Metrikk metrikk,
             ArbeidsgiverVarselService arbeidsgiverVarselService,
-            VeilederVarselService veilederVarselService,
             SykmeldtVarselService sykmeldtVarselService,
             NorgService norgService,
             MqStoppRevarslingService mqStoppRevarslingService,
@@ -69,7 +67,6 @@ public class MoteService {
         this.veilederService = veilederService;
         this.metrikk = metrikk;
         this.arbeidsgiverVarselService = arbeidsgiverVarselService;
-        this.veilederVarselService = veilederVarselService;
         this.sykmeldtVarselService = sykmeldtVarselService;
         this.norgService = norgService;
         this.mqStoppRevarslingService = mqStoppRevarslingService;
@@ -94,13 +91,11 @@ public class MoteService {
     }
 
     @Transactional
-    public void avbrytMote(String moteUuid, boolean varsle, String userId) {
+    public void avbrytMote(String moteUuid, boolean varsle) {
         Mote Mote = moteDAO.findMoteByUUID(moteUuid);
         mqStoppRevarslingService.stoppReVarsel(finnAktoerIMote(Mote).uuid);
         if (varsle) {
-            Veileder veileder = veilederService.hentVeileder(userId).mote(Mote);
             Varseltype varseltype = Mote.status.equals(MoteStatus.BEKREFTET) ? Varseltype.AVBRUTT_BEKREFTET : Varseltype.AVBRUTT;
-            veilederVarselService.sendVarsel(varseltype, veileder);
             arbeidsgiverVarselService.sendVarsel(varseltype, Mote, false);
             sykmeldtVarselService.sendVarsel(varseltype, Mote);
         }
@@ -113,7 +108,7 @@ public class MoteService {
     }
 
     @Transactional
-    public void bekreftMote(String moteUuid, Long tidOgStedId, String userId) {
+    public void bekreftMote(String moteUuid, Long tidOgStedId) {
         Mote Mote = moteDAO.findMoteByUUID(moteUuid);
 
         metrikk.reportAntallDagerSiden(Mote.opprettetTidspunkt, "antallDagerForSvar");
@@ -123,11 +118,8 @@ public class MoteService {
         Mote.valgtTidOgSted(Mote.alternativer.stream().filter(tidOgSted -> tidOgSted.id.equals(tidOgStedId)).findFirst().orElseThrow(() -> new RuntimeException("Fant ikke tidspunktet!")));
 
         hendelseService.moteStatusEndret(Mote.status(BEKREFTET));
-        Veileder veileder = veilederService.hentVeileder(userId)
-                .mote(Mote);
 
         mqStoppRevarslingService.stoppReVarsel(finnAktoerIMote(Mote).uuid);
-        veilederVarselService.sendVarsel(Varseltype.BEKREFTET, veileder);
         arbeidsgiverVarselService.sendVarsel(Varseltype.BEKREFTET, Mote, false);
         sykmeldtVarselService.sendVarsel(Varseltype.BEKREFTET, Mote);
         if (feedService.skalOppretteFeedHendelse(Mote, PFeedHendelse.FeedHendelseType.BEKREFTET)) {
@@ -146,9 +138,7 @@ public class MoteService {
 
         hendelseService.moteStatusEndret(Mote.status(FLERE_TIDSPUNKT));
         nyeAlternativer.forEach(tidOgSted -> tidOgStedDAO.create(tidOgSted.moteId(Mote.id)));
-        Veileder veileder = veilederService.hentVeileder(userId).mote(Mote);
 
-        veilederVarselService.sendVarsel(Varseltype.NYE_TIDSPUNKT, veileder);
         arbeidsgiverVarselService.sendVarsel(Varseltype.NYE_TIDSPUNKT, Mote, false);
         sykmeldtVarselService.sendVarsel(Varseltype.NYE_TIDSPUNKT, Mote);
         if (feedService.skalOppretteFeedHendelse(Mote, PFeedHendelse.FeedHendelseType.FLERE_TIDSPUNKT)) {
