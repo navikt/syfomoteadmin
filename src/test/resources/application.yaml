@@ -74,6 +74,8 @@ syfoveilederoppgaver.systemapi.password: "test123"
 
 tilgangskontrollapi.url: "https://www.ikke.no"
 
+syfosyketilfelleApi.url: http://localhost:8080
+
 ## DATABASE ##
 moteadmindb.url: moteadmindburl
 moteadmindb.username: MOTEADMIN_Q1

@@ -147,6 +147,8 @@ fasitResources:
     path: /syfoveilederoppgaver/api/system/veilederoppgaver/v1
   - alias: syfoveilederoppgaver_actions_system_v1
     resourceType: restservice
+  - alias: syfosyketilfelleApi
+    resourceType: restservice
   - alias: ldap
     resourceType: ldap
 

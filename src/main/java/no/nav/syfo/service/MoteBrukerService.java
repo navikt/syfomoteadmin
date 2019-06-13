@@ -2,19 +2,16 @@ package no.nav.syfo.service;
 
 import lombok.extern.slf4j.Slf4j;
 import no.nav.security.oidc.context.OIDCRequestContextHolder;
-import no.nav.syfo.api.domain.bruker.BrukerMote;
-import no.nav.syfo.api.domain.bruker.BrukerMoteSvar;
-import no.nav.syfo.api.domain.bruker.BrukerOppdaterMoteSvar;
-import no.nav.syfo.api.domain.bruker.BrukerTidOgSted;
-import no.nav.syfo.domain.model.Mote;
-import no.nav.syfo.domain.model.MoteStatus;
-import no.nav.syfo.domain.model.Motedeltaker;
+import no.nav.syfo.api.domain.bruker.*;
+import no.nav.syfo.domain.model.*;
 import no.nav.syfo.util.Brukerkontekst;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.NotFoundException;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 import static java.util.stream.Collectors.toList;
@@ -40,6 +37,8 @@ public class MoteBrukerService {
 
     private NaermesteLedersMoterService naermesteLedersMoterService;
 
+    private SyketilfelleService syketilfelleService;
+
     @Inject
     public MoteBrukerService(
             OIDCRequestContextHolder contextHolder,
@@ -48,7 +47,8 @@ public class MoteBrukerService {
             BrukertilgangService brukertilgangService,
             MoteService moteService,
             MotedeltakerService motedeltakerService,
-            NaermesteLedersMoterService naermesteLedersMoterService
+            NaermesteLedersMoterService naermesteLedersMoterService,
+            SyketilfelleService syketilfelleService
     ) {
         this.contextHolder = contextHolder;
         this.aktoerService = aktoerService;
@@ -57,6 +57,7 @@ public class MoteBrukerService {
         this.moteService = moteService;
         this.motedeltakerService = motedeltakerService;
         this.naermesteLedersMoterService = naermesteLedersMoterService;
+        this.syketilfelleService = syketilfelleService;
     }
 
 
@@ -65,6 +66,23 @@ public class MoteBrukerService {
                 .stream()
                 .min((o1, o2) -> o2.opprettetTidspunkt.compareTo(o1.opprettetTidspunkt))
                 .orElseThrow(() -> new NotFoundException("Fant ingen møter på brukeren"));
+    }
+
+    public BrukerMote hentSisteBrukerMoteINyesteOppfolgingstilfelle(String aktorId, String brukerkontekst) {
+        OppfolgingstilfelleDTO oppfolgingstilfelle = syketilfelleService.hentNyesteOppfolgingstilfelle(aktorId);
+
+        if (oppfolgingstilfelle == null || oppfolgingstilfelle.arbeidsgiverperiode == null) {
+            return null;
+        }
+
+        PeriodeDTO periode = oppfolgingstilfelle.arbeidsgiverperiode;
+        LocalDateTime startDato = LocalDateTime.of(periode.fom, LocalTime.MIN);
+
+        return hentBrukerMoteListe(aktorId, brukerkontekst)
+                .stream()
+                .filter((mote) -> mote.opprettetTidspunkt.isAfter(startDato))
+                .min((o1, o2) -> o2.opprettetTidspunkt.compareTo(o1.opprettetTidspunkt))
+                .orElse(null);
     }
 
     public List<BrukerMote> hentBrukerMoteListe(String aktorId, String brukerkontekst) {
