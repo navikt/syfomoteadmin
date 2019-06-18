@@ -70,6 +70,30 @@ syfoveilederoppgaver_system_v1.url: "https://app-q1.adeo.no/syfoveilederoppgaver
 syfoveilederoppgaver.systemapi.username: "dummy"
 syfoveilederoppgaver.systemapi.password: "test123"
 
+aadaccesstoken.url: http://azuread
+aad_syfomoteadmin_clientid.username: 12345
+aad_syfomoteadmin_clientid.password: XXX
+
+no.nav.security.oidc:
+  issuers: selvbetjening, intern, azuread
+  issuer:
+    selvbetjening:
+      discoveryurl: http://selvbetjening-metadata
+      accepted_audience: aud-localhost
+      cookie_name: localhost-idtoken
+    intern:
+      discoveryurl: http://intern-metadata
+      accepted_audience: aud-localhost
+      cookie_name: localhost-idtoken
+    aadaccesstoken:
+      discoveryurl: http://aadaccesstoken-metadata
+      acceptedaudience: syfomoteadmin_clientid
+      cookie_name: localhost-idtoken
+    veileder:
+      discoveryurl: http://veileder-metadata
+      accepted_audience: aud-localhost
+      cookie_name: localhost-idtoken
+
 tilgangskontrollapi.url: "https://www.ikke.no"
 
 ## DATABASE ##
