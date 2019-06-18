@@ -1,5 +1,5 @@
 no.nav.security.oidc:
-  issuers: selvbetjening,intern,veileder
+  issuers: selvbetjening,intern,azuread,veileder
   issuer:
     selvbetjening:
       discoveryurl: <SETTES FRA FASIT>
@@ -8,6 +8,11 @@ no.nav.security.oidc:
     intern:
       discoveryurl: <SETTES FRA FASIT>
       accepted_audience: modiabrukerdialog-p,modiabrukerdialog-q1,veilarblogin-p,veilarblogin-q1,fpsak-frontend-p,fpsak-frontend-q1,fplos-p,fplos-q1
+      cookie_name: ID_token
+    aadaccesstoken:
+      discoveryurl: <SETTES FRA FASIT>
+      proxyurl: http://webproxy-nais.nav.no:8088
+      accepted_audience: <SETTES FRA FASIT>
       cookie_name: ID_token
     veileder:
       discoveryurl: <SETTES FRA FASIT>
