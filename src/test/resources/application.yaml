@@ -75,7 +75,7 @@ aad_syfomoteadmin_clientid.username: 12345
 aad_syfomoteadmin_clientid.password: XXX
 
 no.nav.security.oidc:
-  issuers: selvbetjening, intern, azuread
+  issuers: selvbetjening, intern, azuread, veileder
   issuer:
     selvbetjening:
       discoveryurl: http://selvbetjening-metadata
