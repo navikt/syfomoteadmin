@@ -70,7 +70,7 @@ syfoveilederoppgaver_system_v1.url: "https://app-q1.adeo.no/syfoveilederoppgaver
 syfoveilederoppgaver.systemapi.username: "dummy"
 syfoveilederoppgaver.systemapi.password: "test123"
 
-azuread.url: http://azuread
+aadaccesstoken.url: http://azuread
 aad_syfomoteadmin_clientid.username: 12345
 aad_syfomoteadmin_clientid.password: XXX
 
