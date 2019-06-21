@@ -22,7 +22,7 @@ public class AzureAdTokenConsumer {
     private String clientSecret;
 
     public AzureAdTokenConsumer(RestTemplate restTemplateMedProxy,
-                                @Value("${azuread.url}") String url,
+                                @Value("${aadaccesstoken.url}") String url,
                                 @Value("${aad_syfomoteadmin_clientid.username}") String clientId,
                                 @Value("${aad_syfomoteadmin_clientid.password}") String clientSecret) {
         this.restTemplateMedProxy = restTemplateMedProxy;
