@@ -149,7 +149,7 @@ fasitResources:
     resourceType: restservice
   - alias: ldap
     resourceType: ldap
-  - alias: aadaccesstoken
+  - alias: azuread
     resourceType: baseurl
   - alias: aad_syfomoteadmin_clientid
     resourceType: credential

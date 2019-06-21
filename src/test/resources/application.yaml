@@ -70,7 +70,7 @@ syfoveilederoppgaver_system_v1.url: "https://app-q1.adeo.no/syfoveilederoppgaver
 syfoveilederoppgaver.systemapi.username: "dummy"
 syfoveilederoppgaver.systemapi.password: "test123"
 
-aadaccesstoken.url: http://azuread
+azuread.url: http://azuread
 aad_syfomoteadmin_clientid.username: 12345
 aad_syfomoteadmin_clientid.password: XXX
 
@@ -85,8 +85,8 @@ no.nav.security.oidc:
       discoveryurl: http://intern-metadata
       accepted_audience: aud-localhost
       cookie_name: localhost-idtoken
-    aadaccesstoken:
-      discoveryurl: http://aadaccesstoken-metadata
+    azuread:
+      discoveryurl: http://azuread-metadata
       acceptedaudience: syfomoteadmin_clientid
       cookie_name: localhost-idtoken
     veileder:
