@@ -123,10 +123,6 @@ fasitResources:
     resourceType: baseurl
     propertyMap:
       url: NO_NAV_SECURITY_OIDC_ISSUER_INTERN_DISCOVERYURL
-  - alias: azuread_discovery
-    resourceType: baseurl
-    propertyMap:
-      url: NO_NAV_SECURITY_OIDC_ISSUER_AZUREAD_DISCOVERYURL
   - alias: isso-host
     resourceType: baseurl
   - alias: isso-jwks
@@ -153,5 +149,3 @@ fasitResources:
     resourceType: baseurl
   - alias: aad_syfomoteadmin_clientid
     resourceType: credential
-    propertyMap:
-      username: NO_NAV_SECURITY_OIDC_ISSUER_AZUREAD_ACCEPTEDAUDIENCE

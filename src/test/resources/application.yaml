@@ -75,7 +75,7 @@ aad_syfomoteadmin_clientid.username: 12345
 aad_syfomoteadmin_clientid.password: XXX
 
 no.nav.security.oidc:
-  issuers: selvbetjening, intern, azuread, veileder
+  issuers: selvbetjening, intern, veileder
   issuer:
     selvbetjening:
       discoveryurl: http://selvbetjening-metadata
@@ -84,10 +84,6 @@ no.nav.security.oidc:
     intern:
       discoveryurl: http://intern-metadata
       accepted_audience: aud-localhost
-      cookie_name: localhost-idtoken
-    azuread:
-      discoveryurl: http://azuread-metadata
-      acceptedaudience: syfomoteadmin_clientid
       cookie_name: localhost-idtoken
     veileder:
       discoveryurl: http://veileder-metadata
