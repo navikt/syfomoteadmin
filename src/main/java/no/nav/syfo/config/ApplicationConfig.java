@@ -32,6 +32,7 @@ public class ApplicationConfig {
     }
 
     @Bean
+    @Primary
     public RestTemplate restTemplate(ClientHttpRequestInterceptor... interceptors) {
         RestTemplate template = new RestTemplate();
         template.setInterceptors(asList(interceptors));

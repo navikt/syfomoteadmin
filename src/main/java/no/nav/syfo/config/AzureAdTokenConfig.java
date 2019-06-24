@@ -7,7 +7,7 @@ import org.springframework.web.client.RestTemplate;
 
 @Configuration
 public class AzureAdTokenConfig {
-    @Bean
+    @Bean(name = "restTemplateMedProxy")
     RestTemplate restTemplateMedProxy() {
         return new RestTemplateBuilder()
                 .additionalCustomizers(new NaisProxyCustomizer())
