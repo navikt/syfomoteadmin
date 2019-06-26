@@ -21,6 +21,8 @@ public class CacheConfig {
     public static final String CACHENAME_EREG_NAVN = "eregnavn";
     public static final String CACHENAME_LDAP_VEILEDER = "ldapveileder";
     public static final String CACHENAME_NORG_ENHETER = "norgenheter";
+    public static final String CACHENAME_ORGN_KONTORGEOGRAFISK = "orgnkontorgeografisk";
+    public static final String CACHENAME_PERSON_GEOGRAFISK = "persongeografisk";
     public static final String CACHENAME_PERSON_PERSON = "person";
     public static final String CACHENAME_TPS_BRUKER = "tpsbruker";
     public static final String CACHENAME_TPS_NAVN = "tpsnavn";
@@ -38,6 +40,8 @@ public class CacheConfig {
                 new ConcurrentMapCache(CACHENAME_EREG_NAVN),
                 new ConcurrentMapCache(CACHENAME_LDAP_VEILEDER),
                 new ConcurrentMapCache(CACHENAME_NORG_ENHETER),
+                new ConcurrentMapCache(CACHENAME_ORGN_KONTORGEOGRAFISK),
+                new ConcurrentMapCache(CACHENAME_PERSON_GEOGRAFISK),
                 new ConcurrentMapCache(CACHENAME_PERSON_PERSON),
                 new ConcurrentMapCache(CACHENAME_TPS_BRUKER),
                 new ConcurrentMapCache(CACHENAME_TPS_NAVN)

@@ -48,19 +48,21 @@ virksomhet:
   diskresjonskode.v1.endpointurl: "diskresjonskode.url"
   egenansatt.v1.endpointurl: "egenansattv1.url"
   organisasjon.v4.endpointurl: "organisasjonv4.url"
-  organisasjonenhet.v2.endpointurl: "organisasjonEnhetv2.url"
+  organisasjonEnhet.v2.endpointurl: "organisasjonEnhetv2.url"
   organisasjonressursenhet.v1.endpointurl: "organisasjonRessursEnhetv1.url"
   person.v3.endpointurl: "personv3.url"
 
 fasit.environment.name: 'local'
 
 aktoer.withmock: true
+arbeidsfordeling.withmock: true
 arena.withmock: true
 brukerprofil.withmock: true
 dkif.withmock: true
 egenansatt.withmock: true
 ereg.withmock: true
 norg.withmock: true
+organisasjonenhet.withmock: true
 person.withmock: true
 sykefravaersoppfoelging.syfoservice.withmock: true
 
