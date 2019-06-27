@@ -11,14 +11,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -45,20 +43,20 @@ public class MoteBrukerServiceTest {
     @Mock
     private NaermesteLedersMoterService naermesteLedersMoterService;
 
-    @Mock
-    private SyketilfelleService syketilfelleService;
-
     @InjectMocks
     private MoteBrukerService moteBrukerService;
 
     private String aktorId;
     private String brukerkontekst;
     private Mote mote;
+    private LocalDateTime mottattDatoTiDagerSiden;
+
 
     @Before
     public void setup() {
         aktorId = "123";
         brukerkontekst = Brukerkontekst.ARBEIDSTAKER;
+        mottattDatoTiDagerSiden = LocalDateTime.now().minusDays(10);
         mote = new Mote()
                 .uuid("123-abc")
                 .status(MoteStatus.OPPRETTET)
@@ -82,89 +80,42 @@ public class MoteBrukerServiceTest {
     }
 
     @Test
-    public void finner_ingen_moter_hvis_ingen_oppfolgingstilfeller() {
-        when(syketilfelleService.hentNyesteOppfolgingstilfelle(any())).thenReturn(null);
-
-        assertThat(moteBrukerService.hentSisteBrukerMoteINyesteOppfolgingstilfelle(aktorId, brukerkontekst)).isEqualTo(null);
-    }
-
-    @Test
-    public void finner_ingen_moter_hvis_ingen_arbeidsgiverperiode() {
-        when(syketilfelleService.hentNyesteOppfolgingstilfelle(any())).thenReturn(new OppfolgingstilfelleDTO()
-                .antallBrukteDager(10)
-                .oppbruktArbeidsgvierperiode(false)
-                .arbeidsgiverperiode(null));
-
-        assertThat(moteBrukerService.hentSisteBrukerMoteINyesteOppfolgingstilfelle(aktorId, brukerkontekst)).isEqualTo(null);
-    }
-
-    @Test
-    public void finner_ikke_mote_hvis_det_er_opprettet_for_oppfolgingstilfellet() {
-        LocalDate tiDagerSiden = LocalDate.now().minusDays(10);
-        LocalDate omSeksDager = LocalDate.now().plusDays(6);
+    public void hentSisteBrukerMoteEtterDato_finner_ikke_mote_hvis_det_er_opprettet_for_mottatt_dato() {
         LocalDateTime merEnnTiDagerSiden = LocalDateTime.now().minusDays(20);
-        Mote moteOpprettetIOppfolgingstilfellet = mote.opprettetTidspunkt(merEnnTiDagerSiden);
+        Mote nyesteMote = mote.opprettetTidspunkt(merEnnTiDagerSiden);
 
-        when(syketilfelleService.hentNyesteOppfolgingstilfelle(any())).thenReturn(new OppfolgingstilfelleDTO()
-                .antallBrukteDager(10)
-                .oppbruktArbeidsgvierperiode(false)
-                .arbeidsgiverperiode(new PeriodeDTO()
-                        .fom(tiDagerSiden)
-                        .tom(omSeksDager)));
+        when(moteService.findMoterByBrukerAktoerId(anyString())).thenReturn(singletonList(nyesteMote));
 
-        when(moteService.findMoterByBrukerAktoerId(anyString())).thenReturn(singletonList(moteOpprettetIOppfolgingstilfellet));
-
-        assertThat(moteBrukerService.hentSisteBrukerMoteINyesteOppfolgingstilfelle(aktorId, brukerkontekst)).isEqualTo(null);
+        assertThat(moteBrukerService.hentSisteBrukerMoteEtterDato(aktorId, brukerkontekst, mottattDatoTiDagerSiden).isPresent()).isFalse();
     }
 
     @Test
-    public void finner_mote_hvis_opprettet_i_oppfolgingstilfellet() {
-        LocalDate tiDagerSiden = LocalDate.now().minusDays(10);
-        LocalDate omSeksDager = LocalDate.now().plusDays(6);
+    public void hentSisteBrukerMoteEtterDato_finner_mote_hvis_opprettet_etter_mottatt_dato() {
         LocalDateTime niDagerSiden = LocalDateTime.now().minusDays(9);
-        Mote moteOpprettetIOppfolgingstilfellet = mote.opprettetTidspunkt(niDagerSiden);
+        Mote nyesteMote = mote.opprettetTidspunkt(niDagerSiden);
 
-        when(syketilfelleService.hentNyesteOppfolgingstilfelle(any())).thenReturn(new OppfolgingstilfelleDTO()
-                .antallBrukteDager(10)
-                .oppbruktArbeidsgvierperiode(false)
-                .arbeidsgiverperiode(new PeriodeDTO()
-                        .fom(tiDagerSiden)
-                        .tom(omSeksDager)));
+        when(moteService.findMoterByBrukerAktoerId(anyString())).thenReturn(singletonList(nyesteMote));
 
-        when(moteService.findMoterByBrukerAktoerId(anyString())).thenReturn(singletonList(moteOpprettetIOppfolgingstilfellet));
-
-        BrukerMote funnetBrukerMote = moteBrukerService.hentSisteBrukerMoteINyesteOppfolgingstilfelle(aktorId, brukerkontekst);
+        BrukerMote funnetBrukerMote = moteBrukerService.hentSisteBrukerMoteEtterDato(aktorId, brukerkontekst, mottattDatoTiDagerSiden).orElse(null);
 
         assertThat(funnetBrukerMote).isNotNull();
         assertThat(funnetBrukerMote.moteUuid).isEqualToIgnoringCase("123-abc");
     }
 
     @Test
-    public void finner_nyeste_mote_hvis_flere_opprettet_i_oppfolgingstilfellet() {
-        LocalDate tiDagerSiden = LocalDate.now().minusDays(10);
-        LocalDate omSeksDager = LocalDate.now().plusDays(6);
+    public void hentSisteBrukerMoteEtterDato_finner_nyeste_mote_hvis_flere_opprettet_etter_mottatt_dato() {
         LocalDateTime niDagerSiden = LocalDateTime.now().minusDays(9);
         LocalDateTime femDagerSiden = LocalDateTime.now().minusDays(5);
         final String RIKTIG_UUID = "111-aaa";
 
-        Mote moteOpprettetIOppfolgingstilfellet = mote.opprettetTidspunkt(niDagerSiden);
+        Mote eldsteMoteOpprettetEtterMottatDato = mote.opprettetTidspunkt(niDagerSiden);
         Mote nyesteMote = mote
                 .uuid(RIKTIG_UUID)
                 .opprettetTidspunkt(femDagerSiden);
 
-        BrukerMote moteOpprettetIOppfolgingstilfelle = new BrukerMote()
-                .opprettetTidspunkt(niDagerSiden);
+        when(moteService.findMoterByBrukerAktoerId(anyString())).thenReturn(asList(eldsteMoteOpprettetEtterMottatDato, nyesteMote));
 
-        when(syketilfelleService.hentNyesteOppfolgingstilfelle(any())).thenReturn(new OppfolgingstilfelleDTO()
-                .antallBrukteDager(10)
-                .oppbruktArbeidsgvierperiode(false)
-                .arbeidsgiverperiode(new PeriodeDTO()
-                        .fom(tiDagerSiden)
-                        .tom(omSeksDager)));
-
-        when(moteService.findMoterByBrukerAktoerId(anyString())).thenReturn(asList(moteOpprettetIOppfolgingstilfellet, nyesteMote));
-
-        BrukerMote funnetBrukerMote = moteBrukerService.hentSisteBrukerMoteINyesteOppfolgingstilfelle(aktorId, brukerkontekst);
+        BrukerMote funnetBrukerMote = moteBrukerService.hentSisteBrukerMoteEtterDato(aktorId, brukerkontekst, mottattDatoTiDagerSiden).orElse(null);
 
         assertThat(funnetBrukerMote).isNotNull();
         assertThat(funnetBrukerMote.moteUuid).isEqualToIgnoringCase(RIKTIG_UUID);
