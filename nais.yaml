@@ -67,6 +67,8 @@ fasitResources:
     resourceType: Smtpserver
   - alias: Aktoer_v2
     resourceType: webserviceendpoint
+  - alias: virksomhet:Arbeidsfordeling_v1
+    resourceType: webserviceendpoint
   - alias: virksomhet:Person_V3
     resourceType: webserviceendpoint
   - alias: Sykefravaersoppfoelging_v1
@@ -80,6 +82,8 @@ fasitResources:
   - alias: virksomhet:EgenAnsatt_v1
     resourceType: webserviceendpoint
   - alias: virksomhet:Organisasjon_v4
+    resourceType: webserviceendpoint
+  - alias: virksomhet:OrganisasjonEnhet_v2
     resourceType: webserviceendpoint
   - alias: virksomhet:OrganisasjonRessursEnhet_v1
     resourceType: webserviceendpoint

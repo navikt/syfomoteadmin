@@ -45,6 +45,7 @@ public class MoterRessurs {
     private OIDCRequestContextHolder contextHolder;
     private Metrikk metrikk;
     private AktoerService aktoerService;
+    private EnhetService enhetService;
     private MoteService moteService;
     private TidOgStedDAO tidOgStedDAO;
     private HendelseService hendelseService;
@@ -62,6 +63,7 @@ public class MoterRessurs {
             OIDCRequestContextHolder contextHolder,
             Metrikk metrikk,
             AktoerService aktoerService,
+            EnhetService enhetService,
             MoteService moteService,
             TidOgStedDAO tidOgStedDAO,
             HendelseService hendelseService,
@@ -77,6 +79,7 @@ public class MoterRessurs {
         this.contextHolder = contextHolder;
         this.metrikk = metrikk;
         this.aktoerService = aktoerService;
+        this.enhetService = enhetService;
         this.moteService = moteService;
         this.tidOgStedDAO = tidOgStedDAO;
         this.hendelseService = hendelseService;
@@ -186,6 +189,7 @@ public class MoterRessurs {
             NaermesteLeder naermesteLeder = sykefravaersoppfoelgingService.hentNaermesteLederSomBruker(aktorId, nyttMoteRequest.orgnummer);
             nyttMoteRequest.navn(naermesteLeder.navn);
             nyttMoteRequest.epost(naermesteLeder.epost);
+            nyttMoteRequest.navEnhet(enhetService.finnArbeidstakersBehandlendeEnhet(nyttMoteRequest.fnr));
 
             Mote nyttMote = map(nyttMoteRequest, opprett2Mote);
             String innloggetIdent = getSubjectIntern(contextHolder);

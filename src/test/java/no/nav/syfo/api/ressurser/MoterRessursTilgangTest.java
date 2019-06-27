@@ -52,6 +52,8 @@ public class MoterRessursTilgangTest {
     @Mock
     private MoteService moteService;
     @Mock
+    private EnhetService enhetService;
+    @Mock
     private Metrikk metrikk;
     @Mock
     private TidOgStedDAO tidOgStedDAO;
@@ -83,6 +85,7 @@ public class MoterRessursTilgangTest {
         when(aktoerService.hentAktoerIdForIdent(ARBEIDSTAKER_FNR)).thenReturn(ARBEIDSTAKER_AKTORID);
         when(aktoerService.hentFnrForAktoer(AKTOER_ID_2)).thenReturn(FNR_2);
         when(moteService.findMoterByBrukerNavEnhet(NAVENHET)).thenReturn(MoteList);
+        when(enhetService.finnArbeidstakersBehandlendeEnhet(any())).thenReturn(NAVENHET);
     }
 
     private List<Mote> MoteList = asList(
@@ -298,6 +301,7 @@ public class MoterRessursTilgangTest {
         moterRessurs.opprett(nyttMoteRequest);
 
         verify(brukerprofilService).hentBruker(ARBEIDSTAKER_FNR);
+        verify(enhetService).finnArbeidstakersBehandlendeEnhet(ARBEIDSTAKER_FNR);
     }
 
     @Test(expected = ForbiddenException.class)

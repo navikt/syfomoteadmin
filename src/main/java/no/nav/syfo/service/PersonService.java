@@ -3,6 +3,7 @@ package no.nav.syfo.service;
 import lombok.extern.slf4j.Slf4j;
 import no.nav.tjeneste.virksomhet.person.v3.*;
 import no.nav.tjeneste.virksomhet.person.v3.informasjon.*;
+import no.nav.tjeneste.virksomhet.person.v3.meldinger.WSHentGeografiskTilknytningRequest;
 import no.nav.tjeneste.virksomhet.person.v3.meldinger.WSHentPersonRequest;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -11,6 +12,7 @@ import javax.inject.Inject;
 import javax.ws.rs.ForbiddenException;
 
 import static java.util.Optional.ofNullable;
+import static no.nav.syfo.config.CacheConfig.CACHENAME_PERSON_GEOGRAFISK;
 import static no.nav.syfo.config.CacheConfig.CACHENAME_PERSON_PERSON;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
@@ -65,6 +67,26 @@ public class PersonService {
         } catch (RuntimeException e) {
             log.error("Fikk RuntimeException mot TPS for person ved oppslag av person");
             throw new RuntimeException();
+        }
+    }
+
+    @Cacheable(cacheNames = CACHENAME_PERSON_GEOGRAFISK)
+    public String hentGeografiskTilknytning(String fnr) {
+        try {
+            WSGeografiskTilknytning geografiskTilknytning = personV3.hentGeografiskTilknytning(
+                    new WSHentGeografiskTilknytningRequest()
+                            .withAktoer(new WSPersonIdent().withIdent(new WSNorskIdent().withIdent(fnr))))
+                    .getGeografiskTilknytning();
+            return ofNullable(geografiskTilknytning).map(WSGeografiskTilknytning::getGeografiskTilknytning).orElse("");
+        } catch (HentGeografiskTilknytningSikkerhetsbegrensing e) {
+            log.error("Fikk sikkerhetsbegrensing ved henting av geografiskTilknytning");
+            throw new ForbiddenException();
+        } catch (HentGeografiskTilknytningPersonIkkeFunnet e) {
+            log.error("Fant ikke person ved henting av geografiskTilknytning");
+            throw new RuntimeException();
+        } catch (RuntimeException e) {
+            log.error("Fikk RuntimeException ved henting av geografisk tilknytning", e);
+            throw e;
         }
     }
 }
