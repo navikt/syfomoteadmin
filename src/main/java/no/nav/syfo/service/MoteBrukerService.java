@@ -2,20 +2,17 @@ package no.nav.syfo.service;
 
 import lombok.extern.slf4j.Slf4j;
 import no.nav.security.oidc.context.OIDCRequestContextHolder;
-import no.nav.syfo.api.domain.bruker.BrukerMote;
-import no.nav.syfo.api.domain.bruker.BrukerMoteSvar;
-import no.nav.syfo.api.domain.bruker.BrukerOppdaterMoteSvar;
-import no.nav.syfo.api.domain.bruker.BrukerTidOgSted;
-import no.nav.syfo.domain.model.Mote;
-import no.nav.syfo.domain.model.MoteStatus;
-import no.nav.syfo.domain.model.Motedeltaker;
+import no.nav.syfo.api.domain.bruker.*;
+import no.nav.syfo.domain.model.*;
 import no.nav.syfo.util.Brukerkontekst;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.NotFoundException;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import static java.util.stream.Collectors.toList;
 import static no.nav.syfo.api.mappers.BrukerMoteMapper.mote2BrukerMote;
@@ -65,6 +62,14 @@ public class MoteBrukerService {
                 .stream()
                 .min((o1, o2) -> o2.opprettetTidspunkt.compareTo(o1.opprettetTidspunkt))
                 .orElseThrow(() -> new NotFoundException("Fant ingen møter på brukeren"));
+    }
+
+    public Optional<BrukerMote> hentSisteBrukerMoteEtterDato(String aktorId, String brukerkontekst, LocalDateTime dato) {
+        return Optional.of(hentBrukerMoteListe(aktorId, brukerkontekst)
+                .stream()
+                .filter((mote) -> mote.opprettetTidspunkt.isAfter(dato))
+                .min((o1, o2) -> o2.opprettetTidspunkt.compareTo(o1.opprettetTidspunkt)))
+                .orElse(Optional.empty());
     }
 
     public List<BrukerMote> hentBrukerMoteListe(String aktorId, String brukerkontekst) {
