@@ -7,7 +7,8 @@ import no.nav.syfo.oidc.OIDCIssuer;
 import no.nav.syfo.repository.dao.*;
 import no.nav.syfo.repository.model.PFeedHendelse;
 import no.nav.syfo.service.mq.MqStoppRevarslingService;
-import no.nav.syfo.service.varselinnhold.*;
+import no.nav.syfo.service.varselinnhold.ArbeidsgiverVarselService;
+import no.nav.syfo.service.varselinnhold.SykmeldtVarselService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -20,6 +21,7 @@ import java.util.function.Predicate;
 import static java.time.LocalDateTime.now;
 import static java.util.stream.Collectors.toList;
 import static no.nav.syfo.domain.model.MoteStatus.*;
+import static no.nav.syfo.kafka.producer.OversikthendelseType.MOTEPLANLEGGER_ALLE_SVAR_MOTTATT;
 import static no.nav.syfo.repository.model.PFeedHendelse.FeedHendelseType.ALLE_SVAR_MOTTATT;
 import static no.nav.syfo.service.MotedeltakerService.finnAktoerIMote;
 import static no.nav.syfo.util.MoterUtil.filtrerBortAlternativerSomAlleredeErLagret;
@@ -34,6 +36,7 @@ public class MoteService {
     private FeedDAO feedDAO;
     private TidOgStedDAO tidOgStedDAO;
     private HendelseService hendelseService;
+    private OversikthendelseService oversikthendelseService;
     private VeilederService veilederService;
     private Metrikk metrikk;
     private ArbeidsgiverVarselService arbeidsgiverVarselService;
@@ -50,6 +53,7 @@ public class MoteService {
             FeedDAO feedDAO,
             TidOgStedDAO tidOgStedDAO,
             HendelseService hendelseService,
+            OversikthendelseService oversikthendelseService,
             VeilederService veilederService,
             Metrikk metrikk,
             ArbeidsgiverVarselService arbeidsgiverVarselService,
@@ -64,6 +68,7 @@ public class MoteService {
         this.feedDAO = feedDAO;
         this.tidOgStedDAO = tidOgStedDAO;
         this.hendelseService = hendelseService;
+        this.oversikthendelseService = oversikthendelseService;
         this.veilederService = veilederService;
         this.metrikk = metrikk;
         this.arbeidsgiverVarselService = arbeidsgiverVarselService;
@@ -204,6 +209,8 @@ public class MoteService {
         }
 
         if (harAlleSvartPaaSisteForespoersel(mote, OIDCIssuer.EKSTERN)) {
+            oversikthendelseService.sendOversikthendelse(mote, MOTEPLANLEGGER_ALLE_SVAR_MOTTATT);
+
             feedDAO.createFeedHendelse(new PFeedHendelse()
                     .sistEndretAv(mote.eier)
                     .type(ALLE_SVAR_MOTTATT.name())
