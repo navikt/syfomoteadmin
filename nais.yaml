@@ -58,6 +58,10 @@ fasitResources:
       password: SPRING_DATASOURCE_PASSWORD
   - alias: syfoveilederoppgaver.systemapi
     resourceType: credential
+  - alias: kafka-brokers
+    resourceType: baseurl
+    propertyMap:
+      url: SPRING_KAFKA_BOOTSTRAP-SERVERS
   - alias: loginservice_oidc
     resourceType: azureoidc
     propertyMap:
