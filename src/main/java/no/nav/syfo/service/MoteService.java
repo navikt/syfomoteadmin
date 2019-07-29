@@ -136,7 +136,7 @@ public class MoteService {
     }
 
     @Transactional
-    public void nyeAlternativer(String moteUuid, List<TidOgSted> nyeAlternativer, String userId) {
+    public void nyeAlternativer(String moteUuid, List<TidOgSted> nyeAlternativer) {
         Mote mote = moteDAO.findMoteByUUID(moteUuid);
 
         List<TidOgSted> filtrerBortAlternativerSomAlleredeErLagret = filtrerBortAlternativerSomAlleredeErLagret(nyeAlternativer, mote);
