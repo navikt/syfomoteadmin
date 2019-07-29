@@ -157,7 +157,7 @@ public class MoteService {
     }
 
     private void behandleMote(Mote mote) {
-        if (harAlleSvartPaaSisteForespoersel(mote, OIDCIssuer.EKSTERN)) {
+        if (harAlleSvartPaaSisteForespoersel(mote, OIDCIssuer.INTERN)) {
             oversikthendelseService.sendOversikthendelse(mote, MOTEPLANLEGGER_ALLE_SVAR_BEHANDLET);
         }
     }
