@@ -62,7 +62,7 @@ public class MoteActions {
     @PostMapping(consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     @RequestMapping(value = "/nyealternativer")
     public void nyeAlternativer(@PathVariable("moteUuid") String moteUuid, @RequestBody List<RSNyttAlternativ> alternativer) {
-        moteService.nyeAlternativer(moteUuid, mapListe(alternativer, opprett2TidOgSted), getSubjectIntern(contextHolder));
+        moteService.nyeAlternativer(moteUuid, mapListe(alternativer, opprett2TidOgSted));
 
         metrikk.tellEndepunktKall("nye_alternativer");
     }
