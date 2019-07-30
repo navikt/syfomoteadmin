@@ -1,5 +1,6 @@
 package no.nav.syfo.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.env.Environment;
@@ -15,6 +16,7 @@ import static java.util.Optional.ofNullable;
 
 //må bruke Hashtable i InitiallLdapContext dessverre.
 @SuppressWarnings({"squid:S1149"})
+@Slf4j
 @Service
 public class LdapService {
 
@@ -43,9 +45,12 @@ public class LdapService {
             searchCtrl.setSearchScope(SearchControls.SUBTREE_SCOPE);
 
             NamingEnumeration<SearchResult> result = ldapContext().search(SEARCHBASE, String.format("(&(objectClass=user)(CN=%s))", veilederUid), searchCtrl);
-            Attributes ldapAttributes = result.next().getAttributes();
-            populateAttributtMap(attributter, map, ldapAttributes);
-
+            if (result.hasMore()) {
+                Attributes ldapAttributes = result.next().getAttributes();
+                populateAttributtMap(attributter, map, ldapAttributes);
+            } else {
+                throw new RuntimeException("Fant ingen attributter i resultat fra ldap for veileder " + veilederUid);
+            }
         } catch (NamingException e) {
             throw new RuntimeException(e);
         }
