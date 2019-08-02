@@ -3,6 +3,7 @@ package no.nav.syfo.api.ressurser;
 import no.nav.security.oidc.context.OIDCRequestContextHolder;
 import no.nav.security.spring.oidc.validation.api.ProtectedWithClaims;
 import no.nav.syfo.api.domain.bruker.*;
+import no.nav.syfo.metric.Metrikk;
 import no.nav.syfo.service.*;
 import no.nav.syfo.util.Brukerkontekst;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +22,8 @@ public class BrukerMoterRessurs {
 
     private OIDCRequestContextHolder contextHolder;
 
+    private final Metrikk metrikk;
+
     private AktoerService aktoerService;
 
     private BrukertilgangService brukertilgangService;
@@ -30,11 +33,13 @@ public class BrukerMoterRessurs {
     @Inject
     public BrukerMoterRessurs(
             OIDCRequestContextHolder contextHolder,
+            Metrikk metrikk,
             AktoerService aktoerService,
             BrukertilgangService brukertilgangService,
             MoteBrukerService moteBrukerService
     ) {
         this.contextHolder = contextHolder;
+        this.metrikk = metrikk;
         this.aktoerService = aktoerService;
         this.brukertilgangService = brukertilgangService;
         this.moteBrukerService = moteBrukerService;
@@ -45,6 +50,8 @@ public class BrukerMoterRessurs {
     public List<BrukerMote> hentMoter() {
         String innloggetIdent = getSubjectEkstern(contextHolder);
         String innloggetAktorId = aktoerService.hentAktoerIdForIdent(innloggetIdent);
+
+        metrikk.tellEndepunktKall("hent_mote_arbeidsgiver");
 
         return moteBrukerService.hentBrukerMoteListe(innloggetAktorId, Brukerkontekst.ARBEIDSGIVER);
     }
@@ -57,6 +64,8 @@ public class BrukerMoterRessurs {
 
         brukertilgangService.kastExceptionHvisIkkeTilgang(innloggetIdent);
 
+        metrikk.tellEndepunktKall("hent_mote_arbeidstaker");
+
         return moteBrukerService.hentSisteBrukerMote(innloggetAktorId, Brukerkontekst.ARBEIDSTAKER);
     }
 
@@ -66,6 +75,15 @@ public class BrukerMoterRessurs {
             @PathVariable("moteUuid") final String moteUuid,
             @RequestBody BrukerMoteSvar motesvar
     ) {
+        tellMoteSvar(motesvar);
         return moteBrukerService.sendSvar(moteUuid, motesvar);
+    }
+
+    private void tellMoteSvar(BrukerMoteSvar motesvar) {
+        if (Brukerkontekst.ARBEIDSTAKER.equals(motesvar.deltakertype)) {
+            metrikk.tellEndepunktKall("svar_mote_arbeidstaker");
+        } else {
+            metrikk.tellEndepunktKall("svar_mote_arbeidsgiver");
+        }
     }
 }
