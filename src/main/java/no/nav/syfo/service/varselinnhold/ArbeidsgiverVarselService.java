@@ -14,6 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static java.util.Arrays.asList;
+import static java.util.Optional.ofNullable;
 import static no.nav.syfo.domain.model.TredjepartsVarselType.*;
 import static no.nav.syfo.domain.model.Varseltype.*;
 import static no.nav.syfo.service.varselinnhold.TredjepartsvarselService.createParameter;
@@ -21,7 +22,7 @@ import static no.nav.syfo.util.EpostInnholdUtil.*;
 import static no.nav.syfo.util.OIDCUtil.getSubjectIntern;
 import static no.nav.syfo.util.time.DateUtil.tilKortDato;
 import static no.nav.syfo.util.time.DateUtil.tilLangDatoMedKlokkeslettPostfixDagPrefix;
-import static org.springframework.data.mapping.Alias.ofNullable;
+
 
 @Slf4j
 @Service

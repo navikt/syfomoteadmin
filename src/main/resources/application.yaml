@@ -28,17 +28,20 @@ server:
     context-path: /syfomoteadmin
 
 spring:
-  main.banner-mode: 'off'
+  flyway.table: 'schema_version'
+  main:
+    banner-mode: 'off'
+    allow-bean-definition-overriding: true
   jta.atomikos.datasource:
     max-pool-size: 32
     min-pool-size: 8
   kafka:
-    client-id: ${app.name}-${fasit.environment.name}
+    client-id: ${nais.app.name}-${kafka.env.name}
     properties:
       security.protocol: SASL_SSL
       sasl:
         mechanism: PLAIN
-        jaas.config: org.apache.kafka.common.security.plain.PlainLoginModule required username="${srvsyfomoteadmin.username}" password="${srvsyfomoteadmin.password}";
+        jaas.config: org.apache.kafka.common.security.plain.PlainLoginModule required username="${srv.username}" password="${srv.password}";
       ssl.truststore:
         location: ${javax.net.ssl.trustStore}
         password: ${javax.net.ssl.trustStorePassword}

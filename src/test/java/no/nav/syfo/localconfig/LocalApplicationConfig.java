@@ -17,8 +17,8 @@ public class LocalApplicationConfig {
 
     public LocalApplicationConfig(Environment environment) {
         System.setProperty("SECURITYTOKENSERVICE_URL", requireNonNull(environment.getProperty("securitytokenservice.url")));
-        System.setProperty("SRVSYFOMOTEADMIN_USERNAME", requireNonNull(environment.getProperty("srvsyfomoteadmin.username")));
-        System.setProperty("SRVSYFOMOTEADMIN_PASSWORD", requireNonNull(environment.getProperty("srvsyfomoteadmin.password")));
+        System.setProperty("srv_username", requireNonNull(environment.getProperty("srv.username")));
+        System.setProperty("srv_password", requireNonNull(environment.getProperty("srv.password")));
 
         System.setProperty("LDAP_URL", requireNonNull(environment.getProperty("ldap.url")));
         System.setProperty("LDAP_USERNAME", requireNonNull(environment.getProperty("ldap.username")));
