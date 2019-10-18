@@ -1,4 +1,5 @@
 spring:
+  main.allow-bean-definition-overriding: true
   profiles.active: local
   embedded.kafka.brokers: 'localhost:9092'
   kafka:
@@ -28,10 +29,12 @@ server:
 
 
 securitytokenservice.url: "sts.url"
-srvsyfomoteadmin:
+srv:
   username: "username"
   password: "1234"
 
+nais.app.name: 'syfomoteadmin'
+kafka.env.name: 'local'
 
 #no.nav.security.oidc:
 #  issuers: selvbetjening,intern

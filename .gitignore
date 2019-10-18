@@ -10,6 +10,11 @@ target
 # Log file
 *.log
 
+# Gradle files
+out/
+build/
+.gradle/
+
 # BlueJ files
 *.ctxt
 
@@ -17,7 +22,6 @@ target
 .mtj.tmp/
 
 # Package Files #
-*.jar
 *.war
 *.nar
 *.ear
