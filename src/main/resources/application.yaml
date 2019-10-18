@@ -28,7 +28,6 @@ server:
     context-path: /syfomoteadmin
 
 spring:
-  flyway.table: 'schema_version'
   main:
     banner-mode: 'off'
     allow-bean-definition-overriding: true
