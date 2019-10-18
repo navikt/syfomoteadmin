@@ -46,7 +46,7 @@ plugins {
     id("io.freefair.lombok") version "4.1.2"
     id("java")
     id("com.github.johnrengelman.shadow") version "4.0.3"
-    id("org.springframework.boot") version "2.1.9.RELEASE"
+    id("org.springframework.boot") version "2.0.4.RELEASE"
     id("io.spring.dependency-management") version "1.0.8.RELEASE"
 }
 
@@ -114,7 +114,7 @@ dependencies {
     implementation("org.apache.commons:commons-lang3:$apacheCommonsVersion")
     implementation("javax.mail:mail:$javaxMailVersion")
 
-    api("org.flywaydb:flyway-core")
+    api("org.flywaydb:flyway-core:4.0.3")
     runtimeOnly("com.oracle:ojdbc6:$ojdbc6Version")
     implementation("com.h2database:h2")
 }
