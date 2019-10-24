@@ -1,14 +1,11 @@
 # Syfomoteadmin
-Tidligere moteadmin, håndtere dialogmøter
+Previously named moteadmin, handles 'dialogmøter'-data.
 
-## Lokal utvikling
-Start opp via `LocalApplication.main`. Kjører på port 8999.
+## Local setup
+The application can be started locally by running `LocalApplication.main`. It listens on port 8999.
+A local instance of an in-memory H2 database is initialized during application startup. Queries can
+be executed against `localhost/h2` by logging in using jdbc_url: `jdbc:h2:mem:testdb`. The database
+is also available in test scope.
 
-## Veien til prod
-Bygg og Pipeline jobber ligger i jenkins: https://jenkins-digisyfo.adeo.no/job/digisyfo/job/syfomoteadmin/
-
-
-## Database
-Appen kjører med en lokal H2 in-memory database. Den spinnes opp som en del av applikasjonen og er 
-også tilgjengelig i tester. Du kan logge inn og kjøre spørringer på:
-`localhost/h2` med jdbc_url: `jdbc:h2:mem:testdb`
+## Deployment
+Build and deploy pipeline-jobs are located in: https://jenkins-digisyfo.adeo.no/job/digisyfo/job/syfomoteadmin/
