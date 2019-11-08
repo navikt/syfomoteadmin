@@ -1,8 +1,10 @@
-package no.nav.syfo.api.ressurser;
+package no.nav.syfo.api.ressurser.azure;
 
 import no.nav.syfo.LocalApplication;
 import no.nav.syfo.api.domain.RSEnheter;
 import no.nav.syfo.api.domain.RSVeilederInfo;
+import no.nav.syfo.api.ressurser.AbstractRessursTilgangTest;
+import no.nav.syfo.api.ressurser.azuread.VeilederAzureRessurs;
 import no.nav.syfo.domain.model.Veileder;
 import no.nav.syfo.service.VeilederService;
 import org.junit.Before;
