@@ -16,6 +16,10 @@ import static no.nav.syfo.config.consumer.DkifConfig.MOCK_KEY;
 @ConditionalOnProperty(value = MOCK_KEY, havingValue = "true")
 public class DkifMock implements DigitalKontaktinformasjonV1 {
 
+    public final static String PERSON_EMAIL = "test@nav.no";
+    public final static String PERSON_TLF = "12345678";
+    public final static String PERSON_RESERVASJON = "false";
+
     @Override
     public WSHentSikkerDigitalPostadresseBolkResponse hentSikkerDigitalPostadresseBolk(WSHentSikkerDigitalPostadresseBolkRequest request) throws HentSikkerDigitalPostadresseBolkForMangeForespoersler, HentSikkerDigitalPostadresseBolkSikkerhetsbegrensing {
         return null;
@@ -46,11 +50,11 @@ public class DkifMock implements DigitalKontaktinformasjonV1 {
         return new WSHentDigitalKontaktinformasjonResponse()
                 .withDigitalKontaktinformasjon(new WSKontaktinformasjon()
                         .withEpostadresse(new WSEpostadresse()
-                                .withValue("test@nav.no")
+                                .withValue(PERSON_EMAIL)
                                 .withSistVerifisert(OffsetDateTime.now().minusMonths(10)))
                         .withMobiltelefonnummer(new WSMobiltelefonnummer()
-                                .withValue("12345678")
+                                .withValue(PERSON_TLF)
                                 .withSistVerifisert(OffsetDateTime.now().minusMonths(10)))
-                        .withReservasjon("false"));
+                        .withReservasjon(PERSON_RESERVASJON));
     }
 }

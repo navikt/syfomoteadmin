@@ -14,6 +14,9 @@ import static no.nav.syfo.config.consumer.EregConfig.MOCK_KEY;
 @ConditionalOnProperty(value = MOCK_KEY, havingValue = "true")
 public class OrganisasjonMock implements OrganisasjonV4 {
 
+    public final static String VIRKSOMHET_NAME1 = "Testbedrift";
+    public final static String VIRKSOMHET_NAME2 = "Testveien";
+
     @Override
     public WSFinnOrganisasjonResponse finnOrganisasjon(WSFinnOrganisasjonRequest request) throws FinnOrganisasjonForMangeForekomster, FinnOrganisasjonUgyldigInput {
         throw new RuntimeException("Ikke implementert i mock. Se OrganisasjonMock");
@@ -29,8 +32,8 @@ public class OrganisasjonMock implements OrganisasjonV4 {
         return new WSHentOrganisasjonResponse()
                 .withOrganisasjon(new WSOrganisasjon()
                         .withNavn(new WSUstrukturertNavn()
-                                .withNavnelinje("Testbedrift")
-                                .withNavnelinje("Testveien")));
+                                .withNavnelinje(VIRKSOMHET_NAME1)
+                                .withNavnelinje(VIRKSOMHET_NAME2)));
     }
 
     @Override
