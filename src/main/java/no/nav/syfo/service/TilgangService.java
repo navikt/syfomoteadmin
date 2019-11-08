@@ -1,5 +1,6 @@
 package no.nav.syfo.service;
 
+import no.nav.syfo.domain.Fnr;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
@@ -49,7 +50,7 @@ public class TilgangService {
         }
     }
 
-    public void throwExceptionIfVeilederWithoutAccessToPerson(String fnr) {
+    public void throwExceptionIfVeilederWithoutAccess(Fnr fnr) {
         boolean harTilgang = harVeilederTilgangTilPersonViaAzure(fnr);
         if (!harTilgang) {
             throw new ForbiddenException();
@@ -61,8 +62,8 @@ public class TilgangService {
         return kallUriMedTemplate(tilgangTilBrukerUriMedFnr);
     }
 
-    public boolean harVeilederTilgangTilPersonViaAzure(String fnr) {
-        URI tilgangTilBrukerViaAzureUriMedFnr = tilgangTilBrukerViaAzureUriTemplate.build(singletonMap(FNR, fnr));
+    public boolean harVeilederTilgangTilPersonViaAzure(Fnr fnr) {
+        URI tilgangTilBrukerViaAzureUriMedFnr = tilgangTilBrukerViaAzureUriTemplate.build(singletonMap(FNR, fnr.getFnr()));
         return kallUriMedTemplate(tilgangTilBrukerViaAzureUriMedFnr);
     }
 

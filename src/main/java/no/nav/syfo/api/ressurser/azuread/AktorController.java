@@ -2,6 +2,7 @@ package no.nav.syfo.api.ressurser.azuread;
 
 import no.nav.security.spring.oidc.validation.api.ProtectedWithClaims;
 import no.nav.syfo.api.domain.RSAktor;
+import no.nav.syfo.domain.Fnr;
 import no.nav.syfo.service.AktoerService;
 import no.nav.syfo.service.TilgangService;
 import org.springframework.web.bind.annotation.*;
@@ -31,10 +32,10 @@ public class AktorController {
 
     @GetMapping(produces = APPLICATION_JSON_VALUE)
     public RSAktor get(@PathVariable("aktorId") String aktorId) {
-        final String fnr = aktoerService.hentFnrForAktoer(aktorId);
+        final Fnr fnr = Fnr.of(aktoerService.hentFnrForAktoer(aktorId));
 
-        tilgangService.throwExceptionIfVeilederWithoutAccessToPerson(fnr);
+        tilgangService.throwExceptionIfVeilederWithoutAccess(fnr);
 
-        return new RSAktor().fnr(fnr);
+        return new RSAktor().fnr(fnr.getFnr());
     }
 }

@@ -2,6 +2,7 @@ package no.nav.syfo.api.ressurser.azuread;
 
 import no.nav.security.spring.oidc.validation.api.ProtectedWithClaims;
 import no.nav.syfo.api.domain.RSBrukerPaaEnhet;
+import no.nav.syfo.domain.Fnr;
 import no.nav.syfo.service.*;
 import org.springframework.web.bind.annotation.*;
 
@@ -51,7 +52,7 @@ public class EnhetRessurs {
         return motedeltakerService.sykmeldteMedMoteHvorBeggeHarSvart(enhet)
                 .stream()
                 .map(motedeltakerAktorId -> aktoerService.hentFnrForAktoer(motedeltakerAktorId))
-                .filter(sykmeldtFnr -> tilgangService.harVeilederTilgangTilPersonViaAzure(sykmeldtFnr))
+                .filter(sykmeldtFnr -> tilgangService.harVeilederTilgangTilPersonViaAzure(Fnr.of(sykmeldtFnr)))
                 .map(sykmeldtFnr -> new RSBrukerPaaEnhet()
                         .fnr(sykmeldtFnr)
                         .skjermingskode(hentBrukersSkjermingskode(sykmeldtFnr)))
