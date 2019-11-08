@@ -49,6 +49,13 @@ public class TilgangService {
         }
     }
 
+    public void throwExceptionIfVeilederWithoutAccessToPerson(String fnr) {
+        boolean harTilgang = harVeilederTilgangTilPersonViaAzure(fnr);
+        if (!harTilgang) {
+            throw new ForbiddenException();
+        }
+    }
+
     public boolean harVeilederTilgangTilPerson(String fnr) {
         URI tilgangTilBrukerUriMedFnr = tilgangTilBrukerUriTemplate.build(singletonMap(FNR, fnr));
         return kallUriMedTemplate(tilgangTilBrukerUriMedFnr);
