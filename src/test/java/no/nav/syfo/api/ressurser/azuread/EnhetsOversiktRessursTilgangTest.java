@@ -1,8 +1,7 @@
-package no.nav.syfo.api.ressurser.azure;
+package no.nav.syfo.api.ressurser.azuread;
 
 import no.nav.syfo.LocalApplication;
 import no.nav.syfo.api.domain.RSBrukerPaaEnhet;
-import no.nav.syfo.api.ressurser.azuread.EnhetRessurs;
 import no.nav.syfo.service.MotedeltakerService;
 import no.nav.syfo.service.TilgangService;
 import org.junit.Test;

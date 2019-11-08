@@ -1,9 +1,8 @@
-package no.nav.syfo.api.ressurser.azure;
+package no.nav.syfo.api.ressurser.azuread;
 
 import no.nav.syfo.LocalApplication;
 import no.nav.syfo.api.domain.RSBruker;
 import no.nav.syfo.api.ressurser.AbstractRessursTilgangTest;
-import no.nav.syfo.api.ressurser.azuread.PersonController;
 import no.nav.syfo.domain.model.Kontaktinfo;
 import no.nav.syfo.oidc.OIDCIssuer;
 import no.nav.syfo.service.DkifService;

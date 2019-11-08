@@ -1,9 +1,8 @@
-package no.nav.syfo.api.ressurser.azure;
+package no.nav.syfo.api.ressurser.azuread;
 
 import no.nav.syfo.LocalApplication;
 import no.nav.syfo.api.domain.RSAktor;
 import no.nav.syfo.api.ressurser.AbstractRessursTilgangTest;
-import no.nav.syfo.api.ressurser.azuread.AktorController;
 import no.nav.syfo.service.AktoerService;
 import org.junit.Before;
 import org.junit.Test;
