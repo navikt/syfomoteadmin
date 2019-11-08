@@ -19,7 +19,7 @@ import static no.nav.syfo.util.OIDCUtil.leggTilOnBehalfOfOutInterceptorForOIDC;
 @Configuration
 public class DkifConfig {
 
-    public static final String MOCK_KEY = "arena.withmock";
+    public static final String MOCK_KEY = "dkif.withmock";
     @Value("${virksomhet.digitalkontakinformasjon.v1.endpointurl}")
     private String serviceUrl;
 
