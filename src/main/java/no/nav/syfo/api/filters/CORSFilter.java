@@ -19,6 +19,8 @@ public class CORSFilter implements Filter {
             "https://syfooversikt.nais.adeo.no",
             "https://syfooversikt.nais.preprod.local",
             "https://syfooversikt-q1.nais.preprod.local",
+            "https://syfomodiaperson.nais.adeo.no",
+            "https://syfomodiaperson.nais.preprod.local",
             "https://modiasyfofront.nais.adeo.no",
             "https://modiasyfofront.nais.preprod.local",
             "https://modiasyfofront-q1.nais.preprod.local",
