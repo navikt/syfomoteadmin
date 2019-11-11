@@ -24,6 +24,8 @@ public class CORSFilter implements Filter {
             "https://modiasyfofront-q1.nais.preprod.local",
             "https://fastlegefront.nais.adeo.no",
             "https://fastlegefront.nais.preprod.local",
+            "https://finnfastlege.nais.adeo.no",
+            "https://finnfastlege.nais.preprod.local",
             "https://fastlegefront-q1.nais.preprod.local",
             "https://app.adeo.no",
             "https://app-q1.adeo.no"
