@@ -46,7 +46,7 @@ public class MoteActions {
     @PostMapping(consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     @RequestMapping(value = "/avbryt")
     public void avbryt(@PathVariable("moteUuid") String moteUuid, @RequestParam(value = "varsle") boolean varsle) {
-        moteService.avbrytMote(moteUuid, varsle);
+        moteService.avbrytMote(moteUuid, varsle, getSubjectIntern(contextHolder));
 
         metrikk.tellEndepunktKall("avbryt_mote");
     }
@@ -54,7 +54,7 @@ public class MoteActions {
     @PostMapping(consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     @RequestMapping(value = "/bekreft")
     public void bekreft(@PathVariable("moteUuid") String moteUuid, @RequestParam(value = "valgtAlternativId") Long tidOgStedId) {
-        moteService.bekreftMote(moteUuid, tidOgStedId);
+        moteService.bekreftMote(moteUuid, tidOgStedId, getSubjectIntern(contextHolder));
 
         metrikk.tellEndepunktKall("bekreft_mote");
     }
@@ -62,7 +62,7 @@ public class MoteActions {
     @PostMapping(consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
     @RequestMapping(value = "/nyealternativer")
     public void nyeAlternativer(@PathVariable("moteUuid") String moteUuid, @RequestBody List<RSNyttAlternativ> alternativer) {
-        moteService.nyeAlternativer(moteUuid, mapListe(alternativer, opprett2TidOgSted));
+        moteService.nyeAlternativer(moteUuid, mapListe(alternativer, opprett2TidOgSted), getSubjectIntern(contextHolder));
 
         metrikk.tellEndepunktKall("nye_alternativer");
     }

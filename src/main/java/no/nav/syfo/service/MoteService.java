@@ -27,12 +27,10 @@ import static no.nav.syfo.repository.model.PFeedHendelse.FeedHendelseType.ALLE_S
 import static no.nav.syfo.service.MotedeltakerService.finnAktoerIMote;
 import static no.nav.syfo.util.MoterUtil.filtrerBortAlternativerSomAlleredeErLagret;
 import static no.nav.syfo.util.MoterUtil.hentSisteSvartidspunkt;
-import static no.nav.syfo.util.OIDCUtil.getSubjectIntern;
 
 @Service
 public class MoteService {
 
-    private OIDCRequestContextHolder contextHolder;
     private MoteDAO moteDAO;
     private FeedDAO feedDAO;
     private TidOgStedDAO tidOgStedDAO;
@@ -49,7 +47,6 @@ public class MoteService {
 
     @Autowired
     public MoteService(
-            OIDCRequestContextHolder contextHolder,
             MoteDAO moteDAO,
             FeedDAO feedDAO,
             TidOgStedDAO tidOgStedDAO,
@@ -64,7 +61,6 @@ public class MoteService {
             DkifService dkifService,
             FeedService feedService
     ) {
-        this.contextHolder = contextHolder;
         this.moteDAO = moteDAO;
         this.feedDAO = feedDAO;
         this.tidOgStedDAO = tidOgStedDAO;
@@ -97,7 +93,7 @@ public class MoteService {
     }
 
     @Transactional
-    public void avbrytMote(String moteUuid, boolean varsle) {
+    public void avbrytMote(String moteUuid, boolean varsle, String veilederIdent) {
         Mote mote = moteDAO.findMoteByUUID(moteUuid);
         mqStoppRevarslingService.stoppReVarsel(finnAktoerIMote(mote).uuid);
         if (varsle) {
@@ -108,14 +104,14 @@ public class MoteService {
         moteDAO.setStatus(mote.id, AVBRUTT.name());
         hendelseService.moteStatusEndret(mote.status(AVBRUTT));
         if (feedService.skalOppretteFeedHendelse(mote, PFeedHendelse.FeedHendelseType.AVBRUTT)) {
-            opprettFeedHendelseAvTypen(PFeedHendelse.FeedHendelseType.AVBRUTT, mote);
+            opprettFeedHendelseAvTypen(PFeedHendelse.FeedHendelseType.AVBRUTT, mote, veilederIdent);
         }
         behandleMote(mote);
         metrikk.reportAntallDagerSiden(hentSisteSvartidspunkt(mote).orElse(mote.opprettetTidspunkt), "antallDagerVeilederSvar");
     }
 
     @Transactional
-    public void bekreftMote(String moteUuid, Long tidOgStedId) {
+    public void bekreftMote(String moteUuid, Long tidOgStedId, String veilederIdent) {
         Mote mote = moteDAO.findMoteByUUID(moteUuid);
 
         metrikk.reportAntallDagerSiden(mote.opprettetTidspunkt, "antallDagerForSvar");
@@ -130,13 +126,13 @@ public class MoteService {
         arbeidsgiverVarselService.sendVarsel(Varseltype.BEKREFTET, mote, false);
         sykmeldtVarselService.sendVarsel(Varseltype.BEKREFTET, mote);
         if (feedService.skalOppretteFeedHendelse(mote, PFeedHendelse.FeedHendelseType.BEKREFTET)) {
-            opprettFeedHendelseAvTypen(PFeedHendelse.FeedHendelseType.BEKREFTET, mote);
+            opprettFeedHendelseAvTypen(PFeedHendelse.FeedHendelseType.BEKREFTET, mote, veilederIdent);
         }
         behandleMote(mote);
     }
 
     @Transactional
-    public void nyeAlternativer(String moteUuid, List<TidOgSted> nyeAlternativer) {
+    public void nyeAlternativer(String moteUuid, List<TidOgSted> nyeAlternativer, String veilederIdent) {
         Mote mote = moteDAO.findMoteByUUID(moteUuid);
 
         List<TidOgSted> filtrerBortAlternativerSomAlleredeErLagret = filtrerBortAlternativerSomAlleredeErLagret(nyeAlternativer, mote);
@@ -150,7 +146,7 @@ public class MoteService {
         arbeidsgiverVarselService.sendVarsel(Varseltype.NYE_TIDSPUNKT, mote, false);
         sykmeldtVarselService.sendVarsel(Varseltype.NYE_TIDSPUNKT, mote);
         if (feedService.skalOppretteFeedHendelse(mote, PFeedHendelse.FeedHendelseType.FLERE_TIDSPUNKT)) {
-            opprettFeedHendelseAvTypen(PFeedHendelse.FeedHendelseType.FLERE_TIDSPUNKT, mote);
+            opprettFeedHendelseAvTypen(PFeedHendelse.FeedHendelseType.FLERE_TIDSPUNKT, mote, veilederIdent);
         }
         behandleMote(mote);
         metrikk.reportAntallDagerSiden(hentSisteSvartidspunkt(mote).orElse(mote.opprettetTidspunkt), "antallDagerVeilederSvar");
@@ -242,9 +238,9 @@ public class MoteService {
         return moteDAO.findMoterByNavEnhet(navenhet);
     }
 
-    private void opprettFeedHendelseAvTypen(PFeedHendelse.FeedHendelseType type, Mote Mote) {
+    private void opprettFeedHendelseAvTypen(PFeedHendelse.FeedHendelseType type, Mote Mote, String veilederIdent) {
         feedDAO.createFeedHendelse(new PFeedHendelse()
-                .sistEndretAv(getSubjectIntern(contextHolder))
+                .sistEndretAv(veilederIdent)
                 .uuid(feedService.finnNyesteFeedUuidiMote(Mote))
                 .type(type.name())
                 .moteId(Mote.id)
