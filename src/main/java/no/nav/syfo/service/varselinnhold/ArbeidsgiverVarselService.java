@@ -58,15 +58,15 @@ public class ArbeidsgiverVarselService {
 
     public void sendVarsel(Varseltype varseltype, Mote Mote, boolean erSystemKall, String innloggetIdent) {
         hendelseService.opprettHendelseVarselArbeidsgiver(varseltype, Mote.arbeidsgiver(), innloggetIdent);
-        sendMoteTredjepartsVarsel(varseltype, Mote, erSystemKall);
+        sendMoteTredjepartsVarsel(varseltype, Mote, erSystemKall, innloggetIdent);
     }
 
 
-    private void sendMoteTredjepartsVarsel(Varseltype varseltype, Mote mote, boolean erSystemKall) {
+    private void sendMoteTredjepartsVarsel(Varseltype varseltype, Mote mote, boolean erSystemKall, String innloggetIdent) {
         NaermesteLeder leder = sykefravaersoppfoelgingService.finnAktorsLederForOrg(mote.sykmeldt().aktorId, mote.arbeidsgiver().orgnummer, erSystemKall);
         TredjepartsVarselType varselNokkel = null;
 
-        String veiledernavn = erSystemKall ? "NAV" : veiledernavn();
+        String veiledernavn = erSystemKall ? "NAV" : veiledernavn(innloggetIdent);
         String url = finnLenkeUrlForLeder(leder);
 
         List<Parameter> parameterListe = new ArrayList<>();
@@ -103,17 +103,17 @@ public class ArbeidsgiverVarselService {
     }
 
 
-    public PEpost varselinnhold(Varseltype varseltype, Mote mote, boolean erSystemKall) {
+    public PEpost varselinnhold(Varseltype varseltype, Mote mote, boolean erSystemKall, String innloggetIdent) {
         if (varseltype == OPPRETTET) {
-            return arbeidsgiverNyttMote(mote.arbeidsgiver().navn, finnLenkeUrl(mote.sykmeldt().aktorId, mote.arbeidsgiver().orgnummer, erSystemKall), veiledernavn()).mottaker(mote.arbeidsgiver().epost);
+            return arbeidsgiverNyttMote(mote.arbeidsgiver().navn, finnLenkeUrl(mote.sykmeldt().aktorId, mote.arbeidsgiver().orgnummer, erSystemKall), veiledernavn(innloggetIdent)).mottaker(mote.arbeidsgiver().epost);
         } else if (varseltype == AVBRUTT_BEKREFTET) {
-            return arbeidsgiverAvbrytBekreftetMote(mote.arbeidsgiver().navn, veiledernavn(), mote).mottaker(mote.arbeidsgiver().epost);
+            return arbeidsgiverAvbrytBekreftetMote(mote.arbeidsgiver().navn, veiledernavn(innloggetIdent), mote).mottaker(mote.arbeidsgiver().epost);
         } else if (varseltype == AVBRUTT) {
-            return arbeidsgiverAvbrytMote(mote.arbeidsgiver().navn, veiledernavn(), mote).mottaker(mote.arbeidsgiver().epost);
+            return arbeidsgiverAvbrytMote(mote.arbeidsgiver().navn, veiledernavn(innloggetIdent), mote).mottaker(mote.arbeidsgiver().epost);
         } else if (varseltype == BEKREFTET) {
-            return bekreftelseEpost(mote.arbeidsgiver().navn, finnLenkeUrl(mote.sykmeldt().aktorId, mote.arbeidsgiver().orgnummer, erSystemKall), sted(mote.valgtTidOgSted), mote.valgtTidOgSted.tid, veiledernavn()).mottaker(mote.arbeidsgiver().epost);
+            return bekreftelseEpost(mote.arbeidsgiver().navn, finnLenkeUrl(mote.sykmeldt().aktorId, mote.arbeidsgiver().orgnummer, erSystemKall), sted(mote.valgtTidOgSted), mote.valgtTidOgSted.tid, veiledernavn(innloggetIdent)).mottaker(mote.arbeidsgiver().epost);
         } else if (varseltype == NYE_TIDSPUNKT) {
-            return arbeidsgiverNyeTidspunkt(mote.arbeidsgiver().navn, finnLenkeUrl(mote.sykmeldt().aktorId, mote.arbeidsgiver().orgnummer, erSystemKall), veiledernavn()).mottaker(mote.arbeidsgiver().epost);
+            return arbeidsgiverNyeTidspunkt(mote.arbeidsgiver().navn, finnLenkeUrl(mote.sykmeldt().aktorId, mote.arbeidsgiver().orgnummer, erSystemKall), veiledernavn(innloggetIdent)).mottaker(mote.arbeidsgiver().epost);
         } else if (varseltype == PAAMINNELSE) {
             return arbeidsgiverPaaminnelseMote(mote.arbeidsgiver().navn, "NAV", finnLenkeUrl(mote.sykmeldt().aktorId, mote.arbeidsgiver().orgnummer, erSystemKall), opprettetTidspunkt(mote))
                     .mottaker(mote.arbeidsgiver().epost);
@@ -121,8 +121,8 @@ public class ArbeidsgiverVarselService {
         return null;
     }
 
-    private String veiledernavn() {
-        return veilederService.hentVeileder(getSubjectIntern(contextHolder)).navn;
+    private String veiledernavn(String innloggetIdent) {
+        return veilederService.hentVeileder(innloggetIdent).navn;
     }
 
     private String sted(TidOgSted valgtTidOgSted) {
