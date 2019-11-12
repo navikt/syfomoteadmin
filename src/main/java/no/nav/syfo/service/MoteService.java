@@ -98,11 +98,11 @@ public class MoteService {
         mqStoppRevarslingService.stoppReVarsel(finnAktoerIMote(mote).uuid);
         if (varsle) {
             Varseltype varseltype = mote.status.equals(MoteStatus.BEKREFTET) ? Varseltype.AVBRUTT_BEKREFTET : Varseltype.AVBRUTT;
-            arbeidsgiverVarselService.sendVarsel(varseltype, mote, false);
+            arbeidsgiverVarselService.sendVarsel(varseltype, mote, false, veilederIdent);
             sykmeldtVarselService.sendVarsel(varseltype, mote);
         }
         moteDAO.setStatus(mote.id, AVBRUTT.name());
-        hendelseService.moteStatusEndret(mote.status(AVBRUTT));
+        hendelseService.moteStatusEndret(mote.status(AVBRUTT), veilederIdent);
         if (feedService.skalOppretteFeedHendelse(mote, PFeedHendelse.FeedHendelseType.AVBRUTT)) {
             opprettFeedHendelseAvTypen(PFeedHendelse.FeedHendelseType.AVBRUTT, mote, veilederIdent);
         }
@@ -120,10 +120,10 @@ public class MoteService {
         moteDAO.bekreftMote(mote.id, tidOgStedId);
         mote.valgtTidOgSted(mote.alternativer.stream().filter(tidOgSted -> tidOgSted.id.equals(tidOgStedId)).findFirst().orElseThrow(() -> new RuntimeException("Fant ikke tidspunktet!")));
 
-        hendelseService.moteStatusEndret(mote.status(BEKREFTET));
+        hendelseService.moteStatusEndret(mote.status(BEKREFTET), veilederIdent);
 
         mqStoppRevarslingService.stoppReVarsel(finnAktoerIMote(mote).uuid);
-        arbeidsgiverVarselService.sendVarsel(Varseltype.BEKREFTET, mote, false);
+        arbeidsgiverVarselService.sendVarsel(Varseltype.BEKREFTET, mote, false, veilederIdent);
         sykmeldtVarselService.sendVarsel(Varseltype.BEKREFTET, mote);
         if (feedService.skalOppretteFeedHendelse(mote, PFeedHendelse.FeedHendelseType.BEKREFTET)) {
             opprettFeedHendelseAvTypen(PFeedHendelse.FeedHendelseType.BEKREFTET, mote, veilederIdent);
@@ -140,10 +140,10 @@ public class MoteService {
             return;
         }
 
-        hendelseService.moteStatusEndret(mote.status(FLERE_TIDSPUNKT));
+        hendelseService.moteStatusEndret(mote.status(FLERE_TIDSPUNKT), veilederIdent);
         nyeAlternativer.forEach(tidOgSted -> tidOgStedDAO.create(tidOgSted.moteId(mote.id)));
 
-        arbeidsgiverVarselService.sendVarsel(Varseltype.NYE_TIDSPUNKT, mote, false);
+        arbeidsgiverVarselService.sendVarsel(Varseltype.NYE_TIDSPUNKT, mote, false, veilederIdent);
         sykmeldtVarselService.sendVarsel(Varseltype.NYE_TIDSPUNKT, mote);
         if (feedService.skalOppretteFeedHendelse(mote, PFeedHendelse.FeedHendelseType.FLERE_TIDSPUNKT)) {
             opprettFeedHendelseAvTypen(PFeedHendelse.FeedHendelseType.FLERE_TIDSPUNKT, mote, veilederIdent);

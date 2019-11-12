@@ -56,8 +56,8 @@ public class ArbeidsgiverVarselService {
         this.tredjepartsvarselService = tredjepartsvarselService;
     }
 
-    public void sendVarsel(Varseltype varseltype, Mote Mote, boolean erSystemKall) {
-        hendelseService.opprettHendelseVarselArbeidsgiver(varseltype, Mote.arbeidsgiver(), erSystemKall);
+    public void sendVarsel(Varseltype varseltype, Mote Mote, boolean erSystemKall, String innloggetIdent) {
+        hendelseService.opprettHendelseVarselArbeidsgiver(varseltype, Mote.arbeidsgiver(), innloggetIdent);
         sendMoteTredjepartsVarsel(varseltype, Mote, erSystemKall);
     }
 

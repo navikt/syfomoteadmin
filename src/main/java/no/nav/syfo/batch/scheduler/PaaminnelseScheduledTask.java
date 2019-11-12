@@ -21,6 +21,8 @@ import static no.nav.syfo.util.time.NorskeHelligDagerUtil.erNorskHelligDag;
 @Component
 public class PaaminnelseScheduledTask {
 
+    private final String SRV_BRUKER = "srvmoteadmin";
+
     private MotedeltakerService motedeltakerService;
 
     private MoteService moteService;
@@ -69,7 +71,7 @@ public class PaaminnelseScheduledTask {
             motedeltakerService.findMotedeltakereSomIkkeHarSvartSisteDognet(antallDagerBakoverEkstra)
                     .stream()
                     .map(motedeltaker -> moteService.findMoteByMotedeltakerUuid(motedeltaker.uuid))
-                    .forEach(mote -> varselService.sendVarsel(PAAMINNELSE, mote, true));
+                    .forEach(mote -> varselService.sendVarsel(PAAMINNELSE, mote, true, SRV_BRUKER));
         }
     }
 }
