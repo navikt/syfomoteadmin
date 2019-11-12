@@ -52,7 +52,7 @@ public class EnhetRessurs {
         return motedeltakerService.sykmeldteMedMoteHvorBeggeHarSvart(enhet)
                 .stream()
                 .map(motedeltakerAktorId -> aktoerService.hentFnrForAktoer(motedeltakerAktorId))
-                .filter(sykmeldtFnr -> tilgangService.harVeilederTilgangTilPersonViaAzure(Fnr.of(sykmeldtFnr)))
+                .filter(sykmeldtFnr -> tilgangService.harVeilederTilgangTilPersonViaAzure(sykmeldtFnr))
                 .map(sykmeldtFnr -> new RSBrukerPaaEnhet()
                         .fnr(sykmeldtFnr)
                         .skjermingskode(hentBrukersSkjermingskode(sykmeldtFnr)))

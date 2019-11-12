@@ -51,7 +51,7 @@ public class TilgangService {
     }
 
     public void throwExceptionIfVeilederWithoutAccess(Fnr fnr) {
-        boolean harTilgang = harVeilederTilgangTilPersonViaAzure(fnr);
+        boolean harTilgang = harVeilederTilgangTilPersonViaAzure(fnr.getFnr());
         if (!harTilgang) {
             throw new ForbiddenException();
         }
@@ -62,8 +62,8 @@ public class TilgangService {
         return kallUriMedTemplate(tilgangTilBrukerUriMedFnr);
     }
 
-    public boolean harVeilederTilgangTilPersonViaAzure(Fnr fnr) {
-        URI tilgangTilBrukerViaAzureUriMedFnr = tilgangTilBrukerViaAzureUriTemplate.build(singletonMap(FNR, fnr.getFnr()));
+    public boolean harVeilederTilgangTilPersonViaAzure(String fnr) {
+        URI tilgangTilBrukerViaAzureUriMedFnr = tilgangTilBrukerViaAzureUriTemplate.build(singletonMap(FNR, fnr));
         return kallUriMedTemplate(tilgangTilBrukerViaAzureUriMedFnr);
     }
 
