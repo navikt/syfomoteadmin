@@ -1,6 +1,7 @@
 import com.github.jengelman.gradle.plugins.shadow.transformers.ServiceFileTransformer
 import com.github.jengelman.gradle.plugins.shadow.transformers.PropertiesFileTransformer
 import com.github.jengelman.gradle.plugins.shadow.tasks.ShadowJar
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 group = "no.nav.syfo"
 version = "1.0.0"
@@ -20,6 +21,8 @@ val dkifVersion = "1.2"
 val cxfVersion = "3.3.3"
 
 val oidcSpringSupportVersion = "0.2.4"
+val kotlinLibVersion = "1.3.50"
+val kotlinJacksonVersion = "2.9.8"
 
 val mqVersion = "9.0.4.0"
 val varselInnVersion = "1.0.5"
@@ -41,12 +44,19 @@ val javaxMailVersion = "1.5.0-b01"
 val ojdbc6Version = "11.2.0.3"
 
 plugins {
-    kotlin("jvm") version "1.3.31"
+    kotlin("jvm") version "1.3.50"
     id("io.freefair.lombok") version "4.1.2"
+    id("org.jetbrains.kotlin.plugin.allopen") version "1.3.50"
     id("java")
     id("com.github.johnrengelman.shadow") version "4.0.3"
     id("org.springframework.boot") version "2.0.4.RELEASE"
     id("io.spring.dependency-management") version "1.0.8.RELEASE"
+}
+
+allOpen {
+    annotation("org.springframework.context.annotation.Configuration")
+    annotation("org.springframework.stereotype.Service")
+    annotation("org.springframework.stereotype.Component")
 }
 
 repositories {
@@ -55,10 +65,13 @@ repositories {
     maven(url="https://repo.adeo.no/repository/maven-snapshots/")
     maven(url="https://repo.adeo.no/repository/maven-releases/")
     maven(url="https://dl.bintray.com/kotlin/kotlinx/")
-
 }
 
 dependencies {
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlinLibVersion")
+    implementation("org.jetbrains.kotlin:kotlin-reflect:$kotlinLibVersion")
+    implementation("com.fasterxml.jackson.module:jackson-module-kotlin:$kotlinJacksonVersion")
+
     implementation("no.nav.syfo.tjenester:aktoer-v2:$aktoerV2Version")
     implementation("no.nav.sbl.dialogarena:arbeidsfordeling-v1-tjenestespesifikasjon:$arbeidsfordelingV1Version")
     implementation("no.nav.sbl.dialogarena:person-v3-tjenestespesifikasjon:$personV3Version")
@@ -141,4 +154,12 @@ tasks {
         mergeServiceFiles()
     }
 
+
+    named<KotlinCompile>("compileKotlin") {
+        kotlinOptions.jvmTarget = "1.8"
+    }
+
+    named<KotlinCompile>("compileTestKotlin") {
+        kotlinOptions.jvmTarget = "1.8"
+    }
 }
