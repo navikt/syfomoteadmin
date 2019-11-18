@@ -5,6 +5,7 @@ import no.nav.syfo.LocalApplication
 import no.nav.syfo.api.domain.nyttmoterequest.RSNyttAlternativ
 import no.nav.syfo.api.mappers.RSNyttMoteMapper
 import no.nav.syfo.domain.model.TidOgSted
+import no.nav.syfo.oidc.OIDCIssuer.AZURE
 import no.nav.syfo.service.ArenaService
 import no.nav.syfo.service.MoteService
 import no.nav.syfo.testhelper.OidcTestHelper.loggInnVeilederAzure
@@ -53,7 +54,7 @@ class MoterActionsControllerTest {
 
         moteActionsController.avbryt(uuid.toString(), varsle)
 
-        verify<MoteService>(moteService).avbrytMote(uuid.toString(), varsle, VEILEDER_ID)
+        verify<MoteService>(moteService).avbrytMote(uuid.toString(), varsle, VEILEDER_ID, AZURE)
     }
 
     @Test(expected = RuntimeException::class)
@@ -70,7 +71,7 @@ class MoterActionsControllerTest {
 
         moteActionsController.bekreft(uuid.toString(), alternativId)
 
-        verify<MoteService>(moteService).bekreftMote(uuid.toString(), alternativId, VEILEDER_ID)
+        verify<MoteService>(moteService).bekreftMote(uuid.toString(), alternativId, VEILEDER_ID, AZURE)
     }
 
     @Test(expected = RuntimeException::class)
@@ -96,7 +97,7 @@ class MoterActionsControllerTest {
 
         moteActionsController.nyeAlternativer(uuid.toString(), alternativeListe)
 
-        verify<MoteService>(moteService).nyeAlternativer(uuid.toString(), tidStedListe, VEILEDER_ID)
+        verify<MoteService>(moteService).nyeAlternativer(uuid.toString(), tidStedListe, VEILEDER_ID, AZURE)
     }
 
     @Test(expected = RuntimeException::class)
