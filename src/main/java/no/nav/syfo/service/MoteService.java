@@ -93,25 +93,25 @@ public class MoteService {
     }
 
     @Transactional
-    public void avbrytMote(String moteUuid, boolean varsle, String veilederIdent) {
+    public void avbrytMote(String moteUuid, boolean varsle, String veilederIdent, String oidcIssuer) {
         Mote mote = moteDAO.findMoteByUUID(moteUuid);
         mqStoppRevarslingService.stoppReVarsel(finnAktoerIMote(mote).uuid);
         if (varsle) {
             Varseltype varseltype = mote.status.equals(MoteStatus.BEKREFTET) ? Varseltype.AVBRUTT_BEKREFTET : Varseltype.AVBRUTT;
             arbeidsgiverVarselService.sendVarsel(varseltype, mote, false, veilederIdent);
-            sykmeldtVarselService.sendVarsel(varseltype, mote);
+            sykmeldtVarselService.sendVarsel(varseltype, mote, oidcIssuer);
         }
         moteDAO.setStatus(mote.id, AVBRUTT.name());
         hendelseService.moteStatusEndret(mote.status(AVBRUTT), veilederIdent);
         if (feedService.skalOppretteFeedHendelse(mote, PFeedHendelse.FeedHendelseType.AVBRUTT)) {
             opprettFeedHendelseAvTypen(PFeedHendelse.FeedHendelseType.AVBRUTT, mote, veilederIdent);
         }
-        behandleMote(mote);
+        behandleMote(mote, oidcIssuer);
         metrikk.reportAntallDagerSiden(hentSisteSvartidspunkt(mote).orElse(mote.opprettetTidspunkt), "antallDagerVeilederSvar");
     }
 
     @Transactional
-    public void bekreftMote(String moteUuid, Long tidOgStedId, String veilederIdent) {
+    public void bekreftMote(String moteUuid, Long tidOgStedId, String veilederIdent, String oidcIssuer) {
         Mote mote = moteDAO.findMoteByUUID(moteUuid);
 
         metrikk.reportAntallDagerSiden(mote.opprettetTidspunkt, "antallDagerForSvar");
@@ -124,15 +124,15 @@ public class MoteService {
 
         mqStoppRevarslingService.stoppReVarsel(finnAktoerIMote(mote).uuid);
         arbeidsgiverVarselService.sendVarsel(Varseltype.BEKREFTET, mote, false, veilederIdent);
-        sykmeldtVarselService.sendVarsel(Varseltype.BEKREFTET, mote);
+        sykmeldtVarselService.sendVarsel(Varseltype.BEKREFTET, mote, oidcIssuer);
         if (feedService.skalOppretteFeedHendelse(mote, PFeedHendelse.FeedHendelseType.BEKREFTET)) {
             opprettFeedHendelseAvTypen(PFeedHendelse.FeedHendelseType.BEKREFTET, mote, veilederIdent);
         }
-        behandleMote(mote);
+        behandleMote(mote, oidcIssuer);
     }
 
     @Transactional
-    public void nyeAlternativer(String moteUuid, List<TidOgSted> nyeAlternativer, String veilederIdent) {
+    public void nyeAlternativer(String moteUuid, List<TidOgSted> nyeAlternativer, String veilederIdent, String oidcIssuer) {
         Mote mote = moteDAO.findMoteByUUID(moteUuid);
 
         List<TidOgSted> filtrerBortAlternativerSomAlleredeErLagret = filtrerBortAlternativerSomAlleredeErLagret(nyeAlternativer, mote);
@@ -144,16 +144,16 @@ public class MoteService {
         nyeAlternativer.forEach(tidOgSted -> tidOgStedDAO.create(tidOgSted.moteId(mote.id)));
 
         arbeidsgiverVarselService.sendVarsel(Varseltype.NYE_TIDSPUNKT, mote, false, veilederIdent);
-        sykmeldtVarselService.sendVarsel(Varseltype.NYE_TIDSPUNKT, mote);
+        sykmeldtVarselService.sendVarsel(Varseltype.NYE_TIDSPUNKT, mote, oidcIssuer);
         if (feedService.skalOppretteFeedHendelse(mote, PFeedHendelse.FeedHendelseType.FLERE_TIDSPUNKT)) {
             opprettFeedHendelseAvTypen(PFeedHendelse.FeedHendelseType.FLERE_TIDSPUNKT, mote, veilederIdent);
         }
-        behandleMote(mote);
+        behandleMote(mote, oidcIssuer);
         metrikk.reportAntallDagerSiden(hentSisteSvartidspunkt(mote).orElse(mote.opprettetTidspunkt), "antallDagerVeilederSvar");
     }
 
-    private void behandleMote(Mote mote) {
-        if (harAlleSvartPaaSisteForespoersel(mote, OIDCIssuer.INTERN)) {
+    private void behandleMote(Mote mote, String oidcIssuer) {
+        if (harAlleSvartPaaSisteForespoersel(mote, oidcIssuer)) {
             oversikthendelseService.sendOversikthendelse(mote, MOTEPLANLEGGER_ALLE_SVAR_BEHANDLET);
         }
     }

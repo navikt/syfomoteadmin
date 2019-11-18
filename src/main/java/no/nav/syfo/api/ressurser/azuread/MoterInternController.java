@@ -219,7 +219,7 @@ public class MoterInternController {
             ));
 
             arbeidsgiverVarselService.sendVarsel(OPPRETTET, Mote, false, innloggetIdent);
-            sykmeldtVarselService.sendVarsel(OPPRETTET, Mote);
+            sykmeldtVarselService.sendVarsel(OPPRETTET, Mote, AZURE);
 
             metrikk.tellEndepunktKall("opprettet_mote");
         }

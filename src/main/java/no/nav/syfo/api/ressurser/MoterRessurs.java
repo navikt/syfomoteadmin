@@ -220,7 +220,7 @@ public class MoterRessurs {
             ));
 
             arbeidsgiverVarselService.sendVarsel(OPPRETTET, Mote, false, getSubjectIntern(contextHolder));
-            sykmeldtVarselService.sendVarsel(OPPRETTET, Mote);
+            sykmeldtVarselService.sendVarsel(OPPRETTET, Mote, INTERN);
 
             metrikk.tellEndepunktKall("opprettet_mote");
         }
