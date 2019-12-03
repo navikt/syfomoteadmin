@@ -7,7 +7,6 @@ import no.nav.syfo.api.mappers.RSNyttMoteMapper.opprett2TidOgSted
 import no.nav.syfo.domain.model.TidOgSted
 import no.nav.syfo.metric.Metrikk
 import no.nav.syfo.oidc.OIDCIssuer.AZURE
-import no.nav.syfo.service.ArenaService
 import no.nav.syfo.service.MoteService
 import no.nav.syfo.util.MapUtil.mapListe
 import no.nav.syfo.util.OIDCUtil.getSubjectInternAzure
@@ -22,8 +21,7 @@ class MoteActionsController @Inject
 constructor(
         private val contextHolder: OIDCRequestContextHolder,
         private val metrikk: Metrikk,
-        private val moteService: MoteService,
-        private val arenaService: ArenaService
+        private val moteService: MoteService
 ) {
 
     @PostMapping(consumes = [APPLICATION_JSON_VALUE], produces = [APPLICATION_JSON_VALUE])
@@ -72,11 +70,5 @@ constructor(
         )
 
         metrikk.tellEndepunktKall("nye_alternativer")
-    }
-
-    @PostMapping(consumes = [APPLICATION_JSON_VALUE], produces = [APPLICATION_JSON_VALUE])
-    @RequestMapping(value = ["/opprettSanksjonsoppgave"])
-    fun createSanksjonsoppgave(@PathVariable("moteUuid") moteUuid: String) {
-        arenaService.bestillOppgave(moteUuid)
     }
 }

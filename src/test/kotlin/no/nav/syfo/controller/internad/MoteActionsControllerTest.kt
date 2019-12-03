@@ -6,7 +6,6 @@ import no.nav.syfo.api.domain.nyttmoterequest.RSNyttAlternativ
 import no.nav.syfo.api.mappers.RSNyttMoteMapper
 import no.nav.syfo.domain.model.TidOgSted
 import no.nav.syfo.oidc.OIDCIssuer.AZURE
-import no.nav.syfo.service.ArenaService
 import no.nav.syfo.service.MoteService
 import no.nav.syfo.testhelper.OidcTestHelper.loggInnVeilederAzure
 import no.nav.syfo.testhelper.OidcTestHelper.loggUtAlle
@@ -32,8 +31,6 @@ class MoterActionsControllerTest {
 
     @MockBean
     private lateinit var moteService: MoteService
-    @MockBean
-    private lateinit var arenaService: ArenaService
 
     @Inject
     private lateinit var oidcRequestContextHolder: OIDCRequestContextHolder
@@ -105,15 +102,6 @@ class MoterActionsControllerTest {
         loggUtAlle(oidcRequestContextHolder)
 
         moteActionsController.nyeAlternativer(UUID.randomUUID().toString(), emptyList())
-    }
-
-    @Test
-    fun createSanksjonsoppgaveHasAccess() {
-        val uuid = UUID.randomUUID()
-
-        moteActionsController.createSanksjonsoppgave(uuid.toString())
-
-        verify<ArenaService>(arenaService).bestillOppgave(uuid.toString())
     }
 }
 

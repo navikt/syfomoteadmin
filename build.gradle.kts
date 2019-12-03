@@ -10,7 +10,6 @@ val aktoerV2Version = "1.0"
 val arbeidsfordelingV1Version="1.1.0"
 val personV3Version = "3.0.2"
 val sykefravaersoppfoelgingV1Version = "1.0.22"
-val behandleArbeidOgAktivitetOppgaveV1Version = "1.0.1"
 val brukerprofilV3Version = "3.0.1"
 val egenAnsattV1Version= "1.0.1"
 val organisasjonV4Version = "1.0.1"
@@ -76,7 +75,6 @@ dependencies {
     implementation("no.nav.sbl.dialogarena:arbeidsfordeling-v1-tjenestespesifikasjon:$arbeidsfordelingV1Version")
     implementation("no.nav.sbl.dialogarena:person-v3-tjenestespesifikasjon:$personV3Version")
     implementation("no.nav.syfo.tjenester:sykefravaersoppfoelgingv1-tjenestespesifikasjon:$sykefravaersoppfoelgingV1Version")
-    implementation("no.nav.syfo.tjenester:behandleArbeidOgAktivitetOppgave-v1-tjenestespesifikasjon:$behandleArbeidOgAktivitetOppgaveV1Version")
     implementation("no.nav.syfo.tjenester:brukerprofil-v3-tjenestespesifikasjon:$brukerprofilV3Version")
     implementation("no.nav.syfo.tjenester:egenAnsatt-v1-tjenestespesifikasjon:$egenAnsattV1Version")
     implementation("no.nav.sbl.dialogarena:organisasjonv4-tjenestespesifikasjon:$organisasjonV4Version")

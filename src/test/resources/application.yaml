@@ -53,7 +53,6 @@ brukeroppgave.v1.endpointurl: "brukeroppgavev1.url"
 sykefravaersoppfoelging.v1.endpointurl: "sykefravaeroppfoelgingv1.url"
 virksomhet:
   arbeidsfordeling.v1.endpointurl: "arbeidsfordelingv1.url"
-  behandlearbeidogaktivitetoppgave.v1.endpointurl: "brukerprofil.url"
   brukerprofil.v3.endpointurl: "brukerprofil.url"
   digitalkontakinformasjon.v1.endpointurl: "dkif.url"
   diskresjonskode.v1.endpointurl: "diskresjonskode.url"
@@ -67,7 +66,6 @@ fasit.environment.name: 'local'
 
 aktoer.withmock: true
 arbeidsfordeling.withmock: true
-arena.withmock: true
 brukerprofil.withmock: true
 dkif.withmock: true
 egenansatt.withmock: true
