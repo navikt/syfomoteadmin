@@ -35,10 +35,6 @@ public class MotedeltakerService {
         motedeltakerDAO.motedeltakerHarSvart(motedeltakerUuid, valgteAlternativer);
     }
 
-    public List<String> sykmeldteMedMoteHvorBeggeHarSvart(String enhet) {
-        return motedeltakerDAO.sykmeldteMedMoteHvorBeggeHarSvart(enhet);
-    }
-
     public String finnArbeidstakerAktorIdForMoteId(Long moteId) {
         return motedeltakerDAO.arbeidstakerMotedeltakerAktorIdByMoteId(moteId).aktorId;
     }
