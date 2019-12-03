@@ -1,9 +1,6 @@
 package no.nav.syfo.repository.dao;
 
-import no.nav.syfo.domain.model.Mote;
-import no.nav.syfo.domain.model.Motedeltaker;
-import no.nav.syfo.domain.model.MotedeltakerAktorId;
-import no.nav.syfo.domain.model.MotedeltakerArbeidsgiver;
+import no.nav.syfo.domain.model.*;
 import no.nav.syfo.repository.model.PMotedeltakerAktorId;
 import no.nav.syfo.repository.model.PMotedeltakerArbeidsgiver;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -24,7 +21,8 @@ import java.util.List;
 import static java.time.LocalDate.now;
 import static java.util.UUID.randomUUID;
 import static java.util.stream.Collectors.toList;
-import static no.nav.syfo.domain.model.MoteStatus.*;
+import static no.nav.syfo.domain.model.MoteStatus.FLERE_TIDSPUNKT;
+import static no.nav.syfo.domain.model.MoteStatus.OPPRETTET;
 import static no.nav.syfo.domain.model.MotedeltakerStatus.SVART;
 import static no.nav.syfo.repository.mapper.PMotedeltakerMapper.p2Aktoer;
 import static no.nav.syfo.repository.mapper.PMotedeltakerMapper.p2Arbeidsgiver;
@@ -113,21 +111,6 @@ public class MotedeltakerDAO {
                 "set status = :status, " +
                 "svar_tidspunkt = :svar_tidspunkt " +
                 "where motedeltaker_uuid = :motedeltaker_uuid", namedParameters);
-    }
-
-    public List<String> sykmeldteMedMoteHvorBeggeHarSvart(String enhet) {
-        return jdbcTemplate.query("select distinct AKTOR_ID " +
-                        "from MOTEDELTAKER ag " +
-                        "join MOTEDELTAKER sm " +
-                        "on ag.MOTE_ID = sm.MOTE_ID " +
-                        "join MOTEDELTAKER_AKTORID " +
-                        "on sm.MOTEDELTAKER_ID = MOTEDELTAKER_AKTORID.MOTEDELTAKER_ID " +
-                        "where ag.MOTEDELTAKERTYPE = 'arbeidsgiver' " +
-                        "and sm.MOTEDELTAKERTYPE = 'Bruker' " +
-                        "and ag.STATUS = '" + SVART.name() + "' " +
-                        "and sm.STATUS = '" + SVART.name() + "' " +
-                        "and sm.MOTE_ID in (select MOTE_ID from MOTE where STATUS not in ('" + AVBRUTT.name() + "','" + BEKREFTET.name() + "') and NAV_ENHET = ?)",
-                new MotedeltakerAktorIdMapper(), enhet);
     }
 
     public List<Motedeltaker> motedeltakereByMoteId(long moteId) {
