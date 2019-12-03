@@ -4,7 +4,6 @@ import no.nav.security.oidc.context.OIDCRequestContextHolder;
 import no.nav.security.spring.oidc.validation.api.ProtectedWithClaims;
 import no.nav.syfo.api.domain.nyttmoterequest.RSNyttAlternativ;
 import no.nav.syfo.metric.Metrikk;
-import no.nav.syfo.service.ArenaService;
 import no.nav.syfo.service.MoteService;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,19 +27,15 @@ public class MoteActions {
 
     private MoteService moteService;
 
-    private ArenaService arenaService;
-
     @Inject
     public MoteActions(
             OIDCRequestContextHolder contextHolder,
             Metrikk metrikk,
-            MoteService moteService,
-            ArenaService arenaService
+            MoteService moteService
     ) {
         this.contextHolder = contextHolder;
         this.metrikk = metrikk;
         this.moteService = moteService;
-        this.arenaService = arenaService;
     }
 
     @PostMapping(consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
@@ -65,11 +60,5 @@ public class MoteActions {
         moteService.nyeAlternativer(moteUuid, mapListe(alternativer, opprett2TidOgSted), getSubjectIntern(contextHolder), INTERN);
 
         metrikk.tellEndepunktKall("nye_alternativer");
-    }
-
-    @PostMapping(consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
-    @RequestMapping(value = "/opprettSanksjonsoppgave")
-    public void opprettSanksjonsoppgave(@PathVariable("moteUuid") String moteUuid) {
-        arenaService.bestillOppgave(moteUuid);
     }
 }
