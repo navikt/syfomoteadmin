@@ -1,5 +1,6 @@
 package no.nav.syfo.service;
 
+import no.nav.syfo.behandlendeenhet.BehandlendeEnhetConsumer;
 import no.nav.syfo.domain.model.Mote;
 import no.nav.syfo.kafka.producer.OversikthendelseProducer;
 import no.nav.syfo.kafka.producer.OversikthendelseType;
@@ -12,22 +13,22 @@ import static java.time.LocalDateTime.now;
 public class OversikthendelseService {
 
     private AktoerService aktoerService;
-    private EnhetService enhetService;
+    private final BehandlendeEnhetConsumer behandlendeEnhetConsumer;
     private OversikthendelseProducer oversikthendelseProducer;
 
     public OversikthendelseService(
             AktoerService aktoerService,
-            EnhetService enhetService,
+            BehandlendeEnhetConsumer behandlendeEnhetConsumer,
             OversikthendelseProducer oversikthendelseProducer
     ) {
         this.aktoerService = aktoerService;
-        this.enhetService = enhetService;
+        this.behandlendeEnhetConsumer = behandlendeEnhetConsumer;
         this.oversikthendelseProducer = oversikthendelseProducer;
     }
 
     public void sendOversikthendelse(Mote mote, OversikthendelseType type) {
         String sykmeldtFnr = aktoerService.hentFnrForAktoer(mote.sykmeldt().aktorId);
-        String behandlendeEnhet = enhetService.finnArbeidstakersBehandlendeEnhet(sykmeldtFnr);
+        String behandlendeEnhet = behandlendeEnhetConsumer.getBehandlendeEnhet(sykmeldtFnr).getEnhetId();
 
         KOversikthendelse kOversikthendelse = KOversikthendelse.builder()
                 .fnr(sykmeldtFnr)

@@ -16,8 +16,10 @@ public class UserConstants {
     public static final String VIRKSOMHETSNUMMER = "123456789";
     public static final String VIRKSOMHET_NAME = VIRKSOMHET_NAME1 + ", " + VIRKSOMHET_NAME2;
     public static final String NAV_ENHET = "0330";
+    public static final String NAV_ENHET_NAVN = "NAV Enhet";
     public static final String VEILEDER_ID = "Z999999";
     public static final String VEILEDER_NAVN = "Veil Veileder";
+    public static final String STS_TOKEN = "123456789";
 
     public final static String PERSON_NAVN = PERSON_FORNAVN + " " + PERSON_ETTERNAVN;
 }

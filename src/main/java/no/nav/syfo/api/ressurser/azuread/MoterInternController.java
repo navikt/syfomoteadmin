@@ -5,6 +5,7 @@ import no.nav.security.spring.oidc.validation.api.ProtectedWithClaims;
 import no.nav.syfo.api.domain.RSMote;
 import no.nav.syfo.api.domain.RSTilgang;
 import no.nav.syfo.api.domain.nyttmoterequest.RSNyttMoteRequest;
+import no.nav.syfo.behandlendeenhet.BehandlendeEnhetConsumer;
 import no.nav.syfo.domain.model.*;
 import no.nav.syfo.metric.Metrikk;
 import no.nav.syfo.repository.dao.MotedeltakerDAO;
@@ -46,7 +47,7 @@ public class MoterInternController {
     private OIDCRequestContextHolder contextHolder;
     private Metrikk metrikk;
     private AktoerService aktoerService;
-    private EnhetService enhetService;
+    private final BehandlendeEnhetConsumer behandlendeEnhetConsumer;
     private MoteService moteService;
     private TidOgStedDAO tidOgStedDAO;
     private HendelseService hendelseService;
@@ -64,7 +65,7 @@ public class MoterInternController {
             OIDCRequestContextHolder contextHolder,
             Metrikk metrikk,
             AktoerService aktoerService,
-            EnhetService enhetService,
+            BehandlendeEnhetConsumer behandlendeEnhetConsumer,
             MoteService moteService,
             TidOgStedDAO tidOgStedDAO,
             HendelseService hendelseService,
@@ -80,7 +81,7 @@ public class MoterInternController {
         this.contextHolder = contextHolder;
         this.metrikk = metrikk;
         this.aktoerService = aktoerService;
-        this.enhetService = enhetService;
+        this.behandlendeEnhetConsumer = behandlendeEnhetConsumer;
         this.moteService = moteService;
         this.tidOgStedDAO = tidOgStedDAO;
         this.hendelseService = hendelseService;
@@ -188,7 +189,7 @@ public class MoterInternController {
             NaermesteLeder naermesteLeder = sykefravaersoppfoelgingService.hentNaermesteLederSomBruker(aktorId, nyttMoteRequest.orgnummer);
             nyttMoteRequest.navn(naermesteLeder.navn);
             nyttMoteRequest.epost(naermesteLeder.epost);
-            nyttMoteRequest.navEnhet(enhetService.finnArbeidstakersBehandlendeEnhet(nyttMoteRequest.fnr));
+            nyttMoteRequest.navEnhet(behandlendeEnhetConsumer.getBehandlendeEnhet(nyttMoteRequest.fnr).getEnhetId());
 
             Mote nyttMote = map(nyttMoteRequest, opprett2Mote);
             String innloggetIdent = getSubjectInternAzure(contextHolder);
