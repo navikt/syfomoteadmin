@@ -11,16 +11,21 @@ import no.nav.syfo.repository.dao.TidOgStedDAO;
 import no.nav.syfo.repository.model.PMotedeltakerAktorId;
 import no.nav.syfo.repository.model.PMotedeltakerArbeidsgiver;
 import no.nav.syfo.service.*;
-import no.nav.syfo.service.varselinnhold.*;
-import org.junit.Before;
-import org.junit.Test;
+import no.nav.syfo.service.varselinnhold.ArbeidsgiverVarselService;
+import no.nav.syfo.service.varselinnhold.SykmeldtVarselService;
+import no.nav.syfo.sts.StsConsumer;
+import org.junit.*;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.cache.CacheManager;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.web.client.MockRestServiceServer;
+import org.springframework.web.client.RestTemplate;
 
+import javax.inject.Inject;
 import javax.ws.rs.ForbiddenException;
 import java.util.List;
 
@@ -28,6 +33,8 @@ import static java.time.LocalDateTime.now;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
+import static no.nav.syfo.controller.testhelper.RestHelperKt.mockAndExpectBehandlendeEnhetRequest;
+import static no.nav.syfo.controller.testhelper.RestHelperKt.mockAndExpectSTSService;
 import static no.nav.syfo.testhelper.OidcTestHelper.lagOIDCValidationContextIntern;
 import static no.nav.syfo.testhelper.UserConstants.*;
 import static org.junit.Assert.assertEquals;
@@ -45,47 +52,71 @@ public class MoterRessursTilgangTest {
     private static final TpsPerson skjermet_tpsPerson = new TpsPerson().skjermetBruker(true);
     private static final TpsPerson tpsPerson = new TpsPerson().skjermetBruker(false);
 
-    @Mock
+    @Value("${syfobehandlendeenhet.url}")
+    private String behandlendeenhetUrl;
+    @Value("${security.token.service.rest.url}")
+    private String stsUrl;
+    @Value("${srv.username}")
+    private String srvUsername;
+    @Value("${srv.password}")
+    private String srvPassword;
+
+    @MockBean
     public OIDCRequestContextHolder oidcRequestContextHolder;
-    @Mock
+    @MockBean
     private AktoerService aktoerService;
-    @Mock
+    @MockBean
     private MoteService moteService;
-    @Mock
-    private EnhetService enhetService;
-    @Mock
+    @MockBean
     private Metrikk metrikk;
-    @Mock
+    @MockBean
     private TidOgStedDAO tidOgStedDAO;
-    @Mock
+    @MockBean
     private HendelseService hendelseService;
-    @Mock
+    @MockBean
     private MotedeltakerDAO motedeltakerDAO;
-    @Mock
+    @MockBean
     private NorgService norgService;
-    @Mock
+    @MockBean
     private BrukerprofilService brukerprofilService;
-    @Mock
+    @MockBean
     private VeilederService veilederService;
-    @Mock
+    @MockBean
     private ArbeidsgiverVarselService arbeidsgiverVarselService;
-    @Mock
+    @MockBean
     private SykefravaersoppfoelgingService sykefravaersoppfoelgingService;
-    @Mock
+    @MockBean
     private SykmeldtVarselService sykmeldtVarselService;
-    @Mock
+    @MockBean
     private TilgangService tilgangService;
-    @InjectMocks
+
+    @Inject
+    private CacheManager cacheManager;
+    @Inject
+    private StsConsumer stsConsumer;
+    @Inject
+    private RestTemplate restTemplate;
+
+    @Inject
     private MoterRessurs moterRessurs;
+
+    private MockRestServiceServer mockRestServiceServer;
 
     @Before
     public void setUp() {
+        this.mockRestServiceServer = MockRestServiceServer.bindTo(restTemplate).build();
         when(oidcRequestContextHolder.getOIDCValidationContext()).thenReturn(lagOIDCValidationContextIntern(VEILEDER_ID));
         when(aktoerService.hentFnrForAktoer(ARBEIDSTAKER_AKTORID)).thenReturn(ARBEIDSTAKER_FNR);
         when(aktoerService.hentAktoerIdForIdent(ARBEIDSTAKER_FNR)).thenReturn(ARBEIDSTAKER_AKTORID);
         when(aktoerService.hentFnrForAktoer(AKTOER_ID_2)).thenReturn(FNR_2);
         when(moteService.findMoterByBrukerNavEnhet(NAVENHET)).thenReturn(MoteList);
-        when(enhetService.finnArbeidstakersBehandlendeEnhet(any())).thenReturn(NAVENHET);
+    }
+
+    @After
+    public void cleanUp() {
+        mockRestServiceServer.reset();
+        cacheManager.getCacheNames()
+                .forEach(cacheName -> cacheManager.getCache(cacheName).clear());
     }
 
     private List<Mote> MoteList = asList(
@@ -284,6 +315,8 @@ public class MoterRessursTilgangTest {
                 .fnr(ARBEIDSTAKER_FNR)
                 .orgnummer("123");
 
+        mockBehandlendEnhet(ARBEIDSTAKER_FNR);
+
         when(tilgangService.harVeilederTilgangTilPerson(ARBEIDSTAKER_FNR)).thenReturn(true);
 
         when(brukerprofilService.hentBruker(ARBEIDSTAKER_FNR)).thenReturn(tpsPerson);
@@ -301,7 +334,6 @@ public class MoterRessursTilgangTest {
         moterRessurs.opprett(nyttMoteRequest);
 
         verify(brukerprofilService).hentBruker(ARBEIDSTAKER_FNR);
-        verify(enhetService).finnArbeidstakersBehandlendeEnhet(ARBEIDSTAKER_FNR);
     }
 
     @Test(expected = ForbiddenException.class)
@@ -335,5 +367,17 @@ public class MoterRessursTilgangTest {
         moterRessurs.opprett(new RSNyttMoteRequest().fnr(ARBEIDSTAKER_FNR));
 
         verify(brukerprofilService).hentBruker(ARBEIDSTAKER_FNR);
+    }
+
+
+    private void mockSTS() {
+        if (!stsConsumer.isTokenCached()) {
+            mockAndExpectSTSService(mockRestServiceServer, stsUrl, srvUsername, srvPassword);
+        }
+    }
+
+    private void mockBehandlendEnhet(String fnr) {
+        mockSTS();
+        mockAndExpectBehandlendeEnhetRequest(mockRestServiceServer, behandlendeenhetUrl, fnr);
     }
 }

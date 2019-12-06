@@ -7,13 +7,10 @@ group = "no.nav.syfo"
 version = "1.0.0"
 
 val aktoerV2Version = "1.0"
-val arbeidsfordelingV1Version="1.1.0"
 val personV3Version = "3.0.2"
 val sykefravaersoppfoelgingV1Version = "1.0.22"
 val brukerprofilV3Version = "3.0.1"
-val egenAnsattV1Version= "1.0.1"
 val organisasjonV4Version = "1.0.1"
-val organisasjonenhetV2Version = "2.1.0"
 val organisasjonRessursEnhetV1Version = "1.0.3"
 val dkifVersion = "1.2"
 
@@ -72,13 +69,10 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:$kotlinJacksonVersion")
 
     implementation("no.nav.syfo.tjenester:aktoer-v2:$aktoerV2Version")
-    implementation("no.nav.sbl.dialogarena:arbeidsfordeling-v1-tjenestespesifikasjon:$arbeidsfordelingV1Version")
     implementation("no.nav.sbl.dialogarena:person-v3-tjenestespesifikasjon:$personV3Version")
     implementation("no.nav.syfo.tjenester:sykefravaersoppfoelgingv1-tjenestespesifikasjon:$sykefravaersoppfoelgingV1Version")
     implementation("no.nav.syfo.tjenester:brukerprofil-v3-tjenestespesifikasjon:$brukerprofilV3Version")
-    implementation("no.nav.syfo.tjenester:egenAnsatt-v1-tjenestespesifikasjon:$egenAnsattV1Version")
     implementation("no.nav.sbl.dialogarena:organisasjonv4-tjenestespesifikasjon:$organisasjonV4Version")
-    implementation("no.nav.sbl.dialogarena:organisasjonenhet-v2-tjenestespesifikasjon:$organisasjonenhetV2Version")
     implementation("no.nav.syfo.tjenester:organisasjonRessursEnhet-v1-tjenestespesifikasjon:$organisasjonRessursEnhetV1Version")
     implementation("no.nav.syfo.tjenester:dkif-tjenestespesifikasjon:$dkifVersion")
 
@@ -116,7 +110,8 @@ dependencies {
     implementation("io.micrometer:micrometer-registry-prometheus:$prometheusVersion")
     implementation("net.logstash.logback:logstash-logback-encoder:$logstashLogbackEncoderVersion")
     implementation("org.slf4j:slf4j-api:$slf4jVersion")
-    implementation("org.projectlombok:lombok")
+    implementation("org.projectlombok:lombok:1.16.22")
+    annotationProcessor("org.projectlombok:lombok:1.18.6")
     implementation("javax.ws.rs:javax.ws.rs-api:$javaxWsRsVersion")
     implementation("javax.inject:javax.inject:$javaxInjectVersion")
     implementation("org.bitbucket.b_c:jose4j:$jose4jVersion")

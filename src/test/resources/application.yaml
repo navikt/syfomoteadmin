@@ -52,26 +52,20 @@ aktoer.v2.endpointurl: "aktoerv2.url"
 brukeroppgave.v1.endpointurl: "brukeroppgavev1.url"
 sykefravaersoppfoelging.v1.endpointurl: "sykefravaeroppfoelgingv1.url"
 virksomhet:
-  arbeidsfordeling.v1.endpointurl: "arbeidsfordelingv1.url"
   brukerprofil.v3.endpointurl: "brukerprofil.url"
   digitalkontakinformasjon.v1.endpointurl: "dkif.url"
   diskresjonskode.v1.endpointurl: "diskresjonskode.url"
-  egenansatt.v1.endpointurl: "egenansattv1.url"
   organisasjon.v4.endpointurl: "organisasjonv4.url"
-  organisasjonEnhet.v2.endpointurl: "organisasjonEnhetv2.url"
   organisasjonressursenhet.v1.endpointurl: "organisasjonRessursEnhetv1.url"
   person.v3.endpointurl: "personv3.url"
 
 fasit.environment.name: 'local'
 
 aktoer.withmock: true
-arbeidsfordeling.withmock: true
 brukerprofil.withmock: true
 dkif.withmock: true
-egenansatt.withmock: true
 ereg.withmock: true
 norg.withmock: true
-organisasjonenhet.withmock: true
 person.withmock: true
 sykefravaersoppfoelging.syfoservice.withmock: true
 
@@ -81,6 +75,8 @@ syfoveilederoppgaver_system_v1.url: "https://app-q1.adeo.no/syfoveilederoppgaver
 syfoveilederoppgaver.systemapi.username: "dummy"
 syfoveilederoppgaver.systemapi.password: "test123"
 
+syfobehandlendeenhet.url: "https://syfobehandlendeenhet"
+security.token.service.rest.url: "https://security-token-service"
 tilgangskontrollapi.url: "https://www.ikke.no"
 
 ## DATABASE ##

@@ -13,13 +13,17 @@ import no.nav.syfo.repository.model.PMotedeltakerArbeidsgiver;
 import no.nav.syfo.service.*;
 import no.nav.syfo.service.varselinnhold.ArbeidsgiverVarselService;
 import no.nav.syfo.service.varselinnhold.SykmeldtVarselService;
-import org.junit.Before;
-import org.junit.Test;
+import no.nav.syfo.sts.StsConsumer;
+import org.junit.*;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.cache.CacheManager;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.web.client.MockRestServiceServer;
+import org.springframework.web.client.RestTemplate;
 
 import javax.inject.Inject;
 import javax.ws.rs.ForbiddenException;
@@ -30,6 +34,8 @@ import static java.time.LocalDateTime.now;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
+import static no.nav.syfo.controller.testhelper.RestHelperKt.mockAndExpectBehandlendeEnhetRequest;
+import static no.nav.syfo.controller.testhelper.RestHelperKt.mockAndExpectSTSService;
 import static no.nav.syfo.testhelper.OidcTestHelper.loggInnVeilederAzure;
 import static no.nav.syfo.testhelper.UserConstants.*;
 import static org.junit.Assert.assertEquals;
@@ -46,12 +52,19 @@ public class MoterInternControllerTest extends AbstractRessursTilgangTest {
     private static final TpsPerson skjermet_tpsPerson = new TpsPerson().skjermetBruker(true);
     private static final TpsPerson tpsPerson = new TpsPerson().skjermetBruker(false);
 
+    @Value("${syfobehandlendeenhet.url}")
+    private String behandlendeenhetUrl;
+    @Value("${security.token.service.rest.url}")
+    private String stsUrl;
+    @Value("${srv.username}")
+    private String srvUsername;
+    @Value("${srv.password}")
+    private String srvPassword;
+
     @MockBean
     private AktoerService aktoerService;
     @MockBean
     private MoteService moteService;
-    @MockBean
-    private EnhetService enhetService;
     @MockBean
     private Metrikk metrikk;
     @MockBean
@@ -76,17 +89,35 @@ public class MoterInternControllerTest extends AbstractRessursTilgangTest {
     private TilgangService tilgangService;
 
     @Inject
+    private CacheManager cacheManager;
+
+    @Inject
+    private StsConsumer stsConsumer;
+
+    @Inject
+    private RestTemplate restTemplate;
+
+    @Inject
     private MoterInternController moterController;
+
+    private MockRestServiceServer mockRestServiceServer;
 
     @Before
     public void setup() throws ParseException {
+        this.mockRestServiceServer = MockRestServiceServer.bindTo(restTemplate).build();
         loggInnVeilederAzure(oidcRequestContextHolder, VEILEDER_ID);
 
         when(aktoerService.hentFnrForAktoer(ARBEIDSTAKER_AKTORID)).thenReturn(ARBEIDSTAKER_FNR);
         when(aktoerService.hentAktoerIdForIdent(ARBEIDSTAKER_FNR)).thenReturn(ARBEIDSTAKER_AKTORID);
         when(aktoerService.hentFnrForAktoer(AKTOER_ID_2)).thenReturn(FNR_2);
         when(moteService.findMoterByBrukerNavEnhet(NAV_ENHET)).thenReturn(MoteList);
-        when(enhetService.finnArbeidstakersBehandlendeEnhet(any())).thenReturn(NAV_ENHET);
+    }
+
+    @After
+    public void cleanUp() {
+        mockRestServiceServer.reset();
+        cacheManager.getCacheNames()
+                .forEach(cacheName -> cacheManager.getCache(cacheName).clear());
     }
 
     private List<Mote> MoteList = asList(
@@ -285,6 +316,8 @@ public class MoterInternControllerTest extends AbstractRessursTilgangTest {
                 .fnr(ARBEIDSTAKER_FNR)
                 .orgnummer("123");
 
+        mockBehandlendEnhet(ARBEIDSTAKER_FNR);
+
         when(tilgangService.harVeilederTilgangTilPersonViaAzure(ARBEIDSTAKER_FNR)).thenReturn(true);
 
         when(brukerprofilService.hentBruker(ARBEIDSTAKER_FNR)).thenReturn(tpsPerson);
@@ -302,7 +335,6 @@ public class MoterInternControllerTest extends AbstractRessursTilgangTest {
         moterController.opprett(nyttMoteRequest);
 
         verify(brukerprofilService).hentBruker(ARBEIDSTAKER_FNR);
-        verify(enhetService).finnArbeidstakersBehandlendeEnhet(ARBEIDSTAKER_FNR);
     }
 
     @Test(expected = ForbiddenException.class)
@@ -336,5 +368,16 @@ public class MoterInternControllerTest extends AbstractRessursTilgangTest {
         moterController.opprett(new RSNyttMoteRequest().fnr(ARBEIDSTAKER_FNR));
 
         verify(brukerprofilService).hentBruker(ARBEIDSTAKER_FNR);
+    }
+
+    private void mockSTS() {
+        if (!stsConsumer.isTokenCached()) {
+            mockAndExpectSTSService(mockRestServiceServer, stsUrl, srvUsername, srvPassword);
+        }
+    }
+
+    private void mockBehandlendEnhet(String fnr) {
+        mockSTS();
+        mockAndExpectBehandlendeEnhetRequest(mockRestServiceServer, behandlendeenhetUrl, fnr);
     }
 }
