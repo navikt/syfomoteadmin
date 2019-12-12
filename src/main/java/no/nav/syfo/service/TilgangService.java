@@ -1,7 +1,11 @@
 package no.nav.syfo.service;
 
+import no.nav.security.oidc.context.OIDCRequestContextHolder;
 import no.nav.syfo.domain.Fnr;
+import no.nav.syfo.oidc.OIDCIssuer;
+import no.nav.syfo.util.OIDCUtil;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
@@ -9,6 +13,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.ws.rs.ForbiddenException;
 import java.net.URI;
+import java.util.Collections;
 
 import static java.util.Collections.singletonMap;
 import static org.springframework.web.util.UriComponentsBuilder.fromHttpUrl;
@@ -27,9 +32,12 @@ public class TilgangService {
     private final UriComponentsBuilder tilgangTilBrukerUriTemplate;
     private final UriComponentsBuilder tilgangTilBrukerViaAzureUriTemplate;
     private final UriComponentsBuilder tilgangTilEnhetUriTemplate;
+    private OIDCRequestContextHolder contextHolder;
 
     public TilgangService(
-            @Value("${tilgangskontrollapi.url}") String tilgangskontrollUrl, RestTemplate template
+            @Value("${tilgangskontrollapi.url}") String tilgangskontrollUrl,
+            RestTemplate template,
+            final OIDCRequestContextHolder contextHolder
     ) {
         tilgangTilBrukerUriTemplate = fromHttpUrl(tilgangskontrollUrl)
                 .path(TILGANG_TIL_BRUKER_PATH)
@@ -41,6 +49,7 @@ public class TilgangService {
                 .path(TILGANG_TIL_ENHET_PATH)
                 .queryParam(ENHET, ENHET_PLACEHOLDER);
         this.template = template;
+        this.contextHolder = contextHolder;
     }
 
     public void kastExceptionHvisIkkeVeilederHarTilgangTilPerson(String fnr) {
@@ -63,8 +72,22 @@ public class TilgangService {
     }
 
     public boolean harVeilederTilgangTilPersonViaAzure(String fnr) {
-        URI tilgangTilBrukerViaAzureUriMedFnr = tilgangTilBrukerViaAzureUriTemplate.build(singletonMap(FNR, fnr));
-        return kallUriMedTemplate(tilgangTilBrukerViaAzureUriMedFnr);
+        try {
+            URI uri = tilgangTilBrukerViaAzureUriTemplate.build(singletonMap(FNR, fnr));
+            template.exchange(
+                    uri,
+                    HttpMethod.GET,
+                    lagRequest(OIDCIssuer.AZURE),
+                    String.class
+            );
+            return true;
+        } catch (HttpClientErrorException e) {
+            if (e.getRawStatusCode() == 403) {
+                return false;
+            } else {
+                throw e;
+            }
+        }
     }
 
     public void kastExceptionHvisIkkeVeilederHarTilgangTilEnhet(String enhet) {
@@ -77,6 +100,13 @@ public class TilgangService {
     public boolean harVeilederTilgangTilEnhet(String enhet) {
         URI tilgangTilEnhetUriMedFnr = tilgangTilEnhetUriTemplate.build(singletonMap(ENHET, enhet));
         return kallUriMedTemplate(tilgangTilEnhetUriMedFnr);
+    }
+
+    private HttpEntity<String> lagRequest(String issuer) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
+        headers.set("Authorization", "Bearer " + OIDCUtil.tokenFraOIDC(contextHolder, issuer));
+        return new HttpEntity<>(headers);
     }
 
     private boolean kallUriMedTemplate(URI uri) {
