@@ -1,15 +1,14 @@
 package no.nav.syfo.batch.scheduler;
 
+import no.nav.syfo.batch.leaderelection.LeaderElectionService;
 import no.nav.syfo.service.MotedeltakerService;
 import no.nav.syfo.util.DatoService;
 import no.nav.syfo.util.Toggle;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.ArgumentCaptor;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.*;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import static java.time.LocalDate.of;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -24,11 +23,14 @@ public class PaaminnelseScheduledTaskTest {
     private DatoService datoService;
     @Mock
     private Toggle toggle;
+    @Mock
+    private LeaderElectionService leaderElectionService;
     @InjectMocks
     private PaaminnelseScheduledTask paaminnelseScheduledTask;
 
     @Before
     public void setup() {
+        when(leaderElectionService.isLeader()).thenReturn(true);
         when(toggle.toggleBatchPaaminelse()).thenReturn(true);
     }
 

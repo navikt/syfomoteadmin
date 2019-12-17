@@ -105,3 +105,4 @@ varselproduksjon.varslinger.queuename: mqvarslinger
 tredjepartsvarsel.queuename: mqtredjepartsvarsel
 
 tjenester.url: https://tjenester-q1.nav.no
+elector.path: "localhost:4040"

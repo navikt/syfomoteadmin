@@ -1,6 +1,7 @@
 package no.nav.syfo.batch.scheduler;
 
 import lombok.extern.slf4j.Slf4j;
+import no.nav.syfo.batch.leaderelection.LeaderElectionService;
 import no.nav.syfo.service.MoteService;
 import no.nav.syfo.service.MotedeltakerService;
 import no.nav.syfo.service.varselinnhold.ArbeidsgiverVarselService;
@@ -33,25 +34,29 @@ public class PaaminnelseScheduledTask {
 
     private Toggle toggle;
 
+    private final LeaderElectionService leaderElectionService;
+
     @Inject
     public PaaminnelseScheduledTask(
             MotedeltakerService motedeltakerService,
             MoteService moteService,
             ArbeidsgiverVarselService varselService,
             DatoService datoService,
-            Toggle toggle
+            Toggle toggle,
+            LeaderElectionService leaderElectionService
     ) {
         this.motedeltakerService = motedeltakerService;
         this.moteService = moteService;
         this.varselService = varselService;
         this.datoService = datoService;
         this.toggle = toggle;
+        this.leaderElectionService = leaderElectionService;
     }
 
     @Transactional
     @Scheduled(cron = "0 0 8 * * *")
     public void run() {
-        if (toggle.toggleBatchPaaminelse()) {
+        if (toggle.toggleBatchPaaminelse() && leaderElectionService.isLeader()) {
             log.info("TRACEBATCH: run {}", this.getClass().getName());
 
             int antallDagerBakoverEkstra = 0;
