@@ -22,6 +22,7 @@ public class CacheConfig {
     public static final String CACHENAME_LDAP_VEILEDER = "ldapveileder";
     public static final String CACHENAME_NORG_ENHETER = "norgenheter";
     public static final String CACHENAME_PERSON_PERSON = "person";
+    public static final String CACHENAME_TILGANG_IDENT = "tilgangtilident";
     public static final String CACHENAME_TPS_BRUKER = "tpsbruker";
     public static final String CACHENAME_TPS_NAVN = "tpsnavn";
 
@@ -39,6 +40,7 @@ public class CacheConfig {
                 new ConcurrentMapCache(CACHENAME_LDAP_VEILEDER),
                 new ConcurrentMapCache(CACHENAME_NORG_ENHETER),
                 new ConcurrentMapCache(CACHENAME_PERSON_PERSON),
+                new ConcurrentMapCache(CACHENAME_TILGANG_IDENT),
                 new ConcurrentMapCache(CACHENAME_TPS_BRUKER),
                 new ConcurrentMapCache(CACHENAME_TPS_NAVN)
         ));
