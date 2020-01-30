@@ -1,46 +1,43 @@
 package no.nav.syfo.service;
 
-import lombok.extern.slf4j.Slf4j;
 import no.nav.security.oidc.context.OIDCRequestContextHolder;
-import no.nav.syfo.domain.model.Ansatt;
-import no.nav.syfo.oidc.OIDCIssuer;
+import no.nav.syfo.brukertilgang.BrukertilgangConsumer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import javax.ws.rs.ForbiddenException;
 
+import static no.nav.syfo.config.CacheConfig.CACHENAME_TILGANG_IDENT;
 import static no.nav.syfo.util.OIDCUtil.getSubjectEkstern;
 
-@Slf4j
 @Service
 public class BrukertilgangService {
 
-    private OIDCRequestContextHolder contextHolder;
+    private static final Logger LOG = LoggerFactory.getLogger(BrukertilgangService.class);
 
-    private AktoerService aktoerService;
-
-    private PersonService personService;
-
-    private SykefravaersoppfoelgingService sykefravaersoppfoelgingService;
+    private final OIDCRequestContextHolder contextHolder;
+    private final BrukertilgangConsumer brukertilgangConsumer;
+    private final PersonService personService;
 
     @Autowired
     public BrukertilgangService(
             OIDCRequestContextHolder contextHolder,
-            AktoerService aktoerService,
-            PersonService personService,
-            SykefravaersoppfoelgingService sykefravaersoppfoelgingService
+            BrukertilgangConsumer brukertilgangConsumer,
+            PersonService personService
     ) {
         this.contextHolder = contextHolder;
-        this.aktoerService = aktoerService;
+        this.brukertilgangConsumer = brukertilgangConsumer;
         this.personService = personService;
-        this.sykefravaersoppfoelgingService = sykefravaersoppfoelgingService;
     }
 
     public void kastExceptionHvisIkkeTilgang(String oppslattBrukerIdent) {
         String innloggetIdent = getSubjectEkstern(contextHolder);
         boolean harTilgang = harTilgangTilOppslaattBruker(innloggetIdent, oppslattBrukerIdent);
         if (!harTilgang) {
-            log.error("Ikke tilgang");
+            LOG.error("Ikke tilgang");
             throw new ForbiddenException();
         }
     }
@@ -54,20 +51,8 @@ public class BrukertilgangService {
         }
     }
 
-    boolean sporOmNoenAndreEnnSegSelvEllerEgneAnsatte(String innloggetIdent, String oppslaattFnr) {
-        return !(sporInnloggetBrukerOmSegSelv(innloggetIdent, oppslaattFnr) || sporInnloggetBrukerOmEnAnsatt(innloggetIdent, oppslaattFnr));
-    }
-
-    private boolean sporInnloggetBrukerOmEnAnsatt(String innloggetIdent, String oppslaattFnr) {
-        String innloggetAktoerId = aktoerService.hentAktoerIdForIdent(innloggetIdent);
-        String oppslaattAktoerId = aktoerService.hentAktoerIdForIdent(oppslaattFnr);
-        return sykefravaersoppfoelgingService.hentNaermesteLedersAnsattListe(innloggetAktoerId, OIDCIssuer.EKSTERN)
-                .stream()
-                .map(Ansatt::aktoerId)
-                .anyMatch(oppslaattAktoerId::equals);
-    }
-
-    private boolean sporInnloggetBrukerOmSegSelv(String innloggetIdent, String brukerFnr) {
-        return brukerFnr.equals(innloggetIdent);
+    @Cacheable(cacheNames = CACHENAME_TILGANG_IDENT, key = "#innloggetIdent.concat(#oppslaattFnr)", condition = "#innloggetIdent != null && #oppslaattFnr != null")
+    public boolean sporOmNoenAndreEnnSegSelvEllerEgneAnsatte(String innloggetIdent, String oppslaattFnr) {
+        return !(oppslaattFnr.equals(innloggetIdent) || brukertilgangConsumer.hasAccessToAnsatt(oppslaattFnr));
     }
 }
