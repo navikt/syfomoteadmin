@@ -3,7 +3,7 @@ package no.nav.syfo.config.consumer;
 import no.nav.syfo.service.ws.LogErrorHandler;
 import no.nav.syfo.service.ws.STSClientConfig;
 import no.nav.syfo.service.ws.WsClient;
-import no.nav.tjeneste.virksomhet.person.v3.PersonV3;
+import no.nav.tjeneste.virksomhet.person.v3.binding.PersonV3;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
