@@ -1,9 +1,9 @@
 package no.nav.syfo.service;
 
 import lombok.extern.slf4j.Slf4j;
-import no.nav.tjeneste.virksomhet.person.v3.*;
+import no.nav.tjeneste.virksomhet.person.v3.binding.*;
 import no.nav.tjeneste.virksomhet.person.v3.informasjon.*;
-import no.nav.tjeneste.virksomhet.person.v3.meldinger.WSHentPersonRequest;
+import no.nav.tjeneste.virksomhet.person.v3.meldinger.HentPersonRequest;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
@@ -32,26 +32,26 @@ public class PersonService {
     }
 
     private String hentDiskresjonskodeForFnr(String aktorId) {
-        WSPerson person = hentPersonFraFnr(aktorId);
+        Person person = hentPersonFraFnr(aktorId);
         return ofNullable(person.getDiskresjonskode())
-                .map(WSDiskresjonskoder::getValue)
+                .map(Diskresjonskoder::getValue)
                 .orElse("");
 
     }
 
     @Cacheable(value = CACHENAME_PERSON_PERSON, key = "#fnr", condition = "#fnr != null")
-    public WSPerson hentPersonFraFnr(String fnr) {
+    public Person hentPersonFraFnr(String fnr) {
         if (isBlank(fnr) || !fnr.matches("\\d{11}$")) {
             log.error("Ugyldig format på fnr");
             throw new IllegalArgumentException();
         }
         try {
-            WSNorskIdent norskIdent = new WSNorskIdent();
+            NorskIdent norskIdent = new NorskIdent();
             norskIdent.setIdent(fnr);
-            WSPersonIdent personIdent = new WSPersonIdent();
+            PersonIdent personIdent = new PersonIdent();
             personIdent.setIdent(norskIdent);
 
-            WSHentPersonRequest request = new WSHentPersonRequest();
+            HentPersonRequest request = new HentPersonRequest();
             request.setAktoer(personIdent);
             return personV3
                     .hentPerson(request)

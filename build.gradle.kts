@@ -7,7 +7,7 @@ group = "no.nav.syfo"
 version = "1.0.0"
 
 val aktoerV2Version = "1.0"
-val personV3Version = "3.0.2"
+val personV3Version = "1.2019.07.11-06.47-b55f47790a9d"
 val sykefravaersoppfoelgingV1Version = "1.0.22"
 val brukerprofilV3Version = "3.0.1"
 val organisasjonV4Version = "1.0.1"
@@ -69,7 +69,7 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:$kotlinJacksonVersion")
 
     implementation("no.nav.syfo.tjenester:aktoer-v2:$aktoerV2Version")
-    implementation("no.nav.sbl.dialogarena:person-v3-tjenestespesifikasjon:$personV3Version")
+    implementation("no.nav.tjenestespesifikasjoner:person-v3-tjenestespesifikasjon:$personV3Version")
     implementation("no.nav.syfo.tjenester:sykefravaersoppfoelgingv1-tjenestespesifikasjon:$sykefravaersoppfoelgingV1Version")
     implementation("no.nav.syfo.tjenester:brukerprofil-v3-tjenestespesifikasjon:$brukerprofilV3Version")
     implementation("no.nav.sbl.dialogarena:organisasjonv4-tjenestespesifikasjon:$organisasjonV4Version")
