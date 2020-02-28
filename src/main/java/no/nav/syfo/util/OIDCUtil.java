@@ -37,12 +37,6 @@ public class OIDCUtil {
                 .orElse(null);
     }
 
-    public static String getSubjectIntern(OIDCRequestContextHolder contextHolder) {
-        return Optional.ofNullable(claimSet(contextHolder, OIDCIssuer.INTERN))
-                .map(JWTClaimsSet::getSubject)
-                .orElse(null);
-    }
-
     public static String getSubjectEkstern(OIDCRequestContextHolder contextHolder) {
         return Optional.ofNullable(claimSet(contextHolder, OIDCIssuer.EKSTERN))
                 .map(JWTClaimsSet::getSubject)
@@ -70,6 +64,6 @@ public class OIDCUtil {
         OIDCValidationContext context = (OIDCValidationContext) contextHolder
                 .getRequestAttribute(OIDCConstants.OIDC_VALIDATION_CONTEXT);
 
-        return  context.getToken(issuer).getIdToken();
+        return context.getToken(issuer).getIdToken();
     }
 }

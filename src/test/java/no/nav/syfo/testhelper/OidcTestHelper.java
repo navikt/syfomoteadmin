@@ -16,12 +16,6 @@ public class OidcTestHelper {
         settOIDCValidationContext(oidcRequestContextHolder, jwt, OIDCIssuer.AZURE);
     }
 
-    public static void loggInnVeileder(OIDCRequestContextHolder oidcRequestContextHolder, String subject) {
-        SignedJWT jwt = JwtTokenGenerator.createSignedJWT(subject);
-
-        settOIDCValidationContext(oidcRequestContextHolder, jwt, OIDCIssuer.INTERN);
-    }
-
     public static void loggInnBruker(OIDCRequestContextHolder oidcRequestContextHolder, String subject) {
         SignedJWT jwt = JwtTokenGenerator.createSignedJWT(subject);
         settOIDCValidationContext(oidcRequestContextHolder, jwt, OIDCIssuer.EKSTERN);
@@ -33,10 +27,6 @@ public class OidcTestHelper {
         OIDCValidationContext oidcValidationContext = new OIDCValidationContext();
         oidcValidationContext.addValidatedToken(issuer, tokenContext, oidcClaims);
         oidcRequestContextHolder.setOIDCValidationContext(oidcValidationContext);
-    }
-
-    public static OIDCValidationContext lagOIDCValidationContextIntern(String subject) {
-        return lagOIDCValidationContext(subject, OIDCIssuer.INTERN);
     }
 
     public static OIDCValidationContext lagOIDCValidationContextEkstern(String subject) {
