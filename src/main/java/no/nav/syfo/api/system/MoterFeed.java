@@ -1,7 +1,7 @@
 package no.nav.syfo.api.system;
 
-import no.nav.security.spring.oidc.validation.api.ProtectedWithClaims;
-import no.nav.security.spring.oidc.validation.api.Unprotected;
+import no.nav.security.oidc.api.ProtectedWithClaims;
+import no.nav.security.oidc.api.Unprotected;
 import no.nav.syfo.api.system.domain.VeilederOppgaveFeedItem;
 import no.nav.syfo.domain.model.Mote;
 import no.nav.syfo.repository.dao.FeedDAO;

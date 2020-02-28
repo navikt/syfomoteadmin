@@ -16,7 +16,8 @@ val dkifVersion = "1.2"
 
 val cxfVersion = "3.3.3"
 
-val oidcSpringSupportVersion = "0.2.4"
+val oidcSpringSupportVersion = "0.2.7"
+val oidcSpringSupportTestVersion = "0.2.4"
 val kotlinLibVersion = "1.3.50"
 val kotlinJacksonVersion = "2.9.8"
 
@@ -98,7 +99,7 @@ dependencies {
 
     implementation("no.nav.security:oidc-support:$oidcSpringSupportVersion")
     implementation("no.nav.security:oidc-spring-support:$oidcSpringSupportVersion")
-    testImplementation("no.nav.security:oidc-spring-test:$oidcSpringSupportVersion")
+    testImplementation("no.nav.security:oidc-spring-test:$oidcSpringSupportTestVersion")
 
     implementation("com.ibm.mq:com.ibm.mq.allclient:$mqVersion")
     implementation("no.nav.sbl.dialogarena:varsel-inn:$varselInnVersion")

@@ -1,6 +1,6 @@
 package no.nav.syfo.api.ressurser.azuread;
 
-import no.nav.security.spring.oidc.validation.api.ProtectedWithClaims;
+import no.nav.security.oidc.api.ProtectedWithClaims;
 import no.nav.syfo.api.domain.RSVirksomhet;
 import no.nav.syfo.service.OrganisasjonService;
 import org.springframework.web.bind.annotation.*;

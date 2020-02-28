@@ -1,6 +1,6 @@
 package no.nav.syfo.api.ressurser;
 
-import no.nav.security.spring.oidc.validation.api.ProtectedWithClaims;
+import no.nav.security.oidc.api.ProtectedWithClaims;
 import no.nav.syfo.service.MoteBrukerService;
 import no.nav.syfo.util.Brukerkontekst;
 import org.springframework.web.bind.annotation.*;
