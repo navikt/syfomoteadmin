@@ -2,7 +2,6 @@ package no.nav.syfo.service.varselinnhold;
 
 import lombok.extern.slf4j.Slf4j;
 import no.nav.melding.virksomhet.servicemeldingmedkontaktinformasjon.v1.servicemeldingmedkontaktinformasjon.Parameter;
-import no.nav.security.oidc.context.OIDCRequestContextHolder;
 import no.nav.syfo.domain.model.*;
 import no.nav.syfo.repository.model.PEpost;
 import no.nav.syfo.service.*;
@@ -19,7 +18,6 @@ import static no.nav.syfo.domain.model.TredjepartsVarselType.*;
 import static no.nav.syfo.domain.model.Varseltype.*;
 import static no.nav.syfo.service.varselinnhold.TredjepartsvarselService.createParameter;
 import static no.nav.syfo.util.EpostInnholdUtil.*;
-import static no.nav.syfo.util.OIDCUtil.getSubjectIntern;
 import static no.nav.syfo.util.time.DateUtil.tilKortDato;
 import static no.nav.syfo.util.time.DateUtil.tilLangDatoMedKlokkeslettPostfixDagPrefix;
 
@@ -31,8 +29,6 @@ public class ArbeidsgiverVarselService {
     @Value("${tjenester.url}")
     private String tjenesterUrl;
 
-    private OIDCRequestContextHolder contextHolder;
-
     private VeilederService veilederService;
 
     private HendelseService hendelseService;
@@ -43,13 +39,11 @@ public class ArbeidsgiverVarselService {
 
     @Autowired
     public ArbeidsgiverVarselService(
-            OIDCRequestContextHolder contextHolder,
             VeilederService veilederService,
             HendelseService hendelseService,
             SykefravaersoppfoelgingService sykefravaersoppfoelgingService,
             TredjepartsvarselService tredjepartsvarselService
     ) {
-        this.contextHolder = contextHolder;
         this.veilederService = veilederService;
         this.hendelseService = hendelseService;
         this.sykefravaersoppfoelgingService = sykefravaersoppfoelgingService;
