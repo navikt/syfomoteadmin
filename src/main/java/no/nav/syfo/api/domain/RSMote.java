@@ -24,5 +24,6 @@ public class RSMote {
     public RSTidOgSted bekreftetAlternativ;
     public List<RSTidOgSted> alternativer = new ArrayList<>();
     public LocalDateTime sistEndret;
+    public boolean trengerBehandling;
 }
 
