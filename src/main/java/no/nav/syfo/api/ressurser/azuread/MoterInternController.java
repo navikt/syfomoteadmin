@@ -162,7 +162,19 @@ public class MoterInternController {
 
         metrikk.tellEndepunktKall("hent_moter");
 
-        return mapListe(moter, mote2rs).stream().map(rsMote -> rsMote.sistEndret(hendelseService.sistEndretMoteStatus(rsMote.id).orElse(rsMote.opprettetTidspunkt))).collect(toList());
+        return mapListe(moter, mote2rs)
+                .stream()
+                .map(rsMote -> rsMote
+                        .sistEndret(hendelseService.sistEndretMoteStatus(rsMote.id)
+                                .orElse(rsMote.opprettetTidspunkt))
+                        .trengerBehandling(trengerBehandling(rsMote)))
+                .collect(toList());
+    }
+
+    private boolean trengerBehandling(RSMote rsMote) {
+        return moteService.harAlleSvartPaSisteForesporselRs(rsMote, AZURE)
+                && !"bekreftet".equalsIgnoreCase(rsMote.status)
+                && !"avbrutt".equalsIgnoreCase(rsMote.status);
     }
 
     private List<Mote> populerMedTpsData(List<Mote> moter) {

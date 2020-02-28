@@ -1,6 +1,7 @@
 package no.nav.syfo.service;
 
-import no.nav.security.oidc.context.OIDCRequestContextHolder;
+import no.nav.syfo.api.domain.RSMote;
+import no.nav.syfo.api.domain.RSMotedeltaker;
 import no.nav.syfo.domain.model.*;
 import no.nav.syfo.metric.Metrikk;
 import no.nav.syfo.oidc.OIDCIssuer;
@@ -197,6 +198,25 @@ public class MoteService {
 
     private Predicate<Motedeltaker> erIkkeReservertSykmeldt(boolean skalSykmeldtHaVarsler) {
         return motedeltaker -> skalSykmeldtHaVarsler || !motedeltaker.motedeltakertype().equals("Bruker");
+    }
+
+    public boolean harAlleSvartPaSisteForesporselRs(RSMote rsMote, String oidcIssuer) {
+        boolean skalSykmeldtHaVarsler = dkifService.hentKontaktinfoAktoerId(rsMote.aktorId, oidcIssuer).skalHaVarsel;
+        LocalDateTime nyesteAlternativOpprettetTidspunkt = rsMote.alternativer.stream().sorted((o1, o2) -> o2.created.compareTo(o1.created)).findFirst().get().created;
+
+        return rsMote.deltakere.stream()
+                .filter(erIkkeReservertSykmeldtRs(skalSykmeldtHaVarsler))
+                .noneMatch(deltaker -> harDeltakerSvartTidligereEnnNyesteOpprettetRs(deltaker, nyesteAlternativOpprettetTidspunkt));
+    }
+
+    private Predicate<RSMotedeltaker> erIkkeReservertSykmeldtRs(boolean skalSykmeldtHaVarsler) {
+        return rsMotedeltaker -> skalSykmeldtHaVarsler || !rsMotedeltaker.type().equals("Bruker");
+    }
+
+    private boolean harDeltakerSvartTidligereEnnNyesteOpprettetRs(RSMotedeltaker motedeltaker, LocalDateTime nyesteAlternativOpprettetTidspunkt) {
+        return Optional.ofNullable(motedeltaker.svartidspunkt)
+                .map(svartTidspunkt -> svartTidspunkt.isBefore(nyesteAlternativOpprettetTidspunkt))
+                .orElse(true);
     }
 
     public void svarMottatt(String motedeltakerSomSvarteUuid, Mote mote) {
