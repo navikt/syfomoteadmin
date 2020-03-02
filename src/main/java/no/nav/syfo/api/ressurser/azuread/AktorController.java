@@ -1,6 +1,6 @@
 package no.nav.syfo.api.ressurser.azuread;
 
-import no.nav.security.spring.oidc.validation.api.ProtectedWithClaims;
+import no.nav.security.oidc.api.ProtectedWithClaims;
 import no.nav.syfo.api.domain.RSAktor;
 import no.nav.syfo.domain.Fnr;
 import no.nav.syfo.service.AktoerService;

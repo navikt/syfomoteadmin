@@ -1,7 +1,7 @@
 package no.nav.syfo.api.ressurser.azuread;
 
+import no.nav.security.oidc.api.ProtectedWithClaims;
 import no.nav.security.oidc.context.OIDCRequestContextHolder;
-import no.nav.security.spring.oidc.validation.api.ProtectedWithClaims;
 import no.nav.syfo.api.domain.RSEnheter;
 import no.nav.syfo.api.domain.RSVeilederInfo;
 import no.nav.syfo.service.NorgService;

@@ -1,11 +1,10 @@
 package no.nav.syfo.api.ressurser.azuread;
 
-import no.nav.security.spring.oidc.validation.api.ProtectedWithClaims;
+import no.nav.security.oidc.api.ProtectedWithClaims;
 import no.nav.syfo.api.domain.RSBruker;
 import no.nav.syfo.api.domain.RSReservasjon;
 import no.nav.syfo.domain.Fnr;
 import no.nav.syfo.domain.model.Kontaktinfo;
-import no.nav.syfo.oidc.OIDCIssuer;
 import no.nav.syfo.service.*;
 import org.springframework.web.bind.annotation.*;
 
