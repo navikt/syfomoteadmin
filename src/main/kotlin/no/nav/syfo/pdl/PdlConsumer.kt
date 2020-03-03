@@ -6,7 +6,6 @@ import no.nav.syfo.sts.StsConsumer
 import no.nav.syfo.util.*
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.cache.annotation.Cacheable
 import org.springframework.core.ParameterizedTypeReference
 import org.springframework.http.*
 import org.springframework.http.HttpHeaders.AUTHORIZATION
@@ -21,7 +20,6 @@ class PdlConsumer(
         private val stsConsumer: StsConsumer,
         private val restTemplate: RestTemplate
 ) {
-    @Cacheable(cacheNames = [CacheConfig.CACHENAME_PDL_PERSON], key = "#ident", condition = "#ident != null")
     fun person(ident: String): PdlHentPerson? {
         metric.countEvent("call_pdl")
 
@@ -54,7 +52,7 @@ class PdlConsumer(
     }
 
     fun isKode6(ident: String): Boolean {
-        return person(ident)?.isKode6() ?: true
+        return person(ident)?.isKode6() ?: throw PdlRequestFailedException()
     }
 
     private fun createRequestEntity(request: PdlRequest): HttpEntity<PdlRequest> {
