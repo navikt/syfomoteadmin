@@ -1,6 +1,5 @@
 package no.nav.syfo.pdl
 
-import no.nav.syfo.config.CacheConfig
 import no.nav.syfo.metric.Metrikk
 import no.nav.syfo.sts.StsConsumer
 import no.nav.syfo.util.*
@@ -53,6 +52,10 @@ class PdlConsumer(
 
     fun isKode6(ident: String): Boolean {
         return person(ident)?.isKode6() ?: throw PdlRequestFailedException()
+    }
+
+    fun isKode6Or7(ident: String): Boolean {
+        return person(ident)?.isKode6Or7() ?: throw PdlRequestFailedException()
     }
 
     private fun createRequestEntity(request: PdlRequest): HttpEntity<PdlRequest> {

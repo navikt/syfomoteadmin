@@ -61,6 +61,17 @@ fun PdlHentPerson.isKode6(): Boolean {
     }
 }
 
+fun PdlHentPerson.isKode6Or7(): Boolean {
+    val adressebeskyttelse = this.hentPerson?.adressebeskyttelse
+    return if (adressebeskyttelse.isNullOrEmpty()) {
+        false
+    } else {
+        return adressebeskyttelse.any {
+            it.gradering == Gradering.STRENGT_FORTROLIG || it.gradering == Gradering.FORTROLIG
+        }
+    }
+}
+
 fun PdlHentPerson.fullName(): String? {
     val nameList = this.hentPerson?.navn
     if (nameList.isNullOrEmpty()) {
