@@ -2,6 +2,7 @@ package no.nav.syfo.service;
 
 import no.nav.security.oidc.context.OIDCRequestContextHolder;
 import no.nav.syfo.brukertilgang.BrukertilgangConsumer;
+import no.nav.syfo.pdl.PdlConsumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,17 +21,17 @@ public class BrukertilgangService {
 
     private final OIDCRequestContextHolder contextHolder;
     private final BrukertilgangConsumer brukertilgangConsumer;
-    private final PersonService personService;
+    private final PdlConsumer pdlConsumer;
 
     @Autowired
     public BrukertilgangService(
             OIDCRequestContextHolder contextHolder,
             BrukertilgangConsumer brukertilgangConsumer,
-            PersonService personService
+            PdlConsumer pdlConsumer
     ) {
         this.contextHolder = contextHolder;
         this.brukertilgangConsumer = brukertilgangConsumer;
-        this.personService = personService;
+        this.pdlConsumer = pdlConsumer;
     }
 
     public void kastExceptionHvisIkkeTilgang(String oppslattBrukerIdent) {
@@ -45,7 +46,7 @@ public class BrukertilgangService {
     boolean harTilgangTilOppslaattBruker(String innloggetIdent, String brukerFnr) {
         try {
             return !(sporOmNoenAndreEnnSegSelvEllerEgneAnsatte(innloggetIdent, brukerFnr)
-                    || personService.erPersonKode6(brukerFnr));
+                    || pdlConsumer.isKode6(brukerFnr));
         } catch (ForbiddenException e) {
             return false;
         }
