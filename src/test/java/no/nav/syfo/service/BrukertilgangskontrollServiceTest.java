@@ -1,6 +1,7 @@
 package no.nav.syfo.service;
 
 import no.nav.syfo.brukertilgang.BrukertilgangConsumer;
+import no.nav.syfo.pdl.PdlConsumer;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -18,7 +19,7 @@ public class BrukertilgangskontrollServiceTest {
     @Mock
     private BrukertilgangConsumer brukertilgangConsumer;
     @Mock
-    private PersonService personService;
+    private PdlConsumer pdlConsumer;
     @InjectMocks
     private BrukertilgangService brukertilgangService;
 
@@ -28,7 +29,7 @@ public class BrukertilgangskontrollServiceTest {
     @Test
     public void harTilgangTilOppslaattBrukerGirFalseNaarOppslaattBrukerErKode6() {
         when(brukertilgangConsumer.hasAccessToAnsatt(SPOR_OM_FNR)).thenReturn(true);
-        when(personService.erPersonKode6(SPOR_OM_FNR)).thenReturn(true);
+        when(pdlConsumer.isKode6(SPOR_OM_FNR)).thenReturn(true);
 
         boolean tilgang = brukertilgangService.harTilgangTilOppslaattBruker(INNLOGGET_FNR, SPOR_OM_FNR);
         assertThat(tilgang).isFalse();
