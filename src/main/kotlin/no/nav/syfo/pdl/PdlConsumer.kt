@@ -50,6 +50,10 @@ class PdlConsumer(
         }
     }
 
+    fun fullName(ident: String): String {
+        return person(ident)?.fullName() ?: throw PdlRequestFailedException()
+    }
+
     fun isKode6(ident: String): Boolean {
         return person(ident)?.isKode6() ?: throw PdlRequestFailedException()
     }
