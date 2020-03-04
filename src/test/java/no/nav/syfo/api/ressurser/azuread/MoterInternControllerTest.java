@@ -6,6 +6,7 @@ import no.nav.syfo.api.domain.nyttmoterequest.RSNyttMoteRequest;
 import no.nav.syfo.api.ressurser.AbstractRessursTilgangTest;
 import no.nav.syfo.domain.model.*;
 import no.nav.syfo.metric.Metrikk;
+import no.nav.syfo.pdl.PdlConsumer;
 import no.nav.syfo.repository.dao.MotedeltakerDAO;
 import no.nav.syfo.repository.dao.TidOgStedDAO;
 import no.nav.syfo.repository.model.PMotedeltakerAktorId;
@@ -49,8 +50,6 @@ public class MoterInternControllerTest extends AbstractRessursTilgangTest {
 
     private static final String AKTOER_ID_2 = "1101010101010";
     private static final String FNR_2 = "11010101010";
-    private static final TpsPerson skjermet_tpsPerson = new TpsPerson().skjermetBruker(true);
-    private static final TpsPerson tpsPerson = new TpsPerson().skjermetBruker(false);
 
     @Value("${syfobehandlendeenhet.url}")
     private String behandlendeenhetUrl;
@@ -77,6 +76,8 @@ public class MoterInternControllerTest extends AbstractRessursTilgangTest {
     private NorgService norgService;
     @MockBean
     private BrukerprofilService brukerprofilService;
+    @MockBean
+    private PdlConsumer pdlConsumer;
     @MockBean
     private VeilederService veilederService;
     @MockBean
@@ -148,7 +149,6 @@ public class MoterInternControllerTest extends AbstractRessursTilgangTest {
 
         when(tilgangService.harVeilederTilgangTilPersonViaAzure(ARBEIDSTAKER_FNR)).thenReturn(true);
 
-        when(brukerprofilService.hentBruker(ARBEIDSTAKER_FNR)).thenReturn(tpsPerson);
         when(moteService.findMoterByBrukerAktoerId(ARBEIDSTAKER_AKTORID)).thenReturn(asList(Mote1, Mote2));
         when(hendelseService.sistEndretMoteStatus(anyLong())).thenReturn(empty());
 
@@ -157,7 +157,6 @@ public class MoterInternControllerTest extends AbstractRessursTilgangTest {
         assertEquals(ARBEIDSTAKER_AKTORID, moteList.get(0).aktorId);
         assertEquals(ARBEIDSTAKER_AKTORID, moteList.get(1).aktorId);
 
-        verify(brukerprofilService, times(3)).hentBruker(ARBEIDSTAKER_FNR);
         verify(aktoerService, times(4)).hentFnrForAktoer(ARBEIDSTAKER_AKTORID);
         verify(aktoerService, times(1)).hentAktoerIdForIdent(ARBEIDSTAKER_FNR);
         verify(moteService).findMoterByBrukerAktoerId(ARBEIDSTAKER_AKTORID);
@@ -167,18 +166,18 @@ public class MoterInternControllerTest extends AbstractRessursTilgangTest {
     public void hentMoter_fnr_veileder_har_ikke_tilgang_pga_rolle() {
         when(tilgangService.harVeilederTilgangTilPersonViaAzure(ARBEIDSTAKER_FNR)).thenReturn(false);
 
-        when(brukerprofilService.hentBruker(ARBEIDSTAKER_FNR)).thenReturn(tpsPerson);
+        when(pdlConsumer.isKode6Or7(ARBEIDSTAKER_FNR)).thenReturn(false);
 
         moterController.hentMoter(null, ARBEIDSTAKER_FNR, false, null, false);
 
-        verify(brukerprofilService).hentBruker(ARBEIDSTAKER_FNR);
+        verify(pdlConsumer).isKode6Or7(ARBEIDSTAKER_FNR);
     }
 
     @Test(expected = ForbiddenException.class)
     public void hentMoter_fnr_veileder_har_ikke_tilgang_pga_skjermet_bruker() {
         when(tilgangService.harVeilederTilgangTilPersonViaAzure(ARBEIDSTAKER_FNR)).thenReturn(true);
 
-        when(brukerprofilService.hentBruker(ARBEIDSTAKER_FNR)).thenReturn(skjermet_tpsPerson);
+        when(pdlConsumer.isKode6Or7(ARBEIDSTAKER_FNR)).thenReturn(true);
 
         moterController.hentMoter(null, ARBEIDSTAKER_FNR, false, null, false);
     }
@@ -187,11 +186,11 @@ public class MoterInternControllerTest extends AbstractRessursTilgangTest {
     public void hentMoter_fnr_veileder_annen_tilgangsfeil() {
         when(tilgangService.harVeilederTilgangTilPersonViaAzure(ARBEIDSTAKER_FNR)).thenReturn(false);
 
-        when(brukerprofilService.hentBruker(ARBEIDSTAKER_FNR)).thenReturn(tpsPerson);
+        when(pdlConsumer.isKode6Or7(ARBEIDSTAKER_FNR)).thenReturn(false);
 
         moterController.hentMoter(null, ARBEIDSTAKER_FNR, false, null, false);
 
-        verify(brukerprofilService).hentBruker(ARBEIDSTAKER_FNR);
+        verify(pdlConsumer).isKode6Or7(ARBEIDSTAKER_FNR);
     }
 
     @Test
@@ -200,10 +199,8 @@ public class MoterInternControllerTest extends AbstractRessursTilgangTest {
         when(tilgangService.harVeilederTilgangTilPersonViaAzure(FNR_2)).thenReturn(true);
 
         when(norgService.hoererNavEnhetTilBruker(anyString(), anyString())).thenReturn(true);
-        when(brukerprofilService.hentBruker(ARBEIDSTAKER_FNR))
-                .thenReturn(tpsPerson);
-        when(brukerprofilService.hentBruker(FNR_2))
-                .thenReturn(tpsPerson);
+        when(pdlConsumer.isKode6Or7(ARBEIDSTAKER_FNR)).thenReturn(false);
+        when(pdlConsumer.isKode6Or7(FNR_2)).thenReturn(false);
         when(hendelseService.sistEndretMoteStatus(anyLong())).thenReturn(empty());
 
         List<RSMote> moteList = moterController.hentMoter(null, null, false, NAV_ENHET, false);
@@ -212,8 +209,8 @@ public class MoterInternControllerTest extends AbstractRessursTilgangTest {
         assertEquals(ARBEIDSTAKER_AKTORID, moteList.get(0).aktorId);
         assertEquals(AKTOER_ID_2, moteList.get(1).aktorId);
 
-        verify(brukerprofilService).hentBruker(ARBEIDSTAKER_FNR);
-        verify(brukerprofilService).hentBruker(FNR_2);
+        verify(pdlConsumer).isKode6Or7(ARBEIDSTAKER_FNR);
+        verify(pdlConsumer).isKode6Or7(FNR_2);
     }
 
     @Test
@@ -223,10 +220,8 @@ public class MoterInternControllerTest extends AbstractRessursTilgangTest {
                 .thenReturn(false);
 
         when(norgService.hoererNavEnhetTilBruker(anyString(), anyString())).thenReturn(true);
-        when(brukerprofilService.hentBruker(ARBEIDSTAKER_FNR))
-                .thenReturn(tpsPerson);
-        when(brukerprofilService.hentBruker(FNR_2))
-                .thenReturn(tpsPerson);
+        when(pdlConsumer.isKode6Or7(ARBEIDSTAKER_FNR)).thenReturn(false);
+        when(pdlConsumer.isKode6Or7(FNR_2)).thenReturn(false);
         when(hendelseService.sistEndretMoteStatus(anyLong())).thenReturn(empty());
 
         List<RSMote> moteList = moterController.hentMoter(null, null, false, NAV_ENHET, false);
@@ -234,8 +229,8 @@ public class MoterInternControllerTest extends AbstractRessursTilgangTest {
         assertEquals(1, moteList.size());
         assertEquals(ARBEIDSTAKER_AKTORID, moteList.get(0).aktorId);
 
-        verify(brukerprofilService).hentBruker(ARBEIDSTAKER_FNR);
-        verify(brukerprofilService).hentBruker(FNR_2);
+        verify(pdlConsumer).isKode6Or7(ARBEIDSTAKER_FNR);
+        verify(pdlConsumer).isKode6Or7(FNR_2);
     }
 
     @Test
@@ -243,10 +238,8 @@ public class MoterInternControllerTest extends AbstractRessursTilgangTest {
         when(tilgangService.harVeilederTilgangTilPersonViaAzure(ARBEIDSTAKER_FNR)).thenReturn(true);
 
         when(norgService.hoererNavEnhetTilBruker(anyString(), anyString())).thenReturn(true);
-        when(brukerprofilService.hentBruker(ARBEIDSTAKER_FNR))
-                .thenReturn(tpsPerson);
-        when(brukerprofilService.hentBruker(FNR_2))
-                .thenReturn(skjermet_tpsPerson);
+        when(pdlConsumer.isKode6Or7(ARBEIDSTAKER_FNR)).thenReturn(false);
+        when(pdlConsumer.isKode6Or7(FNR_2)).thenReturn(true);
 
         when(hendelseService.sistEndretMoteStatus(anyLong())).thenReturn(empty());
 
@@ -255,8 +248,8 @@ public class MoterInternControllerTest extends AbstractRessursTilgangTest {
         assertEquals(1, moteList.size());
         assertEquals(ARBEIDSTAKER_AKTORID, moteList.get(0).aktorId);
 
-        verify(brukerprofilService).hentBruker(ARBEIDSTAKER_FNR);
-        verify(brukerprofilService).hentBruker(FNR_2);
+        verify(pdlConsumer).isKode6Or7(ARBEIDSTAKER_FNR);
+        verify(pdlConsumer).isKode6Or7(FNR_2);
     }
 
     @Test
@@ -264,8 +257,8 @@ public class MoterInternControllerTest extends AbstractRessursTilgangTest {
         when(tilgangService.harVeilederTilgangTilPersonViaAzure(ARBEIDSTAKER_FNR)).thenReturn(false);
 
         when(norgService.hoererNavEnhetTilBruker(anyString(), anyString())).thenReturn(true);
-        when(brukerprofilService.hentBruker(ARBEIDSTAKER_FNR)).thenReturn(tpsPerson);
-        when(brukerprofilService.hentBruker(FNR_2)).thenReturn(tpsPerson);
+        when(pdlConsumer.isKode6Or7(ARBEIDSTAKER_FNR)).thenReturn(false);
+        when(pdlConsumer.isKode6Or7(FNR_2)).thenReturn(false);
 
         when(hendelseService.sistEndretMoteStatus(anyLong())).thenReturn(empty());
 
@@ -273,8 +266,8 @@ public class MoterInternControllerTest extends AbstractRessursTilgangTest {
 
         assertEquals(0, moteList.size());
 
-        verify(brukerprofilService).hentBruker(ARBEIDSTAKER_FNR);
-        verify(brukerprofilService).hentBruker(FNR_2);
+        verify(pdlConsumer).isKode6Or7(ARBEIDSTAKER_FNR);
+        verify(pdlConsumer).isKode6Or7(FNR_2);
     }
 
     @Test
@@ -282,16 +275,16 @@ public class MoterInternControllerTest extends AbstractRessursTilgangTest {
         when(tilgangService.harVeilederTilgangTilPersonViaAzure(ARBEIDSTAKER_FNR)).thenReturn(true);
 
         when(norgService.hoererNavEnhetTilBruker(anyString(), anyString())).thenReturn(true);
-        when(brukerprofilService.hentBruker(ARBEIDSTAKER_FNR)).thenReturn(skjermet_tpsPerson);
-        when(brukerprofilService.hentBruker(FNR_2)).thenReturn(skjermet_tpsPerson);
+        when(pdlConsumer.isKode6Or7(ARBEIDSTAKER_FNR)).thenReturn(true);
+        when(pdlConsumer.isKode6Or7(FNR_2)).thenReturn(true);
         when(hendelseService.sistEndretMoteStatus(anyLong())).thenReturn(empty());
 
         List<RSMote> moteList = moterController.hentMoter(null, null, false, NAV_ENHET, false);
 
         assertEquals(0, moteList.size());
 
-        verify(brukerprofilService).hentBruker(ARBEIDSTAKER_FNR);
-        verify(brukerprofilService).hentBruker(FNR_2);
+        verify(pdlConsumer).isKode6Or7(ARBEIDSTAKER_FNR);
+        verify(pdlConsumer).isKode6Or7(FNR_2);
     }
 
     @Test(expected = RuntimeException.class)
@@ -300,14 +293,14 @@ public class MoterInternControllerTest extends AbstractRessursTilgangTest {
         doThrow(new RuntimeException()).when(tilgangService).harVeilederTilgangTilPersonViaAzure(ARBEIDSTAKER_FNR);
 
         when(norgService.hoererNavEnhetTilBruker(anyString(), anyString())).thenReturn(true);
-        when(brukerprofilService.hentBruker(ARBEIDSTAKER_FNR)).thenReturn(tpsPerson);
-        when(brukerprofilService.hentBruker(FNR_2)).thenReturn(tpsPerson);
+        when(pdlConsumer.isKode6Or7(ARBEIDSTAKER_FNR)).thenReturn(false);
+        when(pdlConsumer.isKode6Or7(FNR_2)).thenReturn(false);
         when(hendelseService.sistEndretMoteStatus(anyLong())).thenReturn(empty());
 
         moterController.hentMoter(null, null, false, NAV_ENHET, false);
 
-        verify(brukerprofilService).hentBruker(ARBEIDSTAKER_FNR);
-        verify(brukerprofilService).hentBruker(FNR_2);
+        verify(pdlConsumer).isKode6Or7(ARBEIDSTAKER_FNR);
+        verify(pdlConsumer).isKode6Or7(FNR_2);
     }
 
     @Test
@@ -320,7 +313,7 @@ public class MoterInternControllerTest extends AbstractRessursTilgangTest {
 
         when(tilgangService.harVeilederTilgangTilPersonViaAzure(ARBEIDSTAKER_FNR)).thenReturn(true);
 
-        when(brukerprofilService.hentBruker(ARBEIDSTAKER_FNR)).thenReturn(tpsPerson);
+        when(pdlConsumer.isKode6Or7(ARBEIDSTAKER_FNR)).thenReturn(false);
         when(sykefravaersoppfoelgingService.hentNaermesteLederSomBruker(ARBEIDSTAKER_AKTORID, nyttMoteRequest.orgnummer)).thenReturn(
                 new NaermesteLeder()
                         .navn("Frida Frisk")
@@ -334,40 +327,34 @@ public class MoterInternControllerTest extends AbstractRessursTilgangTest {
 
         moterController.opprett(nyttMoteRequest);
 
-        verify(brukerprofilService).hentBruker(ARBEIDSTAKER_FNR);
+        verify(pdlConsumer).isKode6Or7(ARBEIDSTAKER_FNR);
     }
 
     @Test(expected = ForbiddenException.class)
     public void opprettMoter_ikke_tilgang_pga_skjermet_bruker() {
         when(tilgangService.harVeilederTilgangTilPersonViaAzure(ARBEIDSTAKER_FNR)).thenReturn(true);
 
-        when(brukerprofilService.hentBruker(ARBEIDSTAKER_FNR)).thenReturn(skjermet_tpsPerson);
+        when(pdlConsumer.isKode6Or7(ARBEIDSTAKER_FNR)).thenReturn(true);
 
         moterController.opprett(new RSNyttMoteRequest().fnr(ARBEIDSTAKER_FNR));
-
-        verify(brukerprofilService).hentBruker(ARBEIDSTAKER_FNR);
     }
 
     @Test(expected = ForbiddenException.class)
     public void opprettMoter_ikke_tilgang_pga_rolle() {
         when(tilgangService.harVeilederTilgangTilPersonViaAzure(ARBEIDSTAKER_FNR)).thenReturn(false);
 
-        when(brukerprofilService.hentBruker(ARBEIDSTAKER_FNR)).thenReturn(tpsPerson);
+        when(pdlConsumer.isKode6Or7(ARBEIDSTAKER_FNR)).thenReturn(false);
 
         moterController.opprett(new RSNyttMoteRequest().fnr(ARBEIDSTAKER_FNR));
-
-        verify(brukerprofilService).hentBruker(ARBEIDSTAKER_FNR);
     }
 
     @Test(expected = RuntimeException.class)
     public void opprettMoter_annen_tilgangsfeil() {
         doThrow(new RuntimeException()).when(tilgangService).harVeilederTilgangTilPersonViaAzure(ARBEIDSTAKER_FNR);
 
-        when(brukerprofilService.hentBruker(ARBEIDSTAKER_FNR)).thenReturn(tpsPerson);
+        when(pdlConsumer.isKode6Or7(ARBEIDSTAKER_FNR)).thenReturn(false);
 
         moterController.opprett(new RSNyttMoteRequest().fnr(ARBEIDSTAKER_FNR));
-
-        verify(brukerprofilService).hentBruker(ARBEIDSTAKER_FNR);
     }
 
     private void mockSTS() {

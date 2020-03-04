@@ -8,6 +8,7 @@ import no.nav.syfo.api.domain.nyttmoterequest.RSNyttMoteRequest;
 import no.nav.syfo.behandlendeenhet.BehandlendeEnhetConsumer;
 import no.nav.syfo.domain.model.*;
 import no.nav.syfo.metric.Metrikk;
+import no.nav.syfo.pdl.PdlConsumer;
 import no.nav.syfo.repository.dao.MotedeltakerDAO;
 import no.nav.syfo.repository.dao.TidOgStedDAO;
 import no.nav.syfo.repository.model.PMotedeltakerAktorId;
@@ -54,6 +55,7 @@ public class MoterInternController {
     private MotedeltakerDAO motedeltakerDAO;
     private NorgService norgService;
     private BrukerprofilService brukerprofilService;
+    private PdlConsumer pdlConsumer;
     private VeilederService veilederService;
     private ArbeidsgiverVarselService arbeidsgiverVarselService;
     private SykefravaersoppfoelgingService sykefravaersoppfoelgingService;
@@ -72,6 +74,7 @@ public class MoterInternController {
             MotedeltakerDAO motedeltakerDAO,
             NorgService norgService,
             BrukerprofilService brukerprofilService,
+            PdlConsumer pdlConsumer,
             VeilederService veilederService,
             ArbeidsgiverVarselService arbeidsgiverVarselService,
             SykefravaersoppfoelgingService sykefravaersoppfoelgingService,
@@ -88,6 +91,7 @@ public class MoterInternController {
         this.motedeltakerDAO = motedeltakerDAO;
         this.norgService = norgService;
         this.brukerprofilService = brukerprofilService;
+        this.pdlConsumer = pdlConsumer;
         this.veilederService = veilederService;
         this.arbeidsgiverVarselService = arbeidsgiverVarselService;
         this.sykefravaersoppfoelgingService = sykefravaersoppfoelgingService;
@@ -108,7 +112,7 @@ public class MoterInternController {
         List<Mote> moterByFnr = new ArrayList<>();
 
         if (!isEmpty(fnr)) {
-            boolean erBrukerSkjermet = brukerprofilService.hentBruker(fnr).skjermetBruker;
+            boolean erBrukerSkjermet = pdlConsumer.isKode6Or7(fnr);
             if (erBrukerSkjermet || !tilgangService.harVeilederTilgangTilPersonViaAzure(fnr)) {
                 throw new ForbiddenException(status(FORBIDDEN)
                         .entity(erBrukerSkjermet ?
@@ -147,7 +151,7 @@ public class MoterInternController {
         }
 
         moter = moter.stream()
-                .filter(mote -> !brukerprofilService.hentBruker(aktoerService.hentFnrForAktoer(mote.sykmeldt().aktorId)).skjermetBruker)
+                .filter(mote -> !pdlConsumer.isKode6Or7(aktoerService.hentFnrForAktoer(mote.sykmeldt().aktorId)))
                 .filter(mote -> tilgangService.harVeilederTilgangTilPersonViaAzure(aktoerService.hentFnrForAktoer(mote.sykmeldt().aktorId)))
                 .collect(toList());
 
@@ -194,7 +198,7 @@ public class MoterInternController {
     @PostMapping(consumes = APPLICATION_JSON_VALUE)
     public void opprett(
             @RequestBody RSNyttMoteRequest nyttMoteRequest) {
-        if (brukerprofilService.hentBruker(nyttMoteRequest.fnr).skjermetBruker || !tilgangService.harVeilederTilgangTilPersonViaAzure(nyttMoteRequest.fnr)) {
+        if (pdlConsumer.isKode6Or7(nyttMoteRequest.fnr) || !tilgangService.harVeilederTilgangTilPersonViaAzure(nyttMoteRequest.fnr)) {
             throw new ForbiddenException();
         } else {
             String aktorId = aktoerService.hentAktoerIdForIdent(nyttMoteRequest.fnr);
