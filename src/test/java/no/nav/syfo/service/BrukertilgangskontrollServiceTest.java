@@ -15,8 +15,6 @@ import static org.mockito.Mockito.when;
 public class BrukertilgangskontrollServiceTest {
 
     @Mock
-    private BrukerprofilService brukerprofilService;
-    @Mock
     private BrukertilgangConsumer brukertilgangConsumer;
     @Mock
     private PdlConsumer pdlConsumer;

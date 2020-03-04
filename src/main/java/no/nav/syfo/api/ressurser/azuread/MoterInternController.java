@@ -54,7 +54,6 @@ public class MoterInternController {
     private HendelseService hendelseService;
     private MotedeltakerDAO motedeltakerDAO;
     private NorgService norgService;
-    private BrukerprofilService brukerprofilService;
     private PdlConsumer pdlConsumer;
     private VeilederService veilederService;
     private ArbeidsgiverVarselService arbeidsgiverVarselService;
@@ -73,7 +72,6 @@ public class MoterInternController {
             HendelseService hendelseService,
             MotedeltakerDAO motedeltakerDAO,
             NorgService norgService,
-            BrukerprofilService brukerprofilService,
             PdlConsumer pdlConsumer,
             VeilederService veilederService,
             ArbeidsgiverVarselService arbeidsgiverVarselService,
@@ -90,7 +88,6 @@ public class MoterInternController {
         this.hendelseService = hendelseService;
         this.motedeltakerDAO = motedeltakerDAO;
         this.norgService = norgService;
-        this.brukerprofilService = brukerprofilService;
         this.pdlConsumer = pdlConsumer;
         this.veilederService = veilederService;
         this.arbeidsgiverVarselService = arbeidsgiverVarselService;
@@ -187,7 +184,7 @@ public class MoterInternController {
                         .map(motedeltaker -> {
                             if (motedeltaker instanceof MotedeltakerAktorId) {
                                 MotedeltakerAktorId sykmeldt = (MotedeltakerAktorId) motedeltaker;
-                                return sykmeldt.navn(brukerprofilService.finnBrukerPersonnavnByAktoerId(sykmeldt.aktorId));
+                                return sykmeldt.navn(pdlConsumer.fullName(aktoerService.hentFnrForAktoer(sykmeldt.aktorId)));
                             }
                             return motedeltaker;
                         })

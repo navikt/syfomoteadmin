@@ -54,7 +54,6 @@ aktoer.v2.endpointurl: "aktoerv2.url"
 brukeroppgave.v1.endpointurl: "brukeroppgavev1.url"
 sykefravaersoppfoelging.v1.endpointurl: "sykefravaeroppfoelgingv1.url"
 virksomhet:
-  brukerprofil.v3.endpointurl: "brukerprofil.url"
   digitalkontakinformasjon.v1.endpointurl: "dkif.url"
   diskresjonskode.v1.endpointurl: "diskresjonskode.url"
   organisasjon.v4.endpointurl: "organisasjonv4.url"
@@ -63,7 +62,6 @@ virksomhet:
 fasit.environment.name: 'local'
 
 aktoer.withmock: true
-brukerprofil.withmock: true
 dkif.withmock: true
 ereg.withmock: true
 norg.withmock: true

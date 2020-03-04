@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import no.nav.security.oidc.context.OIDCRequestContextHolder;
 import no.nav.syfo.api.domain.bruker.*;
 import no.nav.syfo.domain.model.*;
+import no.nav.syfo.pdl.PdlConsumer;
 import no.nav.syfo.util.Brukerkontekst;
 import org.springframework.stereotype.Service;
 
@@ -27,7 +28,7 @@ public class MoteBrukerService {
 
     private AktoerService aktoerService;
 
-    private BrukerprofilService brukerprofilService;
+    private final PdlConsumer pdlConsumer;
 
     private BrukertilgangService brukertilgangService;
 
@@ -41,19 +42,19 @@ public class MoteBrukerService {
     public MoteBrukerService(
             OIDCRequestContextHolder contextHolder,
             AktoerService aktoerService,
-            BrukerprofilService brukerprofilService,
             BrukertilgangService brukertilgangService,
             MoteService moteService,
             MotedeltakerService motedeltakerService,
-            NaermesteLedersMoterService naermesteLedersMoterService
+            NaermesteLedersMoterService naermesteLedersMoterService,
+            PdlConsumer pdlConsumer
     ) {
         this.contextHolder = contextHolder;
         this.aktoerService = aktoerService;
-        this.brukerprofilService = brukerprofilService;
         this.brukertilgangService = brukertilgangService;
         this.moteService = moteService;
         this.motedeltakerService = motedeltakerService;
         this.naermesteLedersMoterService = naermesteLedersMoterService;
+        this.pdlConsumer = pdlConsumer;
     }
 
 
@@ -83,7 +84,7 @@ public class MoteBrukerService {
                                 .stream()
                                 .map(deltaker -> {
                                     if (Brukerkontekst.ARBEIDSTAKER.equals(deltaker.type)) {
-                                        return deltaker.navn(brukerprofilService.finnBrukerPersonnavnByAktoerId(deltaker.aktoerId));
+                                        return deltaker.navn(pdlConsumer.fullName(aktoerService.hentFnrForAktoer(deltaker.aktoerId)));
                                     }
                                     return deltaker;
                                 })

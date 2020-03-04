@@ -3,18 +3,20 @@ package no.nav.syfo.service;
 import no.nav.security.oidc.context.OIDCRequestContextHolder;
 import no.nav.syfo.api.domain.bruker.BrukerMote;
 import no.nav.syfo.domain.model.*;
+import no.nav.syfo.pdl.PdlConsumer;
 import no.nav.syfo.util.Brukerkontekst;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 
 import java.time.LocalDateTime;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
+import static no.nav.syfo.testhelper.UserConstants.PERSON_NAVN;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
@@ -29,9 +31,6 @@ public class MoteBrukerServiceTest {
     private AktoerService aktoerService;
 
     @Mock
-    private BrukerprofilService brukerprofilService;
-
-    @Mock
     private BrukertilgangService brukertilgangService;
 
     @Mock
@@ -42,6 +41,9 @@ public class MoteBrukerServiceTest {
 
     @Mock
     private NaermesteLedersMoterService naermesteLedersMoterService;
+
+    @Mock
+    private PdlConsumer pdlConsumer;
 
     @InjectMocks
     private MoteBrukerService moteBrukerService;
