@@ -5,6 +5,7 @@ import no.nav.syfo.api.domain.RSBruker;
 import no.nav.syfo.api.domain.RSReservasjon;
 import no.nav.syfo.domain.Fnr;
 import no.nav.syfo.domain.model.Kontaktinfo;
+import no.nav.syfo.pdl.PdlConsumer;
 import no.nav.syfo.service.*;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,21 +20,21 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @ProtectedWithClaims(issuer = AZURE)
 public class PersonController {
 
-    private BrukerprofilService brukerprofilService;
     private DkifService dkifService;
     private AktoerService aktoerService;
+    private PdlConsumer pdlConsumer;
     private TilgangService tilgangService;
 
     @Inject
     public PersonController(
             DkifService dkifService,
             AktoerService aktoerService,
-            BrukerprofilService brukerprofilService,
+            PdlConsumer pdlConsumer,
             TilgangService tilgangService
     ) {
         this.dkifService = dkifService;
         this.aktoerService = aktoerService;
-        this.brukerprofilService = brukerprofilService;
+        this.pdlConsumer = pdlConsumer;
         this.tilgangService = tilgangService;
     }
 
@@ -45,7 +46,7 @@ public class PersonController {
         tilgangService.throwExceptionIfVeilederWithoutAccess(fnr);
 
         return new RSBruker()
-                .navn(brukerprofilService.hentBruker(fnr.getFnr()).navn);
+                .navn(pdlConsumer.fullName(fnr.getFnr()));
     }
 
     @GetMapping(produces = APPLICATION_JSON_VALUE)
@@ -63,7 +64,7 @@ public class PersonController {
                         .skalHaVarsel(kontaktinfo.skalHaVarsel)
                         .feilAarsak(!kontaktinfo.skalHaVarsel ? feilAarsak(kontaktinfo.feilAarsak) : null));
         return rsBruker
-                .navn(brukerprofilService.hentBruker(fnr.getFnr()).navn);
+                .navn(pdlConsumer.fullName(fnr.getFnr()));
     }
 
     private Fnr getFnrForIdent(@PathVariable("ident") String ident) {

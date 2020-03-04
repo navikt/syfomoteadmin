@@ -5,6 +5,7 @@ import no.nav.syfo.api.domain.RSBruker;
 import no.nav.syfo.api.ressurser.AbstractRessursTilgangTest;
 import no.nav.syfo.domain.model.Kontaktinfo;
 import no.nav.syfo.oidc.OIDCIssuer;
+import no.nav.syfo.pdl.PdlConsumer;
 import no.nav.syfo.service.DkifService;
 import org.junit.Before;
 import org.junit.Test;
@@ -33,6 +34,8 @@ public class PersonControllerTest extends AbstractRessursTilgangTest {
 
     @MockBean
     private DkifService dkifService;
+    @MockBean
+    private PdlConsumer pdlConsumer;
 
     @Inject
     private PersonController personController;
@@ -48,6 +51,7 @@ public class PersonControllerTest extends AbstractRessursTilgangTest {
 
     @Test
     public void getUserWithNameHasAccess() {
+        when(pdlConsumer.fullName(ARBEIDSTAKER_FNR)).thenReturn(PERSON_NAVN);
         mockSvarFraTilgangTilBrukerViaAzure(ARBEIDSTAKER_FNR, HttpStatus.OK);
 
         RSBruker user = personController.hentBruker(ARBEIDSTAKER_AKTORID);
@@ -79,6 +83,7 @@ public class PersonControllerTest extends AbstractRessursTilgangTest {
                 .skalHaVarsel(Boolean.valueOf(PERSON_RESERVASJON))
                 .feilAarsak(Kontaktinfo.FeilAarsak.RESERVERT);
         when(dkifService.hentKontaktinfoFnr(ARBEIDSTAKER_FNR, OIDCIssuer.AZURE)).thenReturn(kontaktinfo);
+        when(pdlConsumer.fullName(ARBEIDSTAKER_FNR)).thenReturn(PERSON_NAVN);
 
         mockSvarFraTilgangTilBrukerViaAzure(ARBEIDSTAKER_FNR, HttpStatus.OK);
 
