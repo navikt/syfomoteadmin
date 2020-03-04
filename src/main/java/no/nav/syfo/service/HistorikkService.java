@@ -2,6 +2,7 @@ package no.nav.syfo.service;
 
 import no.nav.syfo.api.domain.RSHistorikk;
 import no.nav.syfo.domain.model.*;
+import no.nav.syfo.pdl.PdlConsumer;
 import no.nav.syfo.repository.dao.HendelseDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -14,17 +15,18 @@ import static java.util.stream.Collectors.toList;
 @Service
 public class HistorikkService {
 
-    private BrukerprofilService brukerprofilService;
-
-    private HendelseDAO hendelseDAO;
+    private final AktoerService aktorService;
+    private final PdlConsumer pdlConsumer;
+    private final HendelseDAO hendelseDAO;
 
     @Autowired
     public HistorikkService(
-            BrukerprofilService brukerprofilService,
+            AktoerService aktorService,
+            PdlConsumer pdlConsumer,
             HendelseDAO hendelseDAO
-
     ) {
-        this.brukerprofilService = brukerprofilService;
+        this.aktorService = aktorService;
+        this.pdlConsumer = pdlConsumer;
         this.hendelseDAO = hendelseDAO;
     }
 
@@ -97,7 +99,7 @@ public class HistorikkService {
     private String hentNavn(Motedeltaker motedeltaker) {
         if (motedeltaker.motedeltakertype.equals("Bruker")) {
             MotedeltakerAktorId motedeltakerAktorId = (MotedeltakerAktorId) motedeltaker;
-            return brukerprofilService.finnBrukerPersonnavnByAktoerId(motedeltakerAktorId.aktorId);
+            return pdlConsumer.fullName(aktorService.hentFnrForAktoer(motedeltakerAktorId.aktorId));
         }
         return motedeltaker.navn;
     }
