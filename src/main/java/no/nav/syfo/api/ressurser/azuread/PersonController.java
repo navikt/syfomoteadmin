@@ -5,6 +5,7 @@ import no.nav.syfo.api.domain.RSBruker;
 import no.nav.syfo.api.domain.RSReservasjon;
 import no.nav.syfo.domain.Fnr;
 import no.nav.syfo.domain.model.Kontaktinfo;
+import no.nav.syfo.metric.Metrikk;
 import no.nav.syfo.pdl.PdlConsumer;
 import no.nav.syfo.service.*;
 import org.springframework.web.bind.annotation.*;
@@ -24,23 +25,28 @@ public class PersonController {
     private AktoerService aktoerService;
     private PdlConsumer pdlConsumer;
     private TilgangService tilgangService;
+    private Metrikk metrikk;
 
     @Inject
     public PersonController(
             DkifService dkifService,
             AktoerService aktoerService,
             PdlConsumer pdlConsumer,
-            TilgangService tilgangService
+            TilgangService tilgangService,
+            Metrikk metrikk
     ) {
         this.dkifService = dkifService;
         this.aktoerService = aktoerService;
         this.pdlConsumer = pdlConsumer;
         this.tilgangService = tilgangService;
+        this.metrikk = metrikk;
     }
 
     @GetMapping(produces = APPLICATION_JSON_VALUE)
     @RequestMapping(value = "/navn")
     public RSBruker hentBruker(@PathVariable("ident") String ident) {
+        metrikk.tellEndepunktKall("bruker_navn");
+
         Fnr fnr = getFnrForIdent(ident);
 
         tilgangService.throwExceptionIfVeilederWithoutAccess(fnr);
@@ -51,6 +57,8 @@ public class PersonController {
 
     @GetMapping(produces = APPLICATION_JSON_VALUE)
     public RSBruker bruker(@PathVariable("ident") String ident) {
+        metrikk.tellEndepunktKall("bruker");
+
         Fnr fnr = getFnrForIdent(ident);
 
         tilgangService.throwExceptionIfVeilederWithoutAccess(fnr);
