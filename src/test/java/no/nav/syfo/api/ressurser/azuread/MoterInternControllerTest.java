@@ -75,8 +75,6 @@ public class MoterInternControllerTest extends AbstractRessursTilgangTest {
     @MockBean
     private NorgService norgService;
     @MockBean
-    private BrukerprofilService brukerprofilService;
-    @MockBean
     private PdlConsumer pdlConsumer;
     @MockBean
     private VeilederService veilederService;

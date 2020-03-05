@@ -8,7 +8,6 @@ version = "1.0.0"
 
 val aktoerV2Version = "1.0"
 val sykefravaersoppfoelgingV1Version = "1.0.22"
-val brukerprofilV3Version = "3.0.1"
 val organisasjonV4Version = "1.0.1"
 val organisasjonRessursEnhetV1Version = "1.0.3"
 val dkifVersion = "1.2"
@@ -70,7 +69,6 @@ dependencies {
 
     implementation("no.nav.syfo.tjenester:aktoer-v2:$aktoerV2Version")
     implementation("no.nav.syfo.tjenester:sykefravaersoppfoelgingv1-tjenestespesifikasjon:$sykefravaersoppfoelgingV1Version")
-    implementation("no.nav.syfo.tjenester:brukerprofil-v3-tjenestespesifikasjon:$brukerprofilV3Version")
     implementation("no.nav.sbl.dialogarena:organisasjonv4-tjenestespesifikasjon:$organisasjonV4Version")
     implementation("no.nav.syfo.tjenester:organisasjonRessursEnhet-v1-tjenestespesifikasjon:$organisasjonRessursEnhetV1Version")
     implementation("no.nav.syfo.tjenester:dkif-tjenestespesifikasjon:$dkifVersion")

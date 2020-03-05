@@ -2,8 +2,6 @@ package no.nav.syfo.testhelper;
 
 import no.nav.syfo.config.mocks.AktoerMock;
 
-import static no.nav.syfo.config.mocks.BrukerProfilV3Mock.PERSON_ETTERNAVN;
-import static no.nav.syfo.config.mocks.BrukerProfilV3Mock.PERSON_FORNAVN;
 import static no.nav.syfo.config.mocks.OrganisasjonMock.VIRKSOMHET_NAME1;
 import static no.nav.syfo.config.mocks.OrganisasjonMock.VIRKSOMHET_NAME2;
 
@@ -20,6 +18,8 @@ public class UserConstants {
     public static final String VEILEDER_ID = "Z999999";
     public static final String VEILEDER_NAVN = "Veil Veileder";
     public static final String STS_TOKEN = "123456789";
+    public static final String PERSON_NAME_FIRST = "First";
+    public static final String PERSON_NAME_LAST = "Last";
 
-    public final static String PERSON_NAVN = PERSON_FORNAVN + " " + PERSON_ETTERNAVN;
+    public final static String PERSON_NAVN = PERSON_NAME_FIRST + " " + PERSON_NAME_LAST;
 }
