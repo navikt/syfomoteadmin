@@ -52,13 +52,6 @@ public class TilgangService {
         this.contextHolder = contextHolder;
     }
 
-    public void kastExceptionHvisIkkeVeilederHarTilgangTilPerson(String fnr) {
-        boolean harTilgang = harVeilederTilgangTilPerson(fnr);
-        if (!harTilgang) {
-            throw new ForbiddenException();
-        }
-    }
-
     public void throwExceptionIfVeilederWithoutAccess(Fnr fnr) {
         boolean harTilgang = harVeilederTilgangTilPersonViaAzure(fnr.getFnr());
         if (!harTilgang) {
@@ -87,13 +80,6 @@ public class TilgangService {
             } else {
                 throw e;
             }
-        }
-    }
-
-    public void kastExceptionHvisIkkeVeilederHarTilgangTilEnhet(String enhet) {
-        boolean harTilgang = harVeilederTilgangTilEnhet(enhet);
-        if (!harTilgang) {
-            throw new ForbiddenException();
         }
     }
 
