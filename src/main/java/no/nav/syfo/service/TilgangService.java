@@ -16,6 +16,7 @@ import java.net.URI;
 import java.util.Collections;
 
 import static java.util.Collections.singletonMap;
+import static no.nav.syfo.util.CredentialUtilKt.bearerCredentials;
 import static org.springframework.web.util.UriComponentsBuilder.fromHttpUrl;
 
 @Service
@@ -69,7 +70,7 @@ public class TilgangService {
     private HttpEntity<String> lagRequest(String issuer) {
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
-        headers.set("Authorization", "Bearer " + OIDCUtil.tokenFraOIDC(contextHolder, issuer));
+        headers.set(HttpHeaders.AUTHORIZATION, bearerCredentials(OIDCUtil.tokenFraOIDC(contextHolder, issuer)));
         return new HttpEntity<>(headers);
     }
 }
