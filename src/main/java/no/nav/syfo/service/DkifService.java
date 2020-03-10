@@ -1,16 +1,19 @@
 package no.nav.syfo.service;
 
-import lombok.extern.slf4j.Slf4j;
 import no.nav.security.oidc.context.OIDCRequestContextHolder;
 import no.nav.syfo.config.consumer.DkifConfig;
 import no.nav.syfo.domain.model.Kontaktinfo;
 import no.nav.tjeneste.virksomhet.digitalkontaktinformasjon.v1.*;
 import no.nav.tjeneste.virksomhet.digitalkontaktinformasjon.v1.informasjon.*;
 import no.nav.tjeneste.virksomhet.digitalkontaktinformasjon.v1.meldinger.WSHentDigitalKontaktinformasjonRequest;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.retry.annotation.*;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
+import javax.xml.ws.soap.SOAPFaultException;
 import java.time.OffsetDateTime;
 
 import static java.util.Optional.ofNullable;
@@ -20,9 +23,10 @@ import static no.nav.syfo.domain.model.Kontaktinfo.FeilAarsak.*;
 import static no.nav.syfo.util.OIDCUtil.getIssuerToken;
 import static org.apache.commons.lang3.StringUtils.isBlank;
 
-@Slf4j
 @Service
 public class DkifService {
+
+    private static final Logger log = LoggerFactory.getLogger(DkifService.class);
 
     private AktoerService aktoerService;
     private DkifConfig dkifConfig;
@@ -39,6 +43,10 @@ public class DkifService {
         this.contextHolder = contextHolder;
     }
 
+    @Retryable(
+            value = {SOAPFaultException.class},
+            backoff = @Backoff(delay = 200, maxDelay = 1000)
+    )
     @Cacheable(value = CACHENAME_DKIF_FNR, key = "#fnr", condition = "#fnr != null")
     public Kontaktinfo hentKontaktinfoFnr(String fnr, String oidcIssuer) {
         if (isBlank(fnr) || !fnr.matches("\\d{11}$")) {
@@ -73,6 +81,12 @@ public class DkifService {
             log.error("Det skjedde en uventet feil mot DKIF. Kaster feil videre");
             throw e;
         }
+    }
+
+    @Recover
+    public void recover(SOAPFaultException e) {
+        log.error("Feil ved kall hentKontaktinfo for Ident etter maks antall kall", e);
+        throw e;
     }
 
     public boolean harVerfisertSiste18Mnd(WSEpostadresse epostadresse, WSMobiltelefonnummer mobiltelefonnummer) {
