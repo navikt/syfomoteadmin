@@ -1,8 +1,9 @@
 package no.nav.syfo.exception;
 
-import lombok.extern.slf4j.Slf4j;
 import no.nav.security.spring.oidc.validation.interceptor.OIDCUnauthorizedException;
 import no.nav.syfo.metric.Metrikk;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -14,11 +15,13 @@ import javax.validation.ConstraintViolationException;
 import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.NotFoundException;
 
-@Slf4j
 @ControllerAdvice
 public class ControllerExceptionHandler {
 
+    private static final Logger log = LoggerFactory.getLogger(ControllerExceptionHandler.class);
+
     private final String BAD_REQUEST_MSG = "Vi kunne ikke tolke inndataene";
+    private final String CONFLICT_MSG = "Dette oppsto en konflikt i tilstand";
     private final String FORBIDDEN_MSG = "Handling er forbudt";
     private final String INTERNAL_MSG = "Det skjedde en uventet feil";
     private final String UNAUTHORIZED_MSG = "Autorisasjonsfeil";
@@ -62,11 +65,20 @@ public class ControllerExceptionHandler {
             NotFoundException notFoundException = (NotFoundException) ex;
 
             return handleNotFoundException(notFoundException, headers, request);
+        } else if (ex instanceof ConflictException) {
+            ConflictException conflictException = (ConflictException) ex;
+
+            return handleConflictException(conflictException, headers, request);
         } else {
             HttpStatus status = HttpStatus.INTERNAL_SERVER_ERROR;
 
             return handleExceptionInternal(ex, new ApiError(status.value(), INTERNAL_MSG), headers, status, request);
         }
+    }
+
+    private ResponseEntity<ApiError> handleConflictException(ConflictException ex, HttpHeaders headers, WebRequest request) {
+        HttpStatus status = HttpStatus.CONFLICT;
+        return handleExceptionInternal(ex, new ApiError(status.value(), CONFLICT_MSG), headers, status, request);
     }
 
     private ResponseEntity<ApiError> handleConstraintViolationException(ConstraintViolationException ex, HttpHeaders headers, WebRequest request) {

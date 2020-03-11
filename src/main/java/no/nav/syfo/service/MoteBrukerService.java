@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import no.nav.security.oidc.context.OIDCRequestContextHolder;
 import no.nav.syfo.api.domain.bruker.*;
 import no.nav.syfo.domain.model.*;
+import no.nav.syfo.exception.ConflictException;
 import no.nav.syfo.pdl.PdlConsumer;
 import no.nav.syfo.util.Brukerkontekst;
 import org.springframework.stereotype.Service;
@@ -113,7 +114,7 @@ public class MoteBrukerService {
                 .findFirst().orElseThrow(NotFoundException::new);
 
         if (harSvartEtterSisteAlternativBleOpprettet(motedeltaker)) {
-            throw new ClientErrorException(409);
+            throw new ConflictException();
         }
 
         String motedeltakerUuid = motedeltaker.uuid;
