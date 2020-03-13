@@ -1,6 +1,6 @@
 package no.nav.syfo.api.ressurser;
 
-import no.nav.security.oidc.api.Protected;
+import no.nav.security.oidc.api.ProtectedWithClaims;
 import no.nav.syfo.service.MoteBrukerService;
 import no.nav.syfo.util.Brukerkontekst;
 import org.springframework.web.bind.annotation.*;
@@ -24,7 +24,7 @@ public class SystemMoterRessurs {
     }
 
     @PostMapping(produces = APPLICATION_JSON_VALUE, value = "/{aktorId}/harAktivtMote")
-    @Protected
+    @ProtectedWithClaims(issuer = STS)
     public boolean hentOmMoteErOpprettetEtterDato(
             @PathVariable("aktorId") String aktorId,
             @RequestBody LocalDateTime dato) {
