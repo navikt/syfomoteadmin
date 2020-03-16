@@ -69,10 +69,6 @@ sykefravaersoppfoelging.syfoservice.withmock: true
 
 dev: true
 
-syfoveilederoppgaver_system_v1.url: "https://app-q1.adeo.no/syfoveilederoppgaver/api/system/veilederoppgaver/v1"
-syfoveilederoppgaver.systemapi.username: "dummy"
-syfoveilederoppgaver.systemapi.password: "test123"
-
 syfobehandlendeenhet.url: "https://syfobehandlendeenhet"
 security.token.service.rest.url: "https://security-token-service"
 tilgangskontrollapi.url: "https://www.ikke.no"

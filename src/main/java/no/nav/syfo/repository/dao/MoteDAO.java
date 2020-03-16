@@ -85,10 +85,6 @@ public class MoteDAO {
         return tilMote(jdbcTemplate.queryForObject("select * from mote where mote_uuid = ?", new MoteMapper(), uuid));
     }
 
-    public Mote findMoteByID(long id) {
-        return tilMote(jdbcTemplate.queryForObject("select * from mote where mote_id = ?", new MoteMapper(), id));
-    }
-
     public List<Mote> findMoterByBrukerAktoerId(String aktorId) {
         return tilMote(jdbcTemplate.query("select * from mote " +
                 "left join motedeltaker ON mote.mote_id = motedeltaker.mote_id " +
