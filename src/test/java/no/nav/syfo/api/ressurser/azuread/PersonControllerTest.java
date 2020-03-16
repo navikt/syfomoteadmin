@@ -3,10 +3,9 @@ package no.nav.syfo.api.ressurser.azuread;
 import no.nav.syfo.LocalApplication;
 import no.nav.syfo.api.domain.RSBruker;
 import no.nav.syfo.api.ressurser.AbstractRessursTilgangTest;
-import no.nav.syfo.domain.model.Kontaktinfo;
-import no.nav.syfo.oidc.OIDCIssuer;
+import no.nav.syfo.dkif.DigitalKontaktinfo;
+import no.nav.syfo.dkif.DkifConsumer;
 import no.nav.syfo.pdl.PdlConsumer;
-import no.nav.syfo.service.DkifService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -20,7 +19,7 @@ import javax.inject.Inject;
 import javax.ws.rs.ForbiddenException;
 import java.text.ParseException;
 
-import static no.nav.syfo.config.mocks.DkifMock.*;
+import static no.nav.syfo.testhelper.DKIFKontakinformasjonResponseGeneratorKt.generateDigitalKontaktinfo;
 import static no.nav.syfo.testhelper.OidcTestHelper.loggInnVeilederAzure;
 import static no.nav.syfo.testhelper.OidcTestHelper.loggUtAlle;
 import static no.nav.syfo.testhelper.UserConstants.*;
@@ -33,7 +32,7 @@ import static org.mockito.Mockito.when;
 public class PersonControllerTest extends AbstractRessursTilgangTest {
 
     @MockBean
-    private DkifService dkifService;
+    private DkifConsumer dkifConsumer;
     @MockBean
     private PdlConsumer pdlConsumer;
 
@@ -77,21 +76,17 @@ public class PersonControllerTest extends AbstractRessursTilgangTest {
 
     @Test
     public void getUserHasAccess() {
-        Kontaktinfo kontaktinfo = new Kontaktinfo()
-                .tlf(PERSON_TLF)
-                .epost(PERSON_EMAIL)
-                .skalHaVarsel(Boolean.valueOf(PERSON_RESERVASJON))
-                .feilAarsak(Kontaktinfo.FeilAarsak.RESERVERT);
-        when(dkifService.hentKontaktinfoFnr(ARBEIDSTAKER_FNR, OIDCIssuer.AZURE)).thenReturn(kontaktinfo);
+        DigitalKontaktinfo digitalKontaktinfo = generateDigitalKontaktinfo();
+        when(dkifConsumer.kontaktinformasjon(ARBEIDSTAKER_FNR)).thenReturn(digitalKontaktinfo);
         when(pdlConsumer.fullName(ARBEIDSTAKER_FNR)).thenReturn(PERSON_NAVN);
 
         mockSvarFraTilgangTilBrukerViaAzure(ARBEIDSTAKER_FNR, HttpStatus.OK);
 
         RSBruker user = personController.bruker(ARBEIDSTAKER_AKTORID);
 
-        assertEquals(PERSON_EMAIL, user.kontaktinfo.epost);
-        assertEquals(PERSON_TLF, user.kontaktinfo.tlf);
-        assertEquals(false, user.kontaktinfo.reservasjon.skalHaVarsel);
+        assertEquals(digitalKontaktinfo.getEpostadresse(), user.kontaktinfo.epost);
+        assertEquals(digitalKontaktinfo.getMobiltelefonnummer(), user.kontaktinfo.tlf);
+        assertEquals(digitalKontaktinfo.getKanVarsles(), user.kontaktinfo.reservasjon.skalHaVarsel);
         assertEquals(PERSON_NAVN, user.navn);
     }
 

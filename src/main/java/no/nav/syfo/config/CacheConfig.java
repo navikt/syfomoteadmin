@@ -16,6 +16,7 @@ public class CacheConfig {
     public static final String CACHENAME_AKTOR_ID = "aktoerid";
     public static final String CACHENAME_AKTOR_FNR = "aktoerfnr";
     public static final String CACHENAME_BEHANDLENDEENHET_FNR = "behandlendeenhetfnr";
+    public static final String CACHENAME_DKIF_IDENT = "dkifident";
     public static final String CACHENAME_DKIF_AKTORID = "dkifaktorid";
     public static final String CACHENAME_DKIF_FNR = "dkiffnr";
     public static final String CACHENAME_EREG_NAVN = "eregnavn";
@@ -31,6 +32,7 @@ public class CacheConfig {
                 new ConcurrentMapCache(CACHENAME_AKTOR_ID),
                 new ConcurrentMapCache(CACHENAME_AKTOR_FNR),
                 new ConcurrentMapCache(CACHENAME_BEHANDLENDEENHET_FNR),
+                new ConcurrentMapCache(CACHENAME_DKIF_IDENT),
                 new ConcurrentMapCache(CACHENAME_DKIF_AKTORID),
                 new ConcurrentMapCache(CACHENAME_DKIF_FNR),
                 new ConcurrentMapCache(CACHENAME_EREG_NAVN),
