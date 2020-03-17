@@ -18,6 +18,9 @@ public class UserConstants {
     public static final String VEILEDER_ID = "Z999999";
     public static final String VEILEDER_NAVN = "Veil Veileder";
     public static final String STS_TOKEN = "123456789";
+
+    public static final String PERSON_TLF = "test@nav.no";
+    public static final String PERSON_EMAIL = "12345678";
     public static final String PERSON_NAME_FIRST = "First";
     public static final String PERSON_NAME_LAST = "Last";
 

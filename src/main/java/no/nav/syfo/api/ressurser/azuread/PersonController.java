@@ -3,11 +3,14 @@ package no.nav.syfo.api.ressurser.azuread;
 import no.nav.security.oidc.api.ProtectedWithClaims;
 import no.nav.syfo.api.domain.RSBruker;
 import no.nav.syfo.api.domain.RSReservasjon;
+import no.nav.syfo.dkif.DigitalKontaktinfo;
+import no.nav.syfo.dkif.DkifConsumer;
 import no.nav.syfo.domain.Fnr;
 import no.nav.syfo.domain.model.Kontaktinfo;
 import no.nav.syfo.metric.Metrikk;
 import no.nav.syfo.pdl.PdlConsumer;
-import no.nav.syfo.service.*;
+import no.nav.syfo.service.AktoerService;
+import no.nav.syfo.service.TilgangService;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
@@ -21,7 +24,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @ProtectedWithClaims(issuer = AZURE)
 public class PersonController {
 
-    private DkifService dkifService;
+    private DkifConsumer dkifConsumer;
     private AktoerService aktoerService;
     private PdlConsumer pdlConsumer;
     private TilgangService tilgangService;
@@ -29,13 +32,13 @@ public class PersonController {
 
     @Inject
     public PersonController(
-            DkifService dkifService,
+            DkifConsumer dkifConsumer,
             AktoerService aktoerService,
             PdlConsumer pdlConsumer,
             TilgangService tilgangService,
             Metrikk metrikk
     ) {
-        this.dkifService = dkifService;
+        this.dkifConsumer = dkifConsumer;
         this.aktoerService = aktoerService;
         this.pdlConsumer = pdlConsumer;
         this.tilgangService = tilgangService;
@@ -64,13 +67,13 @@ public class PersonController {
         tilgangService.throwExceptionIfVeilederWithoutAccess(fnr);
 
         RSBruker rsBruker = new RSBruker();
-        Kontaktinfo kontaktinfo = dkifService.hentKontaktinfoFnr(fnr.getFnr(), AZURE);
+        DigitalKontaktinfo kontaktinfo = dkifConsumer.kontaktinformasjon(fnr.getFnr());
         rsBruker.kontaktinfo
-                .tlf(kontaktinfo.tlf)
-                .epost(kontaktinfo.epost)
+                .tlf(kontaktinfo.getMobiltelefonnummer())
+                .epost(kontaktinfo.getEpostadresse())
                 .reservasjon(rsBruker.kontaktinfo.reservasjon
-                        .skalHaVarsel(kontaktinfo.skalHaVarsel)
-                        .feilAarsak(!kontaktinfo.skalHaVarsel ? feilAarsak(kontaktinfo.feilAarsak) : null));
+                        .skalHaVarsel(kontaktinfo.getKanVarsles())
+                        .feilAarsak(null));
         return rsBruker
                 .navn(pdlConsumer.fullName(fnr.getFnr()));
     }
