@@ -36,6 +36,7 @@ class DkifConsumer(
                 val feil = responseBody.feil?.get(ident)
                 when {
                     kontaktinfo != null -> {
+                        metric.countOutgoingReponses(METRIC_CALL_DKIF, response.statusCodeValue)
                         return kontaktinfo
                     }
                     feil != null -> {
