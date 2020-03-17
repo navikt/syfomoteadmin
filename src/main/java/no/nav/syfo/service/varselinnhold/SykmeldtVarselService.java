@@ -1,7 +1,9 @@
 package no.nav.syfo.service.varselinnhold;
 
-import no.nav.syfo.domain.model.*;
-import no.nav.syfo.service.DkifService;
+import no.nav.syfo.dkif.DigitalKontaktinfo;
+import no.nav.syfo.dkif.DkifConsumer;
+import no.nav.syfo.domain.model.Mote;
+import no.nav.syfo.domain.model.Varseltype;
 import no.nav.syfo.service.ServiceVarselService;
 import no.nav.syfo.service.mq.MqOppgaveVarselService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +14,7 @@ import static no.nav.syfo.domain.model.Varseltype.*;
 @Service
 public class SykmeldtVarselService {
 
-    private DkifService dkifService;
+    private DkifConsumer dkifConsumer;
 
     private MqOppgaveVarselService mqOppgaveVarselService;
 
@@ -20,18 +22,18 @@ public class SykmeldtVarselService {
 
     @Autowired
     public SykmeldtVarselService(
-            DkifService dkifService,
+            DkifConsumer dkifConsumer,
             MqOppgaveVarselService mqOppgaveVarselService,
             ServiceVarselService serviceVarselService
     ) {
-        this.dkifService = dkifService;
+        this.dkifConsumer = dkifConsumer;
         this.mqOppgaveVarselService = mqOppgaveVarselService;
         this.serviceVarselService = serviceVarselService;
     }
 
-    public void sendVarsel(Varseltype varseltype, Mote mote, String oidcIssuer) {
-        Kontaktinfo kontaktinfo = dkifService.hentKontaktinfoAktoerId(mote.sykmeldt().aktorId, oidcIssuer);
-        if (!kontaktinfo.skalHaVarsel) {
+    public void sendVarsel(Varseltype varseltype, Mote mote) {
+        DigitalKontaktinfo kontaktinfo = dkifConsumer.kontaktinformasjon(mote.sykmeldt().aktorId);
+        if (!kontaktinfo.getKanVarsles()) {
             return;
         }
         if (varseltype == OPPRETTET) {

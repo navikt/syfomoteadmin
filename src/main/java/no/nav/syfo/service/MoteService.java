@@ -2,9 +2,9 @@ package no.nav.syfo.service;
 
 import no.nav.syfo.api.domain.RSMote;
 import no.nav.syfo.api.domain.RSMotedeltaker;
+import no.nav.syfo.dkif.DkifConsumer;
 import no.nav.syfo.domain.model.*;
 import no.nav.syfo.metric.Metrikk;
-import no.nav.syfo.oidc.OIDCIssuer;
 import no.nav.syfo.repository.dao.*;
 import no.nav.syfo.repository.model.PFeedHendelse;
 import no.nav.syfo.service.mq.MqStoppRevarslingService;
@@ -40,10 +40,10 @@ public class MoteService {
     private VeilederService veilederService;
     private Metrikk metrikk;
     private ArbeidsgiverVarselService arbeidsgiverVarselService;
+    private DkifConsumer dkifConsumer;
     private SykmeldtVarselService sykmeldtVarselService;
     private NorgService norgService;
     private MqStoppRevarslingService mqStoppRevarslingService;
-    private DkifService dkifService;
     private FeedService feedService;
 
     @Autowired
@@ -56,10 +56,10 @@ public class MoteService {
             VeilederService veilederService,
             Metrikk metrikk,
             ArbeidsgiverVarselService arbeidsgiverVarselService,
+            DkifConsumer dkifConsumer,
             SykmeldtVarselService sykmeldtVarselService,
             NorgService norgService,
             MqStoppRevarslingService mqStoppRevarslingService,
-            DkifService dkifService,
             FeedService feedService
     ) {
         this.moteDAO = moteDAO;
@@ -73,7 +73,7 @@ public class MoteService {
         this.sykmeldtVarselService = sykmeldtVarselService;
         this.norgService = norgService;
         this.mqStoppRevarslingService = mqStoppRevarslingService;
-        this.dkifService = dkifService;
+        this.dkifConsumer = dkifConsumer;
         this.feedService = feedService;
     }
 
@@ -94,25 +94,25 @@ public class MoteService {
     }
 
     @Transactional
-    public void avbrytMote(String moteUuid, boolean varsle, String veilederIdent, String oidcIssuer) {
+    public void avbrytMote(String moteUuid, boolean varsle, String veilederIdent) {
         Mote mote = moteDAO.findMoteByUUID(moteUuid);
         mqStoppRevarslingService.stoppReVarsel(finnAktoerIMote(mote).uuid);
         if (varsle) {
             Varseltype varseltype = mote.status.equals(MoteStatus.BEKREFTET) ? Varseltype.AVBRUTT_BEKREFTET : Varseltype.AVBRUTT;
             arbeidsgiverVarselService.sendVarsel(varseltype, mote, false, veilederIdent);
-            sykmeldtVarselService.sendVarsel(varseltype, mote, oidcIssuer);
+            sykmeldtVarselService.sendVarsel(varseltype, mote);
         }
         moteDAO.setStatus(mote.id, AVBRUTT.name());
         hendelseService.moteStatusEndret(mote.status(AVBRUTT), veilederIdent);
         if (feedService.skalOppretteFeedHendelse(mote, PFeedHendelse.FeedHendelseType.AVBRUTT)) {
             opprettFeedHendelseAvTypen(PFeedHendelse.FeedHendelseType.AVBRUTT, mote, veilederIdent);
         }
-        behandleMote(mote, oidcIssuer);
+        behandleMote(mote);
         metrikk.reportAntallDagerSiden(hentSisteSvartidspunkt(mote).orElse(mote.opprettetTidspunkt), "antallDagerVeilederSvar");
     }
 
     @Transactional
-    public void bekreftMote(String moteUuid, Long tidOgStedId, String veilederIdent, String oidcIssuer) {
+    public void bekreftMote(String moteUuid, Long tidOgStedId, String veilederIdent) {
         Mote mote = moteDAO.findMoteByUUID(moteUuid);
 
         metrikk.reportAntallDagerSiden(mote.opprettetTidspunkt, "antallDagerForSvar");
@@ -125,15 +125,15 @@ public class MoteService {
 
         mqStoppRevarslingService.stoppReVarsel(finnAktoerIMote(mote).uuid);
         arbeidsgiverVarselService.sendVarsel(Varseltype.BEKREFTET, mote, false, veilederIdent);
-        sykmeldtVarselService.sendVarsel(Varseltype.BEKREFTET, mote, oidcIssuer);
+        sykmeldtVarselService.sendVarsel(Varseltype.BEKREFTET, mote);
         if (feedService.skalOppretteFeedHendelse(mote, PFeedHendelse.FeedHendelseType.BEKREFTET)) {
             opprettFeedHendelseAvTypen(PFeedHendelse.FeedHendelseType.BEKREFTET, mote, veilederIdent);
         }
-        behandleMote(mote, oidcIssuer);
+        behandleMote(mote);
     }
 
     @Transactional
-    public void nyeAlternativer(String moteUuid, List<TidOgSted> nyeAlternativer, String veilederIdent, String oidcIssuer) {
+    public void nyeAlternativer(String moteUuid, List<TidOgSted> nyeAlternativer, String veilederIdent) {
         Mote mote = moteDAO.findMoteByUUID(moteUuid);
 
         List<TidOgSted> filtrerBortAlternativerSomAlleredeErLagret = filtrerBortAlternativerSomAlleredeErLagret(nyeAlternativer, mote);
@@ -145,16 +145,16 @@ public class MoteService {
         nyeAlternativer.forEach(tidOgSted -> tidOgStedDAO.create(tidOgSted.moteId(mote.id)));
 
         arbeidsgiverVarselService.sendVarsel(Varseltype.NYE_TIDSPUNKT, mote, false, veilederIdent);
-        sykmeldtVarselService.sendVarsel(Varseltype.NYE_TIDSPUNKT, mote, oidcIssuer);
+        sykmeldtVarselService.sendVarsel(Varseltype.NYE_TIDSPUNKT, mote);
         if (feedService.skalOppretteFeedHendelse(mote, PFeedHendelse.FeedHendelseType.FLERE_TIDSPUNKT)) {
             opprettFeedHendelseAvTypen(PFeedHendelse.FeedHendelseType.FLERE_TIDSPUNKT, mote, veilederIdent);
         }
-        behandleMote(mote, oidcIssuer);
+        behandleMote(mote);
         metrikk.reportAntallDagerSiden(hentSisteSvartidspunkt(mote).orElse(mote.opprettetTidspunkt), "antallDagerVeilederSvar");
     }
 
-    private void behandleMote(Mote mote, String oidcIssuer) {
-        if (harAlleSvartPaaSisteForespoersel(mote, oidcIssuer)) {
+    private void behandleMote(Mote mote) {
+        if (harAlleSvartPaaSisteForespoersel(mote)) {
             oversikthendelseService.sendOversikthendelse(mote, MOTEPLANLEGGER_ALLE_SVAR_BEHANDLET);
         }
     }
@@ -178,8 +178,8 @@ public class MoteService {
     }
 
 
-    public boolean harAlleSvartPaaSisteForespoersel(Mote Mote, String oidcIssuer) {
-        boolean skalSykmeldtHaVarsler = dkifService.hentKontaktinfoAktoerId(Mote.sykmeldt().aktorId, oidcIssuer).skalHaVarsel;
+    public boolean harAlleSvartPaaSisteForespoersel(Mote Mote) {
+        boolean skalSykmeldtHaVarsler = dkifConsumer.kontaktinformasjon(Mote.sykmeldt().aktorId).getKanVarsles();
         LocalDateTime nyesteAlternativOpprettetTidspunkt = Mote.alternativer.stream().sorted((o1, o2) -> o2.created.compareTo(o1.created)).findFirst().get().created;
 
         return Mote.motedeltakere.stream()
@@ -200,8 +200,8 @@ public class MoteService {
         return motedeltaker -> skalSykmeldtHaVarsler || !motedeltaker.motedeltakertype().equals("Bruker");
     }
 
-    public boolean harAlleSvartPaSisteForesporselRs(RSMote rsMote, String oidcIssuer) {
-        boolean skalSykmeldtHaVarsler = dkifService.hentKontaktinfoAktoerId(rsMote.aktorId, oidcIssuer).skalHaVarsel;
+    public boolean harAlleSvartPaSisteForesporselRs(RSMote rsMote) {
+        boolean skalSykmeldtHaVarsler = dkifConsumer.kontaktinformasjon(rsMote.aktorId).getKanVarsles();
         LocalDateTime nyesteAlternativOpprettetTidspunkt = rsMote.alternativer.stream().sorted((o1, o2) -> o2.created.compareTo(o1.created)).findFirst().get().created;
 
         return rsMote.deltakere.stream()
@@ -234,7 +234,7 @@ public class MoteService {
             metrikk.reportAntallDagerSiden(mote.opprettetTidspunkt, "antallDagerArbeidsgiverSvar");
         }
 
-        if (harAlleSvartPaaSisteForespoersel(mote, OIDCIssuer.EKSTERN)) {
+        if (harAlleSvartPaaSisteForespoersel(mote)) {
             oversikthendelseService.sendOversikthendelse(mote, MOTEPLANLEGGER_ALLE_SVAR_MOTTATT);
 
             feedDAO.createFeedHendelse(new PFeedHendelse()
