@@ -10,7 +10,6 @@ val aktoerV2Version = "1.0"
 val sykefravaersoppfoelgingV1Version = "1.0.22"
 val organisasjonV4Version = "1.0.1"
 val organisasjonRessursEnhetV1Version = "1.0.3"
-val dkifVersion = "1.2"
 
 val cxfVersion = "3.3.3"
 
@@ -71,7 +70,6 @@ dependencies {
     implementation("no.nav.syfo.tjenester:sykefravaersoppfoelgingv1-tjenestespesifikasjon:$sykefravaersoppfoelgingV1Version")
     implementation("no.nav.sbl.dialogarena:organisasjonv4-tjenestespesifikasjon:$organisasjonV4Version")
     implementation("no.nav.syfo.tjenester:organisasjonRessursEnhet-v1-tjenestespesifikasjon:$organisasjonRessursEnhetV1Version")
-    implementation("no.nav.syfo.tjenester:dkif-tjenestespesifikasjon:$dkifVersion")
 
     implementation("org.apache.cxf:cxf-rt-features-logging:$cxfVersion")
     implementation("org.apache.cxf:cxf-rt-ws-security:$cxfVersion")
