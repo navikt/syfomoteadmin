@@ -40,10 +40,17 @@ class DkifConsumer(
                         return kontaktinfo
                     }
                     feil != null -> {
-                        throw DKIFRequestFailedException(feil.melding)
+                        if (feil.melding == "Ingen kontaktinformasjon er registrert på personen") {
+                            return DigitalKontaktinfo(
+                                    kanVarsles = false,
+                                    personident = ident
+                            )
+                        } else {
+                            throw DKIFRequestFailedException(feil.melding)
+                        }
                     }
                     else -> {
-                        throw DKIFRequestFailedException("Kontakinfo is null")
+                        throw DKIFRequestFailedException("Kontaktinfo is null")
                     }
                 }
             } else {
