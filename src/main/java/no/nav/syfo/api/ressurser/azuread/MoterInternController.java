@@ -173,7 +173,7 @@ public class MoterInternController {
     }
 
     private boolean trengerBehandling(RSMote rsMote) {
-        return moteService.harAlleSvartPaSisteForesporselRs(rsMote, AZURE)
+        return moteService.harAlleSvartPaSisteForesporselRs(rsMote)
                 && !"bekreftet".equalsIgnoreCase(rsMote.status)
                 && !"avbrutt".equalsIgnoreCase(rsMote.status);
     }
@@ -233,7 +233,7 @@ public class MoterInternController {
             ));
 
             arbeidsgiverVarselService.sendVarsel(OPPRETTET, Mote, false, innloggetIdent);
-            sykmeldtVarselService.sendVarsel(OPPRETTET, Mote, AZURE);
+            sykmeldtVarselService.sendVarsel(OPPRETTET, Mote);
 
             metrikk.tellEndepunktKall("opprettet_mote");
         }

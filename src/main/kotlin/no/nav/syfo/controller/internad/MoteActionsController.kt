@@ -33,8 +33,7 @@ constructor(
         moteService.avbrytMote(
                 moteUuid,
                 varsle,
-                getSubjectInternAzure(contextHolder),
-                AZURE
+                getSubjectInternAzure(contextHolder)
         )
 
         metrikk.tellEndepunktKall("avbryt_mote")
@@ -49,8 +48,7 @@ constructor(
         moteService.bekreftMote(
                 moteUuid,
                 tidOgStedId,
-                getSubjectInternAzure(contextHolder),
-                AZURE
+                getSubjectInternAzure(contextHolder)
         )
 
         metrikk.tellEndepunktKall("bekreft_mote")
@@ -65,8 +63,7 @@ constructor(
         moteService.nyeAlternativer(
                 moteUuid,
                 mapListe<RSNyttAlternativ, TidOgSted>(alternativer, opprett2TidOgSted),
-                getSubjectInternAzure(contextHolder),
-                AZURE
+                getSubjectInternAzure(contextHolder)
         )
 
         metrikk.tellEndepunktKall("nye_alternativer")
