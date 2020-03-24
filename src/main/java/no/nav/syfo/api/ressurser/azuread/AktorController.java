@@ -1,9 +1,10 @@
 package no.nav.syfo.api.ressurser.azuread;
 
 import no.nav.security.oidc.api.ProtectedWithClaims;
+import no.nav.syfo.aktorregister.AktorregisterConsumer;
+import no.nav.syfo.aktorregister.domain.AktorId;
 import no.nav.syfo.api.domain.RSAktor;
 import no.nav.syfo.domain.Fnr;
-import no.nav.syfo.service.AktoerService;
 import no.nav.syfo.service.TilgangService;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,22 +18,21 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @ProtectedWithClaims(issuer = AZURE)
 public class AktorController {
 
-    private AktoerService aktoerService;
-
-    private TilgangService tilgangService;
+    private final AktorregisterConsumer aktorregisterConsumer;
+    private final TilgangService tilgangService;
 
     @Inject
     public AktorController(
-            AktoerService aktoerService,
+            AktorregisterConsumer aktorregisterConsumer,
             TilgangService tilgangService
     ) {
-        this.aktoerService = aktoerService;
+        this.aktorregisterConsumer = aktorregisterConsumer;
         this.tilgangService = tilgangService;
     }
 
     @GetMapping(produces = APPLICATION_JSON_VALUE)
     public RSAktor get(@PathVariable("aktorId") String aktorId) {
-        final Fnr fnr = Fnr.of(aktoerService.hentFnrForAktoer(aktorId));
+        final Fnr fnr = Fnr.of(aktorregisterConsumer.getFnrForAktorId(new AktorId(aktorId)));
 
         tilgangService.throwExceptionIfVeilederWithoutAccess(fnr);
 

@@ -1,13 +1,15 @@
 package no.nav.syfo.api.ressurser.azuread;
 
 import no.nav.syfo.LocalApplication;
+import no.nav.syfo.aktorregister.AktorregisterConsumer;
+import no.nav.syfo.aktorregister.domain.AktorId;
 import no.nav.syfo.api.domain.RSAktor;
 import no.nav.syfo.api.ressurser.AbstractRessursTilgangTest;
-import no.nav.syfo.service.AktoerService;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit4.SpringRunner;
@@ -20,6 +22,7 @@ import static no.nav.syfo.testhelper.OidcTestHelper.loggInnVeilederAzure;
 import static no.nav.syfo.testhelper.OidcTestHelper.loggUtAlle;
 import static no.nav.syfo.testhelper.UserConstants.*;
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.when;
 
 @RunWith(SpringRunner.class)
 @SpringBootTest(classes = LocalApplication.class)
@@ -29,11 +32,12 @@ public class AktorControllerTilgangTest extends AbstractRessursTilgangTest {
     @Inject
     private AktorController aktorController;
 
-    @Inject
-    private AktoerService aktorService;
+    @MockBean
+    private AktorregisterConsumer aktorregisterConsumer;
 
     @Before
     public void setup() {
+        when(aktorregisterConsumer.getFnrForAktorId(new AktorId(ARBEIDSTAKER_AKTORID))).thenReturn(ARBEIDSTAKER_FNR);
         try {
             loggInnVeilederAzure(oidcRequestContextHolder, VEILEDER_ID);
         } catch (ParseException e) {
