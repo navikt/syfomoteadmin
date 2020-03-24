@@ -29,7 +29,7 @@ public class AktoerService {
     @Cacheable(value = CACHENAME_AKTOR_ID, key = "#fnr", condition = "#fnr != null")
     public String hentAktoerIdForIdent(String fnr) {
         if (isBlank(fnr) || !fnr.matches("\\d{11}$")) {
-            log.error("Forsøker å hente aktørId for fnr {} på feil format", fnr);
+            log.error("Forsøker å hente aktørId for fnr på feil format");
             throw new RuntimeException();
         }
 
@@ -46,7 +46,7 @@ public class AktoerService {
     @Cacheable(value = CACHENAME_AKTOR_FNR, key = "#aktoerId", condition = "#aktoerId != null")
     public String hentFnrForAktoer(String aktoerId) {
         if (isBlank(aktoerId) || !aktoerId.matches("\\d{13}$")) {
-            log.error("Forsøker å hente fnr for aktørId {} på feil format", aktoerId);
+            log.error("Forsøker å hente fnr for aktørId på feil format");
             throw new RuntimeException();
         }
 
