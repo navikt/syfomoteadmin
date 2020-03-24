@@ -1,6 +1,7 @@
 package no.nav.syfo.service;
 
 import no.nav.security.oidc.context.OIDCRequestContextHolder;
+import no.nav.syfo.aktorregister.AktorregisterConsumer;
 import no.nav.syfo.api.domain.bruker.BrukerMote;
 import no.nav.syfo.domain.model.*;
 import no.nav.syfo.pdl.PdlConsumer;
@@ -16,7 +17,7 @@ import java.time.LocalDateTime;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
-import static no.nav.syfo.testhelper.UserConstants.PERSON_NAVN;
+import static no.nav.syfo.testhelper.UserConstants.ARBEIDSTAKER_AKTORID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
@@ -28,7 +29,7 @@ public class MoteBrukerServiceTest {
     private OIDCRequestContextHolder contextHolder;
 
     @Mock
-    private AktoerService aktoerService;
+    private AktorregisterConsumer aktorregisterConsumer;
 
     @Mock
     private BrukertilgangService brukertilgangService;
@@ -56,7 +57,7 @@ public class MoteBrukerServiceTest {
 
     @Before
     public void setup() {
-        aktorId = "123";
+        aktorId = ARBEIDSTAKER_AKTORID;
         brukerkontekst = Brukerkontekst.ARBEIDSTAKER;
         mottattDatoTiDagerSiden = LocalDateTime.now().minusDays(10);
         mote = new Mote()
@@ -69,7 +70,8 @@ public class MoteBrukerServiceTest {
                         .created(LocalDateTime.now())
                         .sted("Oslo")
                         .valgt(false)))
-                .motedeltakere(singletonList(new Motedeltaker()
+                .motedeltakere(singletonList(new MotedeltakerAktorId()
+                        .aktorId(ARBEIDSTAKER_AKTORID)
                         .uuid("999-zzz")
                         .svartTidspunkt(LocalDateTime.now())
                         .tidOgStedAlternativer(singletonList(new TidOgSted()
