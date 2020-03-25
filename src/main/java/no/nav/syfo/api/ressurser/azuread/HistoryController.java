@@ -1,6 +1,8 @@
 package no.nav.syfo.api.ressurser.azuread;
 
 import no.nav.security.oidc.api.ProtectedWithClaims;
+import no.nav.syfo.aktorregister.AktorregisterConsumer;
+import no.nav.syfo.aktorregister.domain.Fodselsnummer;
 import no.nav.syfo.api.domain.RSHistorikk;
 import no.nav.syfo.domain.Fnr;
 import no.nav.syfo.domain.model.Mote;
@@ -21,7 +23,7 @@ public class HistoryController {
 
     private TilgangService tilgangService;
 
-    private AktoerService aktoerService;
+    private AktorregisterConsumer aktorregisterConsumer;
 
     private MoteService moteService;
 
@@ -30,12 +32,12 @@ public class HistoryController {
     @Inject
     public HistoryController(
             TilgangService tilgangService,
-            AktoerService aktoerService,
+            AktorregisterConsumer aktorregisterConsumer,
             MoteService moteService,
             HistorikkService historikkService
     ) {
         this.tilgangService = tilgangService;
-        this.aktoerService = aktoerService;
+        this.aktorregisterConsumer = aktorregisterConsumer;
         this.moteService = moteService;
         this.historikkService = historikkService;
     }
@@ -44,11 +46,11 @@ public class HistoryController {
     public List<RSHistorikk> getHistory(
             @RequestParam(value = "fnr") String fnr
     ) {
-        Fnr personFnr = Fnr.of(fnr);
+        Fodselsnummer personFnr = new Fodselsnummer(fnr);
 
-        tilgangService.throwExceptionIfVeilederWithoutAccess(personFnr);
+        tilgangService.throwExceptionIfVeilederWithoutAccess(Fnr.of(personFnr.getValue()));
 
-        List<Mote> moter = moteService.findMoterByBrukerAktoerId(aktoerService.hentAktoerIdForIdent(personFnr.getFnr()));
+        List<Mote> moter = moteService.findMoterByBrukerAktoerId(aktorregisterConsumer.getAktorIdForFodselsnummer(personFnr));
         List<RSHistorikk> historikk = new ArrayList<>();
         historikk.addAll(historikkService.opprettetHistorikk(moter));
         historikk.addAll(historikkService.flereTidspunktHistorikk(moter));

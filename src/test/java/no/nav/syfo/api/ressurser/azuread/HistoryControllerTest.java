@@ -1,6 +1,7 @@
 package no.nav.syfo.api.ressurser.azuread;
 
 import no.nav.syfo.LocalApplication;
+import no.nav.syfo.aktorregister.AktorregisterConsumer;
 import no.nav.syfo.api.domain.RSHistorikk;
 import no.nav.syfo.api.ressurser.AbstractRessursTilgangTest;
 import no.nav.syfo.service.HistorikkService;
@@ -30,6 +31,8 @@ import static org.mockito.Mockito.when;
 @DirtiesContext
 public class HistoryControllerTest extends AbstractRessursTilgangTest {
 
+    @MockBean
+    private AktorregisterConsumer aktorregisterConsumer;
     @MockBean
     private HistorikkService historikkService;
     @MockBean
