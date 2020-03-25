@@ -50,7 +50,6 @@ kafka.env.name: 'local'
 #      cookie_name: localhost-idtoken
 
 syfobrukertilgang.url: "http://syfobrukertilgang"
-aktoer.v2.endpointurl: "aktoerv2.url"
 brukeroppgave.v1.endpointurl: "brukeroppgavev1.url"
 sykefravaersoppfoelging.v1.endpointurl: "sykefravaeroppfoelgingv1.url"
 virksomhet:
@@ -60,7 +59,6 @@ virksomhet:
 
 fasit.environment.name: 'local'
 
-aktoer.withmock: true
 ereg.withmock: true
 norg.withmock: true
 sykefravaersoppfoelging.syfoservice.withmock: true
