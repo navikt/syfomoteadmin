@@ -2,6 +2,9 @@ package no.nav.syfo.service;
 
 import lombok.extern.slf4j.Slf4j;
 import no.nav.security.oidc.context.OIDCRequestContextHolder;
+import no.nav.syfo.aktorregister.AktorregisterConsumer;
+import no.nav.syfo.aktorregister.domain.AktorId;
+import no.nav.syfo.aktorregister.domain.Fodselsnummer;
 import no.nav.syfo.api.domain.bruker.*;
 import no.nav.syfo.domain.model.*;
 import no.nav.syfo.exception.ConflictException;
@@ -10,7 +13,6 @@ import no.nav.syfo.util.Brukerkontekst;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.NotFoundException;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -27,7 +29,7 @@ public class MoteBrukerService {
 
     private OIDCRequestContextHolder contextHolder;
 
-    private AktoerService aktoerService;
+    private AktorregisterConsumer aktorregisterConsumer;
 
     private final PdlConsumer pdlConsumer;
 
@@ -42,7 +44,7 @@ public class MoteBrukerService {
     @Inject
     public MoteBrukerService(
             OIDCRequestContextHolder contextHolder,
-            AktoerService aktoerService,
+            AktorregisterConsumer aktorregisterConsumer,
             BrukertilgangService brukertilgangService,
             MoteService moteService,
             MotedeltakerService motedeltakerService,
@@ -50,7 +52,7 @@ public class MoteBrukerService {
             PdlConsumer pdlConsumer
     ) {
         this.contextHolder = contextHolder;
-        this.aktoerService = aktoerService;
+        this.aktorregisterConsumer = aktorregisterConsumer;
         this.brukertilgangService = brukertilgangService;
         this.moteService = moteService;
         this.motedeltakerService = motedeltakerService;
@@ -85,7 +87,7 @@ public class MoteBrukerService {
                                 .stream()
                                 .map(deltaker -> {
                                     if (Brukerkontekst.ARBEIDSTAKER.equals(deltaker.type)) {
-                                        return deltaker.navn(pdlConsumer.fullName(aktoerService.hentFnrForAktoer(deltaker.aktoerId)));
+                                        return deltaker.navn(pdlConsumer.fullName(aktorregisterConsumer.getFnrForAktorId(new AktorId(deltaker.aktoerId))));
                                     }
                                     return deltaker;
                                 })
@@ -98,10 +100,10 @@ public class MoteBrukerService {
         String brukerkontekst = Brukerkontekst.ARBEIDSTAKER.equals(brukerMoteSvar.deltakertype)
                 ? Brukerkontekst.ARBEIDSTAKER
                 : Brukerkontekst.ARBEIDSGIVER;
-        String innloggetAktorId = aktoerService.hentAktoerIdForIdent(getSubjectEkstern(contextHolder));
+        String innloggetAktorId = aktorregisterConsumer.getAktorIdForFodselsnummer(new Fodselsnummer(getSubjectEkstern(contextHolder)));
         Mote mote = hentMoteByUuid(moteUuid, innloggetAktorId, brukerkontekst);
         String arbeidstakerAktorId = motedeltakerService.finnArbeidstakerAktorIdForMoteId(mote.id);
-        String arbeidstakerFnr = aktoerService.hentFnrForAktoer(arbeidstakerAktorId);
+        String arbeidstakerFnr = aktorregisterConsumer.getFnrForAktorId(new AktorId(arbeidstakerAktorId));
 
         brukertilgangService.kastExceptionHvisIkkeTilgang(arbeidstakerFnr);
 
@@ -152,9 +154,10 @@ public class MoteBrukerService {
     }
 
     private String finnAktoersFnrFraMotet(BrukerMote mote) {
-        return aktoerService.hentFnrForAktoer(mote.deltakere.stream()
+        String aktorId = mote.deltakere.stream()
                 .filter(motedeltaker -> "Bruker".equals(motedeltaker.type))
                 .findFirst().orElseThrow(() -> new NotFoundException("Fant ikke bruker!"))
-                .aktoerId);
+                .aktoerId;
+        return aktorregisterConsumer.getFnrForAktorId(new AktorId(aktorId));
     }
 }

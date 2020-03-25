@@ -2,6 +2,8 @@ package no.nav.syfo.api.ressurser;
 
 import no.nav.security.oidc.api.ProtectedWithClaims;
 import no.nav.security.oidc.context.OIDCRequestContextHolder;
+import no.nav.syfo.aktorregister.AktorregisterConsumer;
+import no.nav.syfo.aktorregister.domain.Fodselsnummer;
 import no.nav.syfo.api.domain.bruker.*;
 import no.nav.syfo.metric.Metrikk;
 import no.nav.syfo.service.*;
@@ -24,7 +26,7 @@ public class BrukerMoterRessurs {
 
     private final Metrikk metrikk;
 
-    private AktoerService aktoerService;
+    private AktorregisterConsumer aktorregisterConsumer;
 
     private BrukertilgangService brukertilgangService;
 
@@ -34,13 +36,13 @@ public class BrukerMoterRessurs {
     public BrukerMoterRessurs(
             OIDCRequestContextHolder contextHolder,
             Metrikk metrikk,
-            AktoerService aktoerService,
+            AktorregisterConsumer aktorregisterConsumer,
             BrukertilgangService brukertilgangService,
             MoteBrukerService moteBrukerService
     ) {
         this.contextHolder = contextHolder;
         this.metrikk = metrikk;
-        this.aktoerService = aktoerService;
+        this.aktorregisterConsumer = aktorregisterConsumer;
         this.brukertilgangService = brukertilgangService;
         this.moteBrukerService = moteBrukerService;
     }
@@ -49,7 +51,7 @@ public class BrukerMoterRessurs {
     @RequestMapping(value = "/arbeidsgiver/moter")
     public List<BrukerMote> hentMoter() {
         String innloggetIdent = getSubjectEkstern(contextHolder);
-        String innloggetAktorId = aktoerService.hentAktoerIdForIdent(innloggetIdent);
+        String innloggetAktorId = aktorregisterConsumer.getAktorIdForFodselsnummer(new Fodselsnummer(innloggetIdent));
 
         metrikk.tellEndepunktKall("hent_mote_arbeidsgiver");
 
@@ -60,7 +62,7 @@ public class BrukerMoterRessurs {
     @RequestMapping(value = "/arbeidstaker/moter/siste")
     public BrukerMote hentSisteMote() {
         String innloggetIdent = getSubjectEkstern(contextHolder);
-        String innloggetAktorId = aktoerService.hentAktoerIdForIdent(innloggetIdent);
+        String innloggetAktorId = aktorregisterConsumer.getAktorIdForFodselsnummer(new Fodselsnummer(innloggetIdent));
 
         brukertilgangService.kastExceptionHvisIkkeTilgang(innloggetIdent);
 
