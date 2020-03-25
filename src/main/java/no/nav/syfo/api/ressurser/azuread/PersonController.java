@@ -1,6 +1,8 @@
 package no.nav.syfo.api.ressurser.azuread;
 
 import no.nav.security.oidc.api.ProtectedWithClaims;
+import no.nav.syfo.aktorregister.AktorregisterConsumer;
+import no.nav.syfo.aktorregister.domain.AktorId;
 import no.nav.syfo.api.domain.RSBruker;
 import no.nav.syfo.dkif.DigitalKontaktinfo;
 import no.nav.syfo.dkif.DkifConsumer;
@@ -21,22 +23,22 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @ProtectedWithClaims(issuer = AZURE)
 public class PersonController {
 
+    private AktorregisterConsumer aktorregisterConsumer;
     private DkifConsumer dkifConsumer;
-    private AktoerService aktoerService;
     private PdlConsumer pdlConsumer;
     private TilgangService tilgangService;
     private Metrikk metrikk;
 
     @Inject
     public PersonController(
+            AktorregisterConsumer aktorregisterConsumer,
             DkifConsumer dkifConsumer,
-            AktoerService aktoerService,
             PdlConsumer pdlConsumer,
             TilgangService tilgangService,
             Metrikk metrikk
     ) {
+        this.aktorregisterConsumer = aktorregisterConsumer;
         this.dkifConsumer = dkifConsumer;
-        this.aktoerService = aktoerService;
         this.pdlConsumer = pdlConsumer;
         this.tilgangService = tilgangService;
         this.metrikk = metrikk;
@@ -80,7 +82,7 @@ public class PersonController {
         if (ident.matches("\\d{11}$")) {
             fnr = Fnr.of(ident);
         } else {
-            fnr = Fnr.of(aktoerService.hentFnrForAktoer(ident));
+            fnr = Fnr.of(aktorregisterConsumer.getFnrForAktorId(new AktorId(ident)));
         }
         return fnr;
     }

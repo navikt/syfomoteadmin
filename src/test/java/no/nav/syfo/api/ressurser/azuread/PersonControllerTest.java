@@ -1,6 +1,8 @@
 package no.nav.syfo.api.ressurser.azuread;
 
 import no.nav.syfo.LocalApplication;
+import no.nav.syfo.aktorregister.AktorregisterConsumer;
+import no.nav.syfo.aktorregister.domain.AktorId;
 import no.nav.syfo.api.domain.RSBruker;
 import no.nav.syfo.api.ressurser.AbstractRessursTilgangTest;
 import no.nav.syfo.dkif.DigitalKontaktinfo;
@@ -32,6 +34,8 @@ import static org.mockito.Mockito.when;
 public class PersonControllerTest extends AbstractRessursTilgangTest {
 
     @MockBean
+    private AktorregisterConsumer aktorregisterConsumer;
+    @MockBean
     private DkifConsumer dkifConsumer;
     @MockBean
     private PdlConsumer pdlConsumer;
@@ -41,6 +45,7 @@ public class PersonControllerTest extends AbstractRessursTilgangTest {
 
     @Before
     public void setup() {
+        when(aktorregisterConsumer.getFnrForAktorId(new AktorId(ARBEIDSTAKER_AKTORID))).thenReturn(ARBEIDSTAKER_FNR);
         try {
             loggInnVeilederAzure(oidcRequestContextHolder, VEILEDER_ID);
         } catch (ParseException e) {
