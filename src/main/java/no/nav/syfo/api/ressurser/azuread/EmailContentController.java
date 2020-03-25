@@ -2,11 +2,14 @@ package no.nav.syfo.api.ressurser.azuread;
 
 import no.nav.security.oidc.api.ProtectedWithClaims;
 import no.nav.security.oidc.context.OIDCRequestContextHolder;
+import no.nav.syfo.aktorregister.AktorregisterConsumer;
+import no.nav.syfo.aktorregister.domain.AktorId;
 import no.nav.syfo.api.domain.RSEpostInnhold;
 import no.nav.syfo.domain.Fnr;
 import no.nav.syfo.domain.model.*;
 import no.nav.syfo.repository.model.PEpost;
-import no.nav.syfo.service.*;
+import no.nav.syfo.service.MoteService;
+import no.nav.syfo.service.TilgangService;
 import no.nav.syfo.service.varselinnhold.ArbeidsgiverVarselService;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,26 +31,26 @@ public class EmailContentController {
 
     private OIDCRequestContextHolder contextHolder;
 
+    private AktorregisterConsumer aktorregisterConsumer;
+
     private MoteService moteService;
 
     private TilgangService tilgangService;
-
-    private AktoerService aktoerService;
 
     private ArbeidsgiverVarselService arbeidsgiverVarselService;
 
     @Inject
     public EmailContentController(
             OIDCRequestContextHolder contextHolder,
+            AktorregisterConsumer aktorregisterConsumer,
             MoteService moteService,
             TilgangService tilgangService,
-            AktoerService aktoerService,
             ArbeidsgiverVarselService arbeidsgiverVarselService
     ) {
         this.contextHolder = contextHolder;
+        this.aktorregisterConsumer = aktorregisterConsumer;
         this.moteService = moteService;
         this.tilgangService = tilgangService;
-        this.aktoerService = aktoerService;
         this.arbeidsgiverVarselService = arbeidsgiverVarselService;
     }
 
@@ -58,7 +61,7 @@ public class EmailContentController {
             @RequestParam(value = "valgtAlternativId", required = false) String valgtAlternativId
     ) {
         Mote Mote = moteService.findMoteByMotedeltakerUuid(motedeltakeruuid);
-        Fnr sykmeldtFnr = Fnr.of(aktoerService.hentFnrForAktoer(Mote.sykmeldt().aktorId));
+        Fnr sykmeldtFnr = Fnr.of(aktorregisterConsumer.getFnrForAktorId(new AktorId(Mote.sykmeldt().aktorId)));
 
         tilgangService.throwExceptionIfVeilederWithoutAccess(sykmeldtFnr);
 
