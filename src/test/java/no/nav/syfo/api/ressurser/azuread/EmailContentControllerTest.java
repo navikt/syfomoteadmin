@@ -1,11 +1,12 @@
 package no.nav.syfo.api.ressurser.azuread;
 
 import no.nav.syfo.LocalApplication;
+import no.nav.syfo.aktorregister.AktorregisterConsumer;
+import no.nav.syfo.aktorregister.domain.AktorId;
 import no.nav.syfo.api.domain.RSEpostInnhold;
 import no.nav.syfo.api.ressurser.AbstractRessursTilgangTest;
 import no.nav.syfo.domain.model.Mote;
 import no.nav.syfo.service.MoteService;
-import no.nav.syfo.service.varselinnhold.ArbeidsgiverVarselService;
 import no.nav.syfo.testhelper.MoteGenerator;
 import org.junit.Before;
 import org.junit.Test;
@@ -23,8 +24,7 @@ import java.util.UUID;
 
 import static no.nav.syfo.testhelper.OidcTestHelper.loggInnVeilederAzure;
 import static no.nav.syfo.testhelper.OidcTestHelper.loggUtAlle;
-import static no.nav.syfo.testhelper.UserConstants.ARBEIDSTAKER_FNR;
-import static no.nav.syfo.testhelper.UserConstants.VEILEDER_ID;
+import static no.nav.syfo.testhelper.UserConstants.*;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.when;
 
@@ -33,6 +33,8 @@ import static org.mockito.Mockito.when;
 @DirtiesContext
 public class EmailContentControllerTest extends AbstractRessursTilgangTest {
 
+    @MockBean
+    private AktorregisterConsumer aktorregisterConsumer;
     @MockBean
     private MoteService moteService;
 
@@ -46,6 +48,7 @@ public class EmailContentControllerTest extends AbstractRessursTilgangTest {
 
     @Before
     public void setup() {
+        when(aktorregisterConsumer.getFnrForAktorId(new AktorId(ARBEIDSTAKER_AKTORID))).thenReturn(ARBEIDSTAKER_FNR);
         try {
             loggInnVeilederAzure(oidcRequestContextHolder, VEILEDER_ID);
         } catch (ParseException e) {
