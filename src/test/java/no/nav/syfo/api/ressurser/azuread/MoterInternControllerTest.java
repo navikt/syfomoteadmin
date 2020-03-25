@@ -1,6 +1,9 @@
 package no.nav.syfo.api.ressurser.azuread;
 
 import no.nav.syfo.LocalApplication;
+import no.nav.syfo.aktorregister.AktorregisterConsumer;
+import no.nav.syfo.aktorregister.domain.AktorId;
+import no.nav.syfo.aktorregister.domain.Fodselsnummer;
 import no.nav.syfo.api.domain.RSMote;
 import no.nav.syfo.api.domain.nyttmoterequest.RSNyttMoteRequest;
 import no.nav.syfo.api.ressurser.AbstractRessursTilgangTest;
@@ -61,7 +64,7 @@ public class MoterInternControllerTest extends AbstractRessursTilgangTest {
     private String srvPassword;
 
     @MockBean
-    private AktoerService aktoerService;
+    private AktorregisterConsumer aktorregisterConsumer;
     @MockBean
     private MoteService moteService;
     @MockBean
@@ -106,9 +109,9 @@ public class MoterInternControllerTest extends AbstractRessursTilgangTest {
         this.mockRestServiceServer = MockRestServiceServer.bindTo(restTemplate).build();
         loggInnVeilederAzure(oidcRequestContextHolder, VEILEDER_ID);
 
-        when(aktoerService.hentFnrForAktoer(ARBEIDSTAKER_AKTORID)).thenReturn(ARBEIDSTAKER_FNR);
-        when(aktoerService.hentAktoerIdForIdent(ARBEIDSTAKER_FNR)).thenReturn(ARBEIDSTAKER_AKTORID);
-        when(aktoerService.hentFnrForAktoer(AKTOER_ID_2)).thenReturn(FNR_2);
+        when(aktorregisterConsumer.getFnrForAktorId(new AktorId(ARBEIDSTAKER_AKTORID))).thenReturn(ARBEIDSTAKER_FNR);
+        when(aktorregisterConsumer.getAktorIdForFodselsnummer(new Fodselsnummer(ARBEIDSTAKER_FNR))).thenReturn(ARBEIDSTAKER_AKTORID);
+        when(aktorregisterConsumer.getFnrForAktorId(new AktorId(AKTOER_ID_2))).thenReturn(FNR_2);
         when(moteService.findMoterByBrukerNavEnhet(NAV_ENHET)).thenReturn(MoteList);
     }
 
@@ -155,8 +158,8 @@ public class MoterInternControllerTest extends AbstractRessursTilgangTest {
         assertEquals(ARBEIDSTAKER_AKTORID, moteList.get(0).aktorId);
         assertEquals(ARBEIDSTAKER_AKTORID, moteList.get(1).aktorId);
 
-        verify(aktoerService, times(4)).hentFnrForAktoer(ARBEIDSTAKER_AKTORID);
-        verify(aktoerService, times(1)).hentAktoerIdForIdent(ARBEIDSTAKER_FNR);
+        verify(aktorregisterConsumer, times(4)).getFnrForAktorId(new AktorId(ARBEIDSTAKER_AKTORID));
+        verify(aktorregisterConsumer, times(1)).getAktorIdForFodselsnummer(new Fodselsnummer(ARBEIDSTAKER_FNR));
         verify(moteService).findMoterByBrukerAktoerId(ARBEIDSTAKER_AKTORID);
     }
 

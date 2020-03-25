@@ -2,6 +2,9 @@ package no.nav.syfo.api.ressurser.azuread;
 
 import no.nav.security.oidc.api.ProtectedWithClaims;
 import no.nav.security.oidc.context.OIDCRequestContextHolder;
+import no.nav.syfo.aktorregister.AktorregisterConsumer;
+import no.nav.syfo.aktorregister.domain.AktorId;
+import no.nav.syfo.aktorregister.domain.Fodselsnummer;
 import no.nav.syfo.api.domain.RSMote;
 import no.nav.syfo.api.domain.RSTilgang;
 import no.nav.syfo.api.domain.nyttmoterequest.RSNyttMoteRequest;
@@ -47,7 +50,7 @@ public class MoterInternController {
 
     private OIDCRequestContextHolder contextHolder;
     private Metrikk metrikk;
-    private AktoerService aktoerService;
+    private final AktorregisterConsumer aktorregisterConsumer;
     private final BehandlendeEnhetConsumer behandlendeEnhetConsumer;
     private MoteService moteService;
     private TidOgStedDAO tidOgStedDAO;
@@ -65,7 +68,7 @@ public class MoterInternController {
     public MoterInternController(
             OIDCRequestContextHolder contextHolder,
             Metrikk metrikk,
-            AktoerService aktoerService,
+            AktorregisterConsumer aktorregisterConsumer,
             BehandlendeEnhetConsumer behandlendeEnhetConsumer,
             MoteService moteService,
             TidOgStedDAO tidOgStedDAO,
@@ -81,7 +84,7 @@ public class MoterInternController {
     ) {
         this.contextHolder = contextHolder;
         this.metrikk = metrikk;
-        this.aktoerService = aktoerService;
+        this.aktorregisterConsumer = aktorregisterConsumer;
         this.behandlendeEnhetConsumer = behandlendeEnhetConsumer;
         this.moteService = moteService;
         this.tidOgStedDAO = tidOgStedDAO;
@@ -120,7 +123,11 @@ public class MoterInternController {
                         .type(APPLICATION_JSON)
                         .build());
             } else {
-                moterByFnr.addAll(moteService.findMoterByBrukerAktoerId(aktoerService.hentAktoerIdForIdent(fnr)));
+                moterByFnr.addAll(
+                        moteService.findMoterByBrukerAktoerId(
+                                aktorregisterConsumer.getAktorIdForFodselsnummer(new Fodselsnummer(fnr))
+                        )
+                );
                 moter.addAll(moterByFnr);
             }
         }
@@ -148,8 +155,10 @@ public class MoterInternController {
         }
 
         moter = moter.stream()
-                .filter(mote -> !pdlConsumer.isKode6Or7(aktoerService.hentFnrForAktoer(mote.sykmeldt().aktorId)))
-                .filter(mote -> tilgangService.harVeilederTilgangTilPersonViaAzure(aktoerService.hentFnrForAktoer(mote.sykmeldt().aktorId)))
+                .filter(mote -> !pdlConsumer.isKode6Or7(aktorregisterConsumer.getFnrForAktorId(new AktorId(mote.sykmeldt().aktorId))))
+                .filter(mote -> tilgangService.harVeilederTilgangTilPersonViaAzure(
+                        aktorregisterConsumer.getFnrForAktorId(new AktorId(mote.sykmeldt().aktorId)))
+                )
                 .collect(toList());
 
         if (limit != null) {
@@ -184,7 +193,7 @@ public class MoterInternController {
                         .map(motedeltaker -> {
                             if (motedeltaker instanceof MotedeltakerAktorId) {
                                 MotedeltakerAktorId sykmeldt = (MotedeltakerAktorId) motedeltaker;
-                                return sykmeldt.navn(pdlConsumer.fullName(aktoerService.hentFnrForAktoer(sykmeldt.aktorId)));
+                                return sykmeldt.navn(pdlConsumer.fullName(aktorregisterConsumer.getFnrForAktorId(new AktorId(sykmeldt.aktorId))));
                             }
                             return motedeltaker;
                         })
@@ -198,7 +207,7 @@ public class MoterInternController {
         if (pdlConsumer.isKode6Or7(nyttMoteRequest.fnr) || !tilgangService.harVeilederTilgangTilPersonViaAzure(nyttMoteRequest.fnr)) {
             throw new ForbiddenException();
         } else {
-            String aktorId = aktoerService.hentAktoerIdForIdent(nyttMoteRequest.fnr);
+            String aktorId = aktorregisterConsumer.getAktorIdForFodselsnummer(new Fodselsnummer(nyttMoteRequest.fnr));
             NaermesteLeder naermesteLeder = sykefravaersoppfoelgingService.hentNaermesteLederSomBruker(aktorId, nyttMoteRequest.orgnummer);
             nyttMoteRequest.navn(naermesteLeder.navn);
             nyttMoteRequest.epost(naermesteLeder.epost);
