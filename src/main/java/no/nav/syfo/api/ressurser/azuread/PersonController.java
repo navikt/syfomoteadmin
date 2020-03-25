@@ -9,7 +9,6 @@ import no.nav.syfo.dkif.DkifConsumer;
 import no.nav.syfo.domain.Fnr;
 import no.nav.syfo.metric.Metrikk;
 import no.nav.syfo.pdl.PdlConsumer;
-import no.nav.syfo.service.AktoerService;
 import no.nav.syfo.service.TilgangService;
 import org.springframework.web.bind.annotation.*;
 
