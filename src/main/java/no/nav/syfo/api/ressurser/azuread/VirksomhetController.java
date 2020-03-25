@@ -2,7 +2,7 @@ package no.nav.syfo.api.ressurser.azuread;
 
 import no.nav.security.oidc.api.ProtectedWithClaims;
 import no.nav.syfo.api.domain.RSVirksomhet;
-import no.nav.syfo.service.OrganisasjonService;
+import no.nav.syfo.ereg.EregConsumer;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
@@ -16,18 +16,18 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @ProtectedWithClaims(issuer = AZURE)
 public class VirksomhetController {
 
-    private OrganisasjonService organisasjonService;
+    private final EregConsumer eregConsumer;
 
     @Inject
     public VirksomhetController(
-            OrganisasjonService organisasjonService
+            EregConsumer eregConsumer
     ) {
-        this.organisasjonService = organisasjonService;
+        this.eregConsumer = eregConsumer;
     }
 
     @GetMapping(produces = APPLICATION_JSON_VALUE)
     public RSVirksomhet getVirksomhetsnavn(@PathVariable("orgnummer") String orgnummer) {
         return new RSVirksomhet()
-                .navn(capitalize(organisasjonService.hentNavn(orgnummer).toLowerCase()));
+                .navn(capitalize(eregConsumer.virksomhetsnavn(orgnummer).toLowerCase()));
     }
 }
