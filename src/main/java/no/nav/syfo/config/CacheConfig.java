@@ -19,6 +19,7 @@ public class CacheConfig {
     public static final String CACHENAME_DKIF_IDENT = "dkifident";
     public static final String CACHENAME_EREG_VIRKSOMHETSNAVN = "virksomhetsnavn";
     public static final String CACHENAME_LDAP_VEILEDER = "ldapveileder";
+    public static final String CACHENAME_AXSYS_ENHETER = "axsysenheter";
     public static final String CACHENAME_NORG_ENHETER = "norgenheter";
     public static final String CACHENAME_TILGANG_IDENT = "tilgangtilident";
 
@@ -29,6 +30,7 @@ public class CacheConfig {
         cacheManager.setCaches(asList(
                 new ConcurrentMapCache(CACHENAME_AKTOR_ID),
                 new ConcurrentMapCache(CACHENAME_AKTOR_FNR),
+                new ConcurrentMapCache(CACHENAME_AXSYS_ENHETER),
                 new ConcurrentMapCache(CACHENAME_BEHANDLENDEENHET_FNR),
                 new ConcurrentMapCache(CACHENAME_DKIF_IDENT),
                 new ConcurrentMapCache(CACHENAME_EREG_VIRKSOMHETSNAVN),
