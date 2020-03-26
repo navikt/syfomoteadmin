@@ -28,6 +28,7 @@ server:
     context-path: /syfomoteadmin
 
 aktorregister.rest.url: "aktorregister.url"
+ereg.baseurl: "ereg.url"
 pdl.url: "https://pdl"
 securitytokenservice.url: "sts.url"
 srv:

@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 import javax.inject.Inject;
 
 import static java.util.stream.Collectors.joining;
-import static no.nav.syfo.config.CacheConfig.CACHENAME_EREG_NAVN;
+import static no.nav.syfo.config.CacheConfig.CACHENAME_EREG_VIRKSOMHETSNAVN;
 
 @Slf4j
 @Service
@@ -27,7 +27,7 @@ public class OrganisasjonService {
         this.organisasjonV4 = organisasjonV4;
     }
 
-    @Cacheable(value = CACHENAME_EREG_NAVN, key = "#orgnr", condition = "#orgnr != null")
+    @Cacheable(value = CACHENAME_EREG_VIRKSOMHETSNAVN, key = "#orgnr", condition = "#orgnr != null")
     public String hentNavn(String orgnr) {
         try {
             WSHentOrganisasjonResponse response = organisasjonV4.hentOrganisasjon(request(orgnr));
