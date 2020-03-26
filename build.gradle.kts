@@ -7,7 +7,6 @@ group = "no.nav.syfo"
 version = "1.0.0"
 
 val sykefravaersoppfoelgingV1Version = "1.0.22"
-val organisasjonV4Version = "1.0.1"
 val organisasjonRessursEnhetV1Version = "1.0.3"
 
 val cxfVersion = "3.3.3"
@@ -66,7 +65,6 @@ dependencies {
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:$kotlinJacksonVersion")
 
     implementation("no.nav.syfo.tjenester:sykefravaersoppfoelgingv1-tjenestespesifikasjon:$sykefravaersoppfoelgingV1Version")
-    implementation("no.nav.sbl.dialogarena:organisasjonv4-tjenestespesifikasjon:$organisasjonV4Version")
     implementation("no.nav.syfo.tjenester:organisasjonRessursEnhet-v1-tjenestespesifikasjon:$organisasjonRessursEnhetV1Version")
 
     implementation("org.apache.cxf:cxf-rt-features-logging:$cxfVersion")
