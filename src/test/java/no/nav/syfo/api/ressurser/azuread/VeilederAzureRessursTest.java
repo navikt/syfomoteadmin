@@ -1,9 +1,10 @@
 package no.nav.syfo.api.ressurser.azuread;
 
 import no.nav.syfo.LocalApplication;
-import no.nav.syfo.api.domain.RSEnheter;
-import no.nav.syfo.api.domain.RSVeilederInfo;
 import no.nav.syfo.api.ressurser.AbstractRessursTilgangTest;
+import no.nav.syfo.axsys.AxsysConsumer;
+import no.nav.syfo.axsys.AxsysEnhet;
+import no.nav.syfo.controller.internad.veileder.*;
 import no.nav.syfo.domain.model.Veileder;
 import no.nav.syfo.service.VeilederService;
 import org.junit.Before;
@@ -17,11 +18,11 @@ import org.springframework.test.context.junit4.SpringRunner;
 import javax.inject.Inject;
 import java.text.ParseException;
 
+import static java.util.Arrays.asList;
 import static no.nav.syfo.config.mocks.NorgMock.NAV_ENHET_NAVN;
 import static no.nav.syfo.testhelper.OidcTestHelper.loggInnVeilederAzure;
 import static no.nav.syfo.testhelper.OidcTestHelper.loggUtAlle;
-import static no.nav.syfo.testhelper.UserConstants.VEILEDER_ID;
-import static no.nav.syfo.testhelper.UserConstants.VEILEDER_NAVN;
+import static no.nav.syfo.testhelper.UserConstants.*;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
 
@@ -29,6 +30,9 @@ import static org.mockito.Mockito.when;
 @SpringBootTest(classes = LocalApplication.class)
 @DirtiesContext
 public class VeilederAzureRessursTest extends AbstractRessursTilgangTest {
+
+    @MockBean
+    private AxsysConsumer axsysConsumer;
 
     @Inject
     private VeilederAzureRessurs veilederAzureRessurs;
@@ -38,6 +42,12 @@ public class VeilederAzureRessursTest extends AbstractRessursTilgangTest {
 
     @Before
     public void setup() {
+        when(axsysConsumer.enheter(VEILEDER_ID)).thenReturn(asList(
+                new AxsysEnhet(
+                        NAV_ENHET,
+                        NAV_ENHET_NAVN
+                )
+        ));
         try {
             loggInnVeilederAzure(oidcRequestContextHolder, VEILEDER_ID);
         } catch (ParseException e) {
@@ -51,8 +61,8 @@ public class VeilederAzureRessursTest extends AbstractRessursTilgangTest {
     public void hentInnloggetVeilederInfo() {
         RSVeilederInfo veilederInfo = veilederAzureRessurs.hentNavn();
 
-        assertEquals(VEILEDER_NAVN, veilederInfo.navn);
-        assertEquals(VEILEDER_ID, veilederInfo.ident);
+        assertEquals(VEILEDER_NAVN, veilederInfo.getNavn());
+        assertEquals(VEILEDER_ID, veilederInfo.getIdent());
     }
 
     @Test(expected = RuntimeException.class)
@@ -66,16 +76,16 @@ public class VeilederAzureRessursTest extends AbstractRessursTilgangTest {
     public void hentVeilederInfo() {
         RSVeilederInfo veilederInfo = veilederAzureRessurs.hentIdent(VEILEDER_ID);
 
-        assertEquals(VEILEDER_NAVN, veilederInfo.navn);
-        assertEquals(VEILEDER_ID, veilederInfo.ident);
+        assertEquals(VEILEDER_NAVN, veilederInfo.getNavn());
+        assertEquals(VEILEDER_ID, veilederInfo.getIdent());
     }
 
     @Test
     public void hentInnloggetVeilederEnheter() {
         RSEnheter rsEnheter = veilederAzureRessurs.hentEnheter();
 
-        assertEquals(1, rsEnheter.enhetliste.size());
-        assertEquals(NAV_ENHET_NAVN, rsEnheter.enhetliste.get(0).navn);
+        assertEquals(1, rsEnheter.getEnhetliste().size());
+        assertEquals(NAV_ENHET_NAVN, rsEnheter.getEnhetliste().get(0).getNavn());
     }
 
     @Test(expected = RuntimeException.class)
