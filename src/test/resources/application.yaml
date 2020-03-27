@@ -55,11 +55,9 @@ brukeroppgave.v1.endpointurl: "brukeroppgavev1.url"
 sykefravaersoppfoelging.v1.endpointurl: "sykefravaeroppfoelgingv1.url"
 virksomhet:
   diskresjonskode.v1.endpointurl: "diskresjonskode.url"
-  organisasjonressursenhet.v1.endpointurl: "organisasjonRessursEnhetv1.url"
 
 fasit.environment.name: 'local'
 
-norg.withmock: true
 sykefravaersoppfoelging.syfoservice.withmock: true
 
 dev: true
