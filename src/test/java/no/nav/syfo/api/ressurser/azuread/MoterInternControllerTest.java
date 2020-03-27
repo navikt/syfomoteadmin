@@ -7,6 +7,8 @@ import no.nav.syfo.aktorregister.domain.Fodselsnummer;
 import no.nav.syfo.api.domain.RSMote;
 import no.nav.syfo.api.domain.nyttmoterequest.RSNyttMoteRequest;
 import no.nav.syfo.api.ressurser.AbstractRessursTilgangTest;
+import no.nav.syfo.axsys.AxsysConsumer;
+import no.nav.syfo.axsys.AxsysEnhet;
 import no.nav.syfo.domain.model.*;
 import no.nav.syfo.metric.Metrikk;
 import no.nav.syfo.pdl.PdlConsumer;
@@ -76,7 +78,7 @@ public class MoterInternControllerTest extends AbstractRessursTilgangTest {
     @MockBean
     private MotedeltakerDAO motedeltakerDAO;
     @MockBean
-    private NorgService norgService;
+    private AxsysConsumer axsysConsumer;
     @MockBean
     private PdlConsumer pdlConsumer;
     @MockBean
@@ -199,7 +201,12 @@ public class MoterInternControllerTest extends AbstractRessursTilgangTest {
         when(tilgangService.harVeilederTilgangTilPersonViaAzure(ARBEIDSTAKER_FNR)).thenReturn(true);
         when(tilgangService.harVeilederTilgangTilPersonViaAzure(FNR_2)).thenReturn(true);
 
-        when(norgService.hoererNavEnhetTilBruker(anyString(), anyString())).thenReturn(true);
+        when(axsysConsumer.enheter(VEILEDER_ID)).thenReturn(singletonList(
+                new AxsysEnhet(
+                        NAV_ENHET,
+                        NAV_ENHET_NAVN
+                )
+        ));
         when(pdlConsumer.isKode6Or7(ARBEIDSTAKER_FNR)).thenReturn(false);
         when(pdlConsumer.isKode6Or7(FNR_2)).thenReturn(false);
         when(hendelseService.sistEndretMoteStatus(anyLong())).thenReturn(empty());
@@ -220,7 +227,12 @@ public class MoterInternControllerTest extends AbstractRessursTilgangTest {
                 .thenReturn(true)
                 .thenReturn(false);
 
-        when(norgService.hoererNavEnhetTilBruker(anyString(), anyString())).thenReturn(true);
+        when(axsysConsumer.enheter(VEILEDER_ID)).thenReturn(singletonList(
+                new AxsysEnhet(
+                        NAV_ENHET,
+                        NAV_ENHET_NAVN
+                )
+        ));
         when(pdlConsumer.isKode6Or7(ARBEIDSTAKER_FNR)).thenReturn(false);
         when(pdlConsumer.isKode6Or7(FNR_2)).thenReturn(false);
         when(hendelseService.sistEndretMoteStatus(anyLong())).thenReturn(empty());
@@ -238,7 +250,12 @@ public class MoterInternControllerTest extends AbstractRessursTilgangTest {
     public void hentMoter_navenhet_veileder_har_delvis_tilgang_pga_skjermet_bruker() {
         when(tilgangService.harVeilederTilgangTilPersonViaAzure(ARBEIDSTAKER_FNR)).thenReturn(true);
 
-        when(norgService.hoererNavEnhetTilBruker(anyString(), anyString())).thenReturn(true);
+        when(axsysConsumer.enheter(VEILEDER_ID)).thenReturn(singletonList(
+                new AxsysEnhet(
+                        NAV_ENHET,
+                        NAV_ENHET_NAVN
+                )
+        ));
         when(pdlConsumer.isKode6Or7(ARBEIDSTAKER_FNR)).thenReturn(false);
         when(pdlConsumer.isKode6Or7(FNR_2)).thenReturn(true);
 
@@ -257,7 +274,12 @@ public class MoterInternControllerTest extends AbstractRessursTilgangTest {
     public void hentMoter_navenhet_veileder_har_ikke_tilgang_pga_rolle() {
         when(tilgangService.harVeilederTilgangTilPersonViaAzure(ARBEIDSTAKER_FNR)).thenReturn(false);
 
-        when(norgService.hoererNavEnhetTilBruker(anyString(), anyString())).thenReturn(true);
+        when(axsysConsumer.enheter(VEILEDER_ID)).thenReturn(singletonList(
+                new AxsysEnhet(
+                        NAV_ENHET,
+                        NAV_ENHET_NAVN
+                )
+        ));
         when(pdlConsumer.isKode6Or7(ARBEIDSTAKER_FNR)).thenReturn(false);
         when(pdlConsumer.isKode6Or7(FNR_2)).thenReturn(false);
 
@@ -275,7 +297,12 @@ public class MoterInternControllerTest extends AbstractRessursTilgangTest {
     public void hentMoter_navenhet_veileder_har_ikke_tilgang_pga_skjerming() {
         when(tilgangService.harVeilederTilgangTilPersonViaAzure(ARBEIDSTAKER_FNR)).thenReturn(true);
 
-        when(norgService.hoererNavEnhetTilBruker(anyString(), anyString())).thenReturn(true);
+        when(axsysConsumer.enheter(VEILEDER_ID)).thenReturn(singletonList(
+                new AxsysEnhet(
+                        NAV_ENHET,
+                        NAV_ENHET_NAVN
+                )
+        ));
         when(pdlConsumer.isKode6Or7(ARBEIDSTAKER_FNR)).thenReturn(true);
         when(pdlConsumer.isKode6Or7(FNR_2)).thenReturn(true);
         when(hendelseService.sistEndretMoteStatus(anyLong())).thenReturn(empty());
@@ -293,7 +320,12 @@ public class MoterInternControllerTest extends AbstractRessursTilgangTest {
         when(tilgangService.harVeilederTilgangTilPersonViaAzure(ARBEIDSTAKER_FNR)).thenReturn(true);
         doThrow(new RuntimeException()).when(tilgangService).harVeilederTilgangTilPersonViaAzure(ARBEIDSTAKER_FNR);
 
-        when(norgService.hoererNavEnhetTilBruker(anyString(), anyString())).thenReturn(true);
+        when(axsysConsumer.enheter(VEILEDER_ID)).thenReturn(singletonList(
+                new AxsysEnhet(
+                        NAV_ENHET,
+                        NAV_ENHET_NAVN
+                )
+        ));
         when(pdlConsumer.isKode6Or7(ARBEIDSTAKER_FNR)).thenReturn(false);
         when(pdlConsumer.isKode6Or7(FNR_2)).thenReturn(false);
         when(hendelseService.sistEndretMoteStatus(anyLong())).thenReturn(empty());

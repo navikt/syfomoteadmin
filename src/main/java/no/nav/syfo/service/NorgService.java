@@ -41,11 +41,6 @@ public class NorgService {
         }
     }
 
-    public boolean hoererNavEnhetTilBruker(String navEnhet, String veilederIdent) {
-        return hentVeiledersNavEnheter(veilederIdent).stream()
-                .anyMatch(enhet -> enhet.enhetId.equals(navEnhet));
-    }
-
     private static Function<WSEnhet, Enhet> ws2enhet = wsEnhet -> new Enhet()
             .enhetId(wsEnhet.getEnhetId())
             .navn(wsEnhet.getNavn());
