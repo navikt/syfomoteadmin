@@ -8,6 +8,7 @@ import no.nav.syfo.aktorregister.domain.Fodselsnummer;
 import no.nav.syfo.api.domain.RSMote;
 import no.nav.syfo.api.domain.RSTilgang;
 import no.nav.syfo.api.domain.nyttmoterequest.RSNyttMoteRequest;
+import no.nav.syfo.axsys.AxsysConsumer;
 import no.nav.syfo.behandlendeenhet.BehandlendeEnhetConsumer;
 import no.nav.syfo.domain.model.*;
 import no.nav.syfo.metric.Metrikk;
@@ -56,7 +57,7 @@ public class MoterInternController {
     private TidOgStedDAO tidOgStedDAO;
     private HendelseService hendelseService;
     private MotedeltakerDAO motedeltakerDAO;
-    private NorgService norgService;
+    private AxsysConsumer axsysConsumer;
     private PdlConsumer pdlConsumer;
     private VeilederService veilederService;
     private ArbeidsgiverVarselService arbeidsgiverVarselService;
@@ -74,7 +75,7 @@ public class MoterInternController {
             TidOgStedDAO tidOgStedDAO,
             HendelseService hendelseService,
             MotedeltakerDAO motedeltakerDAO,
-            NorgService norgService,
+            AxsysConsumer axsysConsumer,
             PdlConsumer pdlConsumer,
             VeilederService veilederService,
             ArbeidsgiverVarselService arbeidsgiverVarselService,
@@ -90,7 +91,7 @@ public class MoterInternController {
         this.tidOgStedDAO = tidOgStedDAO;
         this.hendelseService = hendelseService;
         this.motedeltakerDAO = motedeltakerDAO;
-        this.norgService = norgService;
+        this.axsysConsumer = axsysConsumer;
         this.pdlConsumer = pdlConsumer;
         this.veilederService = veilederService;
         this.arbeidsgiverVarselService = arbeidsgiverVarselService;
@@ -139,7 +140,7 @@ public class MoterInternController {
         }
 
         List<Mote> moterByNavEnhet = new ArrayList<>();
-        if (!isEmpty(navenhet) && norgService.hoererNavEnhetTilBruker(navenhet, getSubjectInternAzure(contextHolder))) {
+        if (!isEmpty(navenhet) && hoererNavEnhetTilBruker(navenhet, getSubjectInternAzure(contextHolder))) {
             moterByNavEnhet.addAll(moteService.findMoterByBrukerNavEnhet(navenhet));
             moter.addAll(moterByNavEnhet);
         }
@@ -253,5 +254,10 @@ public class MoterInternController {
                 .filter(rsMote1 -> liste1.stream()
                         .anyMatch(rsMote2 -> rsMote2.id.equals(rsMote1.id)))
                 .collect(toList());
+    }
+
+    public boolean hoererNavEnhetTilBruker(String navEnhet, String veilederIdent) {
+        return axsysConsumer.enheter(veilederIdent).stream()
+                .anyMatch(enhet -> enhet.getEnhetId().equals(navEnhet));
     }
 }
