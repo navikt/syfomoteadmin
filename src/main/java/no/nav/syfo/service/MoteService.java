@@ -2,6 +2,8 @@ package no.nav.syfo.service;
 
 import no.nav.syfo.api.domain.RSMote;
 import no.nav.syfo.api.domain.RSMotedeltaker;
+import no.nav.syfo.axsys.AxsysConsumer;
+import no.nav.syfo.axsys.AxsysEnhet;
 import no.nav.syfo.dkif.DkifConsumer;
 import no.nav.syfo.domain.model.*;
 import no.nav.syfo.metric.Metrikk;
@@ -35,6 +37,7 @@ public class MoteService {
     private MoteDAO moteDAO;
     private FeedDAO feedDAO;
     private TidOgStedDAO tidOgStedDAO;
+    private AxsysConsumer axsysConsumer;
     private HendelseService hendelseService;
     private OversikthendelseService oversikthendelseService;
     private VeilederService veilederService;
@@ -42,7 +45,6 @@ public class MoteService {
     private ArbeidsgiverVarselService arbeidsgiverVarselService;
     private DkifConsumer dkifConsumer;
     private SykmeldtVarselService sykmeldtVarselService;
-    private NorgService norgService;
     private MqStoppRevarslingService mqStoppRevarslingService;
     private FeedService feedService;
 
@@ -51,6 +53,7 @@ public class MoteService {
             MoteDAO moteDAO,
             FeedDAO feedDAO,
             TidOgStedDAO tidOgStedDAO,
+            AxsysConsumer axsysConsumer,
             HendelseService hendelseService,
             OversikthendelseService oversikthendelseService,
             VeilederService veilederService,
@@ -58,7 +61,6 @@ public class MoteService {
             ArbeidsgiverVarselService arbeidsgiverVarselService,
             DkifConsumer dkifConsumer,
             SykmeldtVarselService sykmeldtVarselService,
-            NorgService norgService,
             MqStoppRevarslingService mqStoppRevarslingService,
             FeedService feedService
     ) {
@@ -71,7 +73,7 @@ public class MoteService {
         this.metrikk = metrikk;
         this.arbeidsgiverVarselService = arbeidsgiverVarselService;
         this.sykmeldtVarselService = sykmeldtVarselService;
-        this.norgService = norgService;
+        this.axsysConsumer = axsysConsumer;
         this.mqStoppRevarslingService = mqStoppRevarslingService;
         this.dkifConsumer = dkifConsumer;
         this.feedService = feedService;
@@ -161,9 +163,9 @@ public class MoteService {
 
     public void overforMoteTil(String moteUuid, String mottakerUserId) {
         Mote Mote = moteDAO.findMoteByUUID(moteUuid);
-        List<Enhet> mottakerEnheter = norgService.hentVeiledersNavEnheter(mottakerUserId);
+        List<AxsysEnhet> mottakerEnheter = axsysConsumer.enheter(mottakerUserId);
 
-        boolean mottakerHarIkkeTilgangTilOppgittNavEnhet = mottakerEnheter.stream().noneMatch(enhet -> Mote.navEnhet.equals(enhet.enhetId));
+        boolean mottakerHarIkkeTilgangTilOppgittNavEnhet = mottakerEnheter.stream().noneMatch(enhet -> Mote.navEnhet.equals(enhet.getEnhetId()));
         if (mottakerHarIkkeTilgangTilOppgittNavEnhet) {
             throw new ForbiddenException();
         }
