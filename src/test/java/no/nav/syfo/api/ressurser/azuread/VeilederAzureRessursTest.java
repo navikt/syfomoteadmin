@@ -19,7 +19,6 @@ import javax.inject.Inject;
 import java.text.ParseException;
 
 import static java.util.Arrays.asList;
-import static no.nav.syfo.config.mocks.NorgMock.NAV_ENHET_NAVN;
 import static no.nav.syfo.testhelper.OidcTestHelper.loggInnVeilederAzure;
 import static no.nav.syfo.testhelper.OidcTestHelper.loggUtAlle;
 import static no.nav.syfo.testhelper.UserConstants.*;
