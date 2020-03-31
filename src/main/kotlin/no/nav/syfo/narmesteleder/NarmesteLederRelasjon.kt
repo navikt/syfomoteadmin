@@ -2,18 +2,21 @@ package no.nav.syfo.narmesteleder
 
 import java.time.LocalDate
 
-class NarmesteLederRelasjon(
+data class NarmesteLederRelasjon(
         val aktorId: String,
         val orgnummer: String,
-        val narmesteLederAktorId: String? = null,
-        val narmesteLederTelefonnummer: String? = null,
-        val narmesteLederEpost: String? = null,
+        val narmesteLederAktorId: String,
+        val narmesteLederTelefonnummer: String?,
+        val narmesteLederEpost: String?,
         val aktivFom: LocalDate,
-        val arbeidsgiverForskutterer: Boolean = false,
-        val skrivetilgang: Boolean = false,
-        val tilganger: List<Tilgang>? = null
+        val arbeidsgiverForskutterer: Boolean?,
+        val skrivetilgang: Boolean,
+        val tilganger: List<Tilgang>
 )
 
 enum class Tilgang {
-    SYKMELDING, SYKEPENGESOKNAD, MOTE, OPPFOLGINGSPLAN
+    SYKMELDING,
+    SYKEPENGESOKNAD,
+    MOTE,
+    OPPFOLGINGSPLAN
 }
