@@ -50,6 +50,11 @@ kafka.env.name: 'local'
 #      accepted_audience: aud-localhost
 #      cookie_name: localhost-idtoken
 
+client.id: "clientId"
+client.secret: "clientSecret"
+syfonarmesteleder.id: "syfonarmestelederID"
+
+ad.accesstoken.url: 'http://aadaccesstoken'
 syfobrukertilgang.url: "http://syfobrukertilgang"
 brukeroppgave.v1.endpointurl: "brukeroppgavev1.url"
 sykefravaersoppfoelging.v1.endpointurl: "sykefravaeroppfoelgingv1.url"

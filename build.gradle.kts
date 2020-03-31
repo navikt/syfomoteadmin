@@ -71,6 +71,8 @@ dependencies {
     implementation("org.apache.cxf:cxf-rt-transports-http:$cxfVersion")
     implementation("org.apache.cxf:cxf-rt-frontend-jaxws:$cxfVersion")
 
+    implementation("org.apache.httpcomponents:httpclient:4.5.6")
+
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
     implementation("org.springframework.boot:spring-boot-starter-jersey")

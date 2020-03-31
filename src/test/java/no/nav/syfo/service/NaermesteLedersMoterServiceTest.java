@@ -1,20 +1,14 @@
 package no.nav.syfo.service;
 
-import no.nav.syfo.domain.model.Ansatt;
-import no.nav.syfo.domain.model.Mote;
-import no.nav.syfo.domain.model.NaermesteLederStatus;
-import no.nav.syfo.domain.model.TidOgSted;
-import no.nav.syfo.oidc.OIDCIssuer;
+import no.nav.syfo.domain.model.*;
+import no.nav.syfo.narmesteleder.*;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.*;
+import org.mockito.junit.MockitoJUnitRunner;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
+import java.time.*;
+import java.util.*;
 
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
@@ -26,7 +20,7 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class NaermesteLedersMoterServiceTest {
     @Mock
-    private SykefravaersoppfoelgingService sykefravaersoppfoelgingService;
+    private NarmesteLederConsumer narmesteLederConsumer;
     @Mock
     private MoteService moteService;
     @InjectMocks
@@ -34,19 +28,31 @@ public class NaermesteLedersMoterServiceTest {
 
     @Test
     public void hentNaermeteLedersMoter() throws Exception {
-        when(sykefravaersoppfoelgingService.hentNaermesteLedersAnsattListe("nlAktoerId", OIDCIssuer.EKSTERN)).thenReturn(
+        when(narmesteLederConsumer.narmestelederRelasjoner("nlAktoerId")).thenReturn(
                 new ArrayList<>(
                         asList(
-                                new Ansatt()
-                                        .aktoerId("aktoerId1")
-                                        .orgnummer("orgnummer1")
-                                        .naermesteLederStatus(new NaermesteLederStatus()
-                                                .aktivFom(LocalDate.of(2017, 3, 2))),
-                                new Ansatt()
-                                        .aktoerId("aktoerId2")
-                                        .orgnummer("orgnummer2")
-                                        .naermesteLederStatus(new NaermesteLederStatus()
-                                                .aktivFom(LocalDate.of(2017, 3, 2))))));
+                                new NarmesteLederRelasjon(
+                                        "aktoerId1",
+                                        "orgnummer1",
+                                        null,
+                                        null,
+                                        null,
+                                        LocalDate.of(2017, 3, 2),
+                                        false,
+                                        false,
+                                        null
+                                ),
+                                new NarmesteLederRelasjon(
+                                        "aktoerId2",
+                                        "orgnummer2",
+                                        null,
+                                        null,
+                                        null,
+                                        LocalDate.of(2017, 3, 2),
+                                        false,
+                                        false,
+                                        null
+                                ))));
 
         when(moteService.findMoterByBrukerAktoerIdOgAGOrgnummer("aktoerId1", "orgnummer1")).thenReturn(
                 new ArrayList<>(asList(
@@ -88,19 +94,31 @@ public class NaermesteLedersMoterServiceTest {
 
     @Test
     public void hentNaermeteLedersMoterToGamleMoter() throws Exception {
-        when(sykefravaersoppfoelgingService.hentNaermesteLedersAnsattListe("nlAktoerId", OIDCIssuer.EKSTERN)).thenReturn(
+        when(narmesteLederConsumer.narmestelederRelasjoner("nlAktoerId")).thenReturn(
                 new ArrayList<>(
                         asList(
-                                new Ansatt()
-                                        .aktoerId("aktoerId1")
-                                        .orgnummer("orgnummer1")
-                                        .naermesteLederStatus(new NaermesteLederStatus()
-                                                .aktivFom(LocalDate.of(2017, 3, 2))),
-                                new Ansatt()
-                                        .aktoerId("aktoerId2")
-                                        .orgnummer("orgnummer2")
-                                        .naermesteLederStatus(new NaermesteLederStatus()
-                                                .aktivFom(LocalDate.of(2017, 3, 3))))));
+                                new NarmesteLederRelasjon(
+                                        "aktoerId1",
+                                        "orgnummer1",
+                                        null,
+                                        null,
+                                        null,
+                                        LocalDate.of(2017, 3, 2),
+                                        false,
+                                        false,
+                                        null
+                                ),
+                                new NarmesteLederRelasjon(
+                                        "aktoerId2",
+                                        "orgnummer2",
+                                        null,
+                                        null,
+                                        null,
+                                        LocalDate.of(2017, 3, 3),
+                                        false,
+                                        false,
+                                        null
+                                ))));
 
         when(moteService.findMoterByBrukerAktoerIdOgAGOrgnummer("aktoerId1", "orgnummer1")).thenReturn(
                 new ArrayList<>(asList(
@@ -140,7 +158,7 @@ public class NaermesteLedersMoterServiceTest {
 
     @Test
     public void hentNaermeteLedersMoterIngenAnsatte() throws Exception {
-        when(sykefravaersoppfoelgingService.hentNaermesteLedersAnsattListe("nlAktoerId", OIDCIssuer.EKSTERN)).thenReturn(emptyList());
+        when(narmesteLederConsumer.narmestelederRelasjoner("nlAktoerId")).thenReturn(emptyList());
 
         List<Mote> moter = naermesteLedersMoterService.hentNaermesteLedersMoter("nlAktoerId");
 
@@ -149,14 +167,31 @@ public class NaermesteLedersMoterServiceTest {
 
     @Test
     public void hentNaermeteLedersMoterIngenMoter() throws Exception {
-        when(sykefravaersoppfoelgingService.hentNaermesteLedersAnsattListe("nlAktoerId", OIDCIssuer.EKSTERN)).thenReturn(
-                asList(
-                        new Ansatt()
-                                .aktoerId("aktoerId1")
-                                .orgnummer("orgnummer1"),
-                        new Ansatt()
-                                .aktoerId("aktoerId2")
-                                .orgnummer("orgnummer2")));
+        when(narmesteLederConsumer.narmestelederRelasjoner("nlAktoerId")).thenReturn(
+                new ArrayList<>(
+                        asList(
+                                new NarmesteLederRelasjon(
+                                        "aktoerId1",
+                                        "orgnummer1",
+                                        null,
+                                        null,
+                                        null,
+                                        LocalDate.of(2017, 3, 2),
+                                        false,
+                                        false,
+                                        null
+                                ),
+                                new NarmesteLederRelasjon(
+                                        "aktoerId2",
+                                        "orgnummer2",
+                                        null,
+                                        null,
+                                        null,
+                                        LocalDate.of(2017, 3, 3),
+                                        false,
+                                        false,
+                                        null
+                                ))));
 
         when(moteService.findMoterByBrukerAktoerIdOgAGOrgnummer(startsWith("aktoerId"), startsWith("orgnummer"))).thenReturn(emptyList());
 
