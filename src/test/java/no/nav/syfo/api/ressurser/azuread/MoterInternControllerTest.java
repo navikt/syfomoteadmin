@@ -2,23 +2,19 @@ package no.nav.syfo.api.ressurser.azuread;
 
 import no.nav.syfo.LocalApplication;
 import no.nav.syfo.aktorregister.AktorregisterConsumer;
-import no.nav.syfo.aktorregister.domain.AktorId;
-import no.nav.syfo.aktorregister.domain.Fodselsnummer;
+import no.nav.syfo.aktorregister.domain.*;
 import no.nav.syfo.api.domain.RSMote;
 import no.nav.syfo.api.domain.nyttmoterequest.RSNyttMoteRequest;
 import no.nav.syfo.api.ressurser.AbstractRessursTilgangTest;
-import no.nav.syfo.axsys.AxsysConsumer;
-import no.nav.syfo.axsys.AxsysEnhet;
+import no.nav.syfo.axsys.*;
 import no.nav.syfo.domain.model.*;
 import no.nav.syfo.metric.Metrikk;
+import no.nav.syfo.narmesteleder.NarmesteLederConsumer;
 import no.nav.syfo.pdl.PdlConsumer;
-import no.nav.syfo.repository.dao.MotedeltakerDAO;
-import no.nav.syfo.repository.dao.TidOgStedDAO;
-import no.nav.syfo.repository.model.PMotedeltakerAktorId;
-import no.nav.syfo.repository.model.PMotedeltakerArbeidsgiver;
+import no.nav.syfo.repository.dao.*;
+import no.nav.syfo.repository.model.*;
 import no.nav.syfo.service.*;
-import no.nav.syfo.service.varselinnhold.ArbeidsgiverVarselService;
-import no.nav.syfo.service.varselinnhold.SykmeldtVarselService;
+import no.nav.syfo.service.varselinnhold.*;
 import no.nav.syfo.sts.StsConsumer;
 import org.junit.*;
 import org.junit.runner.RunWith;
@@ -42,6 +38,7 @@ import static java.util.Collections.singletonList;
 import static java.util.Optional.empty;
 import static no.nav.syfo.controller.testhelper.RestHelperKt.mockAndExpectBehandlendeEnhetRequest;
 import static no.nav.syfo.controller.testhelper.RestHelperKt.mockAndExpectSTSService;
+import static no.nav.syfo.testhelper.NarmesteLederRelasjonGeneratorKt.generateNarmesteLederRelasjon;
 import static no.nav.syfo.testhelper.OidcTestHelper.loggInnVeilederAzure;
 import static no.nav.syfo.testhelper.UserConstants.*;
 import static org.junit.Assert.assertEquals;
@@ -86,7 +83,7 @@ public class MoterInternControllerTest extends AbstractRessursTilgangTest {
     @MockBean
     private ArbeidsgiverVarselService arbeidsgiverVarselService;
     @MockBean
-    private SykefravaersoppfoelgingService sykefravaersoppfoelgingService;
+    private NarmesteLederConsumer narmesteLederConsumer;
     @MockBean
     private SykmeldtVarselService sykmeldtVarselService;
     @MockBean
@@ -114,6 +111,7 @@ public class MoterInternControllerTest extends AbstractRessursTilgangTest {
         when(aktorregisterConsumer.getFnrForAktorId(new AktorId(ARBEIDSTAKER_AKTORID))).thenReturn(ARBEIDSTAKER_FNR);
         when(aktorregisterConsumer.getAktorIdForFodselsnummer(new Fodselsnummer(ARBEIDSTAKER_FNR))).thenReturn(ARBEIDSTAKER_AKTORID);
         when(aktorregisterConsumer.getFnrForAktorId(new AktorId(AKTOER_ID_2))).thenReturn(FNR_2);
+        when(aktorregisterConsumer.getFnrForAktorId(new AktorId(LEDER_AKTORID))).thenReturn(LEDER_FNR);
         when(moteService.findMoterByBrukerNavEnhet(NAV_ENHET)).thenReturn(MoteList);
     }
 
@@ -347,10 +345,9 @@ public class MoterInternControllerTest extends AbstractRessursTilgangTest {
         when(tilgangService.harVeilederTilgangTilPersonViaAzure(ARBEIDSTAKER_FNR)).thenReturn(true);
 
         when(pdlConsumer.isKode6Or7(ARBEIDSTAKER_FNR)).thenReturn(false);
-        when(sykefravaersoppfoelgingService.hentNaermesteLederSomBruker(ARBEIDSTAKER_AKTORID, nyttMoteRequest.orgnummer)).thenReturn(
-                new NaermesteLeder()
-                        .navn("Frida Frisk")
-                        .epost("frida.frisk@bedrift.no")
+        when(pdlConsumer.fullName(LEDER_AKTORID)).thenReturn("Frida Frisk");
+        when(narmesteLederConsumer.narmesteleder(ARBEIDSTAKER_AKTORID, nyttMoteRequest.orgnummer)).thenReturn(
+                generateNarmesteLederRelasjon()
         );
         when(moteService.opprettMote(any())).thenReturn(new Mote().id(1L));
         when(tidOgStedDAO.create(any())).thenReturn(new TidOgSted());

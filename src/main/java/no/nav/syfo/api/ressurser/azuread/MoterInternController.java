@@ -3,29 +3,24 @@ package no.nav.syfo.api.ressurser.azuread;
 import no.nav.security.oidc.api.ProtectedWithClaims;
 import no.nav.security.oidc.context.OIDCRequestContextHolder;
 import no.nav.syfo.aktorregister.AktorregisterConsumer;
-import no.nav.syfo.aktorregister.domain.AktorId;
-import no.nav.syfo.aktorregister.domain.Fodselsnummer;
-import no.nav.syfo.api.domain.RSMote;
-import no.nav.syfo.api.domain.RSTilgang;
+import no.nav.syfo.aktorregister.domain.*;
+import no.nav.syfo.api.domain.*;
 import no.nav.syfo.api.domain.nyttmoterequest.RSNyttMoteRequest;
 import no.nav.syfo.axsys.AxsysConsumer;
 import no.nav.syfo.behandlendeenhet.BehandlendeEnhetConsumer;
 import no.nav.syfo.domain.model.*;
 import no.nav.syfo.metric.Metrikk;
+import no.nav.syfo.narmesteleder.*;
 import no.nav.syfo.pdl.PdlConsumer;
-import no.nav.syfo.repository.dao.MotedeltakerDAO;
-import no.nav.syfo.repository.dao.TidOgStedDAO;
-import no.nav.syfo.repository.model.PMotedeltakerAktorId;
-import no.nav.syfo.repository.model.PMotedeltakerArbeidsgiver;
+import no.nav.syfo.repository.dao.*;
+import no.nav.syfo.repository.model.*;
 import no.nav.syfo.service.*;
-import no.nav.syfo.service.varselinnhold.ArbeidsgiverVarselService;
-import no.nav.syfo.service.varselinnhold.SykmeldtVarselService;
+import no.nav.syfo.service.varselinnhold.*;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 import javax.ws.rs.ForbiddenException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
@@ -61,7 +56,7 @@ public class MoterInternController {
     private PdlConsumer pdlConsumer;
     private VeilederService veilederService;
     private ArbeidsgiverVarselService arbeidsgiverVarselService;
-    private SykefravaersoppfoelgingService sykefravaersoppfoelgingService;
+    private NarmesteLederConsumer narmesteLederConsumer;
     private SykmeldtVarselService sykmeldtVarselService;
     private TilgangService tilgangService;
 
@@ -79,7 +74,7 @@ public class MoterInternController {
             PdlConsumer pdlConsumer,
             VeilederService veilederService,
             ArbeidsgiverVarselService arbeidsgiverVarselService,
-            SykefravaersoppfoelgingService sykefravaersoppfoelgingService,
+            NarmesteLederConsumer narmesteLederConsumer,
             SykmeldtVarselService sykmeldtVarselService,
             TilgangService tilgangService
     ) {
@@ -95,7 +90,7 @@ public class MoterInternController {
         this.pdlConsumer = pdlConsumer;
         this.veilederService = veilederService;
         this.arbeidsgiverVarselService = arbeidsgiverVarselService;
-        this.sykefravaersoppfoelgingService = sykefravaersoppfoelgingService;
+        this.narmesteLederConsumer = narmesteLederConsumer;
         this.sykmeldtVarselService = sykmeldtVarselService;
         this.tilgangService = tilgangService;
     }
@@ -209,9 +204,13 @@ public class MoterInternController {
             throw new ForbiddenException();
         } else {
             String aktorId = aktorregisterConsumer.getAktorIdForFodselsnummer(new Fodselsnummer(nyttMoteRequest.fnr));
-            NaermesteLeder naermesteLeder = sykefravaersoppfoelgingService.hentNaermesteLederSomBruker(aktorId, nyttMoteRequest.orgnummer);
-            nyttMoteRequest.navn(naermesteLeder.navn);
-            nyttMoteRequest.epost(naermesteLeder.epost);
+            NarmesteLederRelasjon narmesteLederRelasjon = Optional.ofNullable(narmesteLederConsumer.narmesteleder(aktorId, nyttMoteRequest.orgnummer))
+                    .orElseThrow(() -> new RuntimeException("Fant ikke nærmeste leder"));
+            String lederNavn = pdlConsumer.fullName(
+                    aktorregisterConsumer.getFnrForAktorId(new AktorId(narmesteLederRelasjon.getNarmesteLederAktorId()))
+            );
+            nyttMoteRequest.navn(lederNavn);
+            nyttMoteRequest.epost(narmesteLederRelasjon.getNarmesteLederEpost());
             nyttMoteRequest.navEnhet(behandlendeEnhetConsumer.getBehandlendeEnhet(nyttMoteRequest.fnr).getEnhetId());
 
             Mote nyttMote = map(nyttMoteRequest, opprett2Mote);
@@ -229,9 +228,9 @@ public class MoterInternController {
                     .moteId(Mote.id)
                     .status(SENDT.name()));
             MotedeltakerArbeidsgiver arbeidsgiver = motedeltakerDAO.create(new PMotedeltakerArbeidsgiver()
-                    .navn(naermesteLeder.navn)
-                    .orgnummer(naermesteLeder.orgnummer)
-                    .epost(naermesteLeder.epost)
+                    .navn(lederNavn)
+                    .orgnummer(narmesteLederRelasjon.getOrgnummer())
+                    .epost(narmesteLederRelasjon.getNarmesteLederEpost())
                     .motedeltakertype("arbeidsgiver")
                     .moteId(Mote.id)
                     .status(SENDT.name())

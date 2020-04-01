@@ -13,6 +13,8 @@ import java.util.*;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
+import static no.nav.syfo.testhelper.NarmesteLederRelasjonGeneratorKt.generateNarmesteLederRelasjon;
+import static no.nav.syfo.testhelper.UserConstants.LEDER_AKTORID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Matchers.startsWith;
 import static org.mockito.Mockito.when;
@@ -31,27 +33,17 @@ public class NaermesteLedersMoterServiceTest {
         when(narmesteLederConsumer.narmestelederRelasjoner("nlAktoerId")).thenReturn(
                 new ArrayList<>(
                         asList(
-                                new NarmesteLederRelasjon(
-                                        "aktoerId1",
-                                        "orgnummer1",
-                                        null,
-                                        null,
-                                        null,
-                                        LocalDate.of(2017, 3, 2),
-                                        false,
-                                        false,
-                                        null
-                                ),
+                                generateNarmesteLederRelasjon(),
                                 new NarmesteLederRelasjon(
                                         "aktoerId2",
                                         "orgnummer2",
-                                        null,
+                                        LEDER_AKTORID,
                                         null,
                                         null,
                                         LocalDate.of(2017, 3, 2),
                                         false,
                                         false,
-                                        null
+                                        emptyList()
                                 ))));
 
         when(moteService.findMoterByBrukerAktoerIdOgAGOrgnummer("aktoerId1", "orgnummer1")).thenReturn(
@@ -97,27 +89,17 @@ public class NaermesteLedersMoterServiceTest {
         when(narmesteLederConsumer.narmestelederRelasjoner("nlAktoerId")).thenReturn(
                 new ArrayList<>(
                         asList(
-                                new NarmesteLederRelasjon(
-                                        "aktoerId1",
-                                        "orgnummer1",
-                                        null,
-                                        null,
-                                        null,
-                                        LocalDate.of(2017, 3, 2),
-                                        false,
-                                        false,
-                                        null
-                                ),
+                                generateNarmesteLederRelasjon(),
                                 new NarmesteLederRelasjon(
                                         "aktoerId2",
                                         "orgnummer2",
-                                        null,
+                                        LEDER_AKTORID,
                                         null,
                                         null,
                                         LocalDate.of(2017, 3, 3),
                                         false,
                                         false,
-                                        null
+                                        emptyList()
                                 ))));
 
         when(moteService.findMoterByBrukerAktoerIdOgAGOrgnummer("aktoerId1", "orgnummer1")).thenReturn(
@@ -170,27 +152,17 @@ public class NaermesteLedersMoterServiceTest {
         when(narmesteLederConsumer.narmestelederRelasjoner("nlAktoerId")).thenReturn(
                 new ArrayList<>(
                         asList(
-                                new NarmesteLederRelasjon(
-                                        "aktoerId1",
-                                        "orgnummer1",
-                                        null,
-                                        null,
-                                        null,
-                                        LocalDate.of(2017, 3, 2),
-                                        false,
-                                        false,
-                                        null
-                                ),
+                                generateNarmesteLederRelasjon(),
                                 new NarmesteLederRelasjon(
                                         "aktoerId2",
                                         "orgnummer2",
-                                        null,
+                                        LEDER_AKTORID,
                                         null,
                                         null,
                                         LocalDate.of(2017, 3, 3),
                                         false,
                                         false,
-                                        null
+                                        emptyList()
                                 ))));
 
         when(moteService.findMoterByBrukerAktoerIdOgAGOrgnummer(startsWith("aktoerId"), startsWith("orgnummer"))).thenReturn(emptyList());
