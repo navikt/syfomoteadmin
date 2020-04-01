@@ -30,7 +30,7 @@ public class NaermesteLedersMoterServiceTest {
 
     @Test
     public void hentNaermeteLedersMoter() throws Exception {
-        when(narmesteLederConsumer.narmestelederRelasjoner("nlAktoerId")).thenReturn(
+        when(narmesteLederConsumer.narmestelederRelasjonerAnsatte("nlAktoerId")).thenReturn(
                 new ArrayList<>(
                         asList(
                                 generateNarmesteLederRelasjon(),
@@ -86,7 +86,7 @@ public class NaermesteLedersMoterServiceTest {
 
     @Test
     public void hentNaermeteLedersMoterToGamleMoter() throws Exception {
-        when(narmesteLederConsumer.narmestelederRelasjoner("nlAktoerId")).thenReturn(
+        when(narmesteLederConsumer.narmestelederRelasjonerAnsatte("nlAktoerId")).thenReturn(
                 new ArrayList<>(
                         asList(
                                 generateNarmesteLederRelasjon(),
@@ -140,7 +140,7 @@ public class NaermesteLedersMoterServiceTest {
 
     @Test
     public void hentNaermeteLedersMoterIngenAnsatte() throws Exception {
-        when(narmesteLederConsumer.narmestelederRelasjoner("nlAktoerId")).thenReturn(emptyList());
+        when(narmesteLederConsumer.narmestelederRelasjonerAnsatte("nlAktoerId")).thenReturn(emptyList());
 
         List<Mote> moter = naermesteLedersMoterService.hentNaermesteLedersMoter("nlAktoerId");
 
@@ -149,7 +149,7 @@ public class NaermesteLedersMoterServiceTest {
 
     @Test
     public void hentNaermeteLedersMoterIngenMoter() throws Exception {
-        when(narmesteLederConsumer.narmestelederRelasjoner("nlAktoerId")).thenReturn(
+        when(narmesteLederConsumer.narmestelederRelasjonerAnsatte("nlAktoerId")).thenReturn(
                 new ArrayList<>(
                         asList(
                                 generateNarmesteLederRelasjon(),

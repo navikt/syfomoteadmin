@@ -25,7 +25,7 @@ public class NaermesteLedersMoterService {
     }
 
     public List<Mote> hentNaermesteLedersMoter(String nlAktoerId) {
-        List<NarmesteLederRelasjon> narmesteLederRelasjoner = narmesteLederConsumer.narmestelederRelasjoner(nlAktoerId);
+        List<NarmesteLederRelasjon> narmesteLederRelasjoner = narmesteLederConsumer.narmestelederRelasjonerAnsatte(nlAktoerId);
 
         List<Mote> moter = new ArrayList<>();
         for (NarmesteLederRelasjon narmesteLederRelasjon : narmesteLederRelasjoner) {

@@ -346,7 +346,7 @@ public class MoterInternControllerTest extends AbstractRessursTilgangTest {
 
         when(pdlConsumer.isKode6Or7(ARBEIDSTAKER_FNR)).thenReturn(false);
         when(pdlConsumer.fullName(LEDER_AKTORID)).thenReturn("Frida Frisk");
-        when(narmesteLederConsumer.narmesteleder(ARBEIDSTAKER_AKTORID, nyttMoteRequest.orgnummer)).thenReturn(
+        when(narmesteLederConsumer.narmesteLederRelasjonLeder(ARBEIDSTAKER_AKTORID, nyttMoteRequest.orgnummer)).thenReturn(
                 generateNarmesteLederRelasjon()
         );
         when(moteService.opprettMote(any())).thenReturn(new Mote().id(1L));

@@ -4,8 +4,7 @@ import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.cache.concurrent.ConcurrentMapCache;
 import org.springframework.cache.support.SimpleCacheManager;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.*;
 
 import static java.util.Arrays.asList;
 
@@ -21,6 +20,7 @@ public class CacheConfig {
     public static final String CACHENAME_LDAP_VEILEDER = "ldapveileder";
     public static final String CACHENAME_AXSYS_ENHETER = "axsysenheter";
     public static final String CACHENAME_NARMESTELEDER_ANSATTE = "ansatte";
+    public static final String CACHENAME_NARMESTELEDER_LEDER = "leder";
     public static final String CACHENAME_NORG_ENHETER = "norgenheter";
     public static final String CACHENAME_TILGANG_IDENT = "tilgangtilident";
 
@@ -37,6 +37,7 @@ public class CacheConfig {
                 new ConcurrentMapCache(CACHENAME_EREG_VIRKSOMHETSNAVN),
                 new ConcurrentMapCache(CACHENAME_LDAP_VEILEDER),
                 new ConcurrentMapCache(CACHENAME_NARMESTELEDER_ANSATTE),
+                new ConcurrentMapCache(CACHENAME_NARMESTELEDER_LEDER),
                 new ConcurrentMapCache(CACHENAME_NORG_ENHETER),
                 new ConcurrentMapCache(CACHENAME_TILGANG_IDENT)
         ));
