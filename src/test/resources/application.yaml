@@ -56,14 +56,8 @@ syfonarmesteleder.id: "syfonarmestelederID"
 
 ad.accesstoken.url: 'http://aadaccesstoken'
 syfobrukertilgang.url: "http://syfobrukertilgang"
-brukeroppgave.v1.endpointurl: "brukeroppgavev1.url"
-sykefravaersoppfoelging.v1.endpointurl: "sykefravaeroppfoelgingv1.url"
-virksomhet:
-  diskresjonskode.v1.endpointurl: "diskresjonskode.url"
 
 fasit.environment.name: 'local'
-
-sykefravaersoppfoelging.syfoservice.withmock: true
 
 dev: true
 

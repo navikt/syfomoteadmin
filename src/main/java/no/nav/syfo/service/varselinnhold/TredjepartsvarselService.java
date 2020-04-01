@@ -1,7 +1,6 @@
 package no.nav.syfo.service.varselinnhold;
 
 import no.nav.melding.virksomhet.servicemeldingmedkontaktinformasjon.v1.servicemeldingmedkontaktinformasjon.*;
-import no.nav.syfo.domain.model.NaermesteLeder;
 import no.nav.syfo.domain.model.TredjepartsVarselType;
 import no.nav.syfo.metric.Metrikk;
 import no.nav.syfo.narmesteleder.NarmesteLederRelasjon;
