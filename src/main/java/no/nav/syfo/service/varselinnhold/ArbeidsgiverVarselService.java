@@ -1,16 +1,14 @@
 package no.nav.syfo.service.varselinnhold;
 
-import lombok.extern.slf4j.Slf4j;
 import no.nav.melding.virksomhet.servicemeldingmedkontaktinformasjon.v1.servicemeldingmedkontaktinformasjon.Parameter;
 import no.nav.syfo.domain.model.*;
 import no.nav.syfo.repository.model.PEpost;
 import no.nav.syfo.service.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.slf4j.*;
+import org.springframework.beans.factory.annotation.*;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 import static java.util.Arrays.asList;
 import static java.util.Optional.ofNullable;
@@ -21,10 +19,10 @@ import static no.nav.syfo.util.EpostInnholdUtil.*;
 import static no.nav.syfo.util.time.DateUtil.tilKortDato;
 import static no.nav.syfo.util.time.DateUtil.tilLangDatoMedKlokkeslettPostfixDagPrefix;
 
-
-@Slf4j
 @Service
 public class ArbeidsgiverVarselService {
+
+    private static final Logger log = LoggerFactory.getLogger(ArbeidsgiverVarselService.class);
 
     @Value("${tjenester.url}")
     private String tjenesterUrl;

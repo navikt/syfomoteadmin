@@ -1,31 +1,29 @@
 package no.nav.syfo.service;
 
-import lombok.extern.slf4j.Slf4j;
 import no.nav.security.oidc.context.OIDCRequestContextHolder;
 import no.nav.syfo.aktorregister.AktorregisterConsumer;
-import no.nav.syfo.aktorregister.domain.AktorId;
-import no.nav.syfo.aktorregister.domain.Fodselsnummer;
+import no.nav.syfo.aktorregister.domain.*;
 import no.nav.syfo.api.domain.bruker.*;
 import no.nav.syfo.domain.model.*;
 import no.nav.syfo.exception.ConflictException;
 import no.nav.syfo.pdl.PdlConsumer;
 import no.nav.syfo.util.Brukerkontekst;
+import org.slf4j.*;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import javax.ws.rs.NotFoundException;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static java.util.stream.Collectors.toList;
 import static no.nav.syfo.api.mappers.BrukerMoteMapper.mote2BrukerMote;
 import static no.nav.syfo.util.MapUtil.mapListe;
 import static no.nav.syfo.util.OIDCUtil.getSubjectEkstern;
 
-@Slf4j
 @Service
 public class MoteBrukerService {
+    private static final Logger log = LoggerFactory.getLogger(MoteBrukerService.class);
 
     private OIDCRequestContextHolder contextHolder;
 

@@ -1,15 +1,16 @@
 package no.nav.syfo.kafka.producer;
 
-import lombok.extern.slf4j.Slf4j;
 import no.nav.syfo.kafka.producer.model.KOversikthendelse;
+import org.slf4j.*;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Component;
 
 import static java.util.UUID.randomUUID;
 
 @Component
-@Slf4j
 public class OversikthendelseProducer {
+    private static final Logger log = LoggerFactory.getLogger(OversikthendelseProducer.class);
+
     private KafkaTemplate<String, Object> kafkaTemplate;
 
     public static final String OVERSIKTHENDELSE_TOPIC = "aapen-syfo-oversikthendelse-v1";

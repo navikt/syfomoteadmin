@@ -1,16 +1,14 @@
 package no.nav.syfo.config.mq.mock;
 
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.jms.JmsException;
-import org.springframework.jms.UncategorizedJmsException;
-import org.springframework.jms.core.JmsTemplate;
-import org.springframework.jms.core.MessageCreator;
+import org.slf4j.*;
+import org.springframework.jms.*;
+import org.springframework.jms.core.*;
 
-import javax.jms.JMSException;
-import javax.jms.TextMessage;
+import javax.jms.*;
 
-@Slf4j
 public class JmsTemplateMock extends JmsTemplate {
+    private static final Logger log = LoggerFactory.getLogger(JmsTemplateMock.class);
+
     private String name;
 
     public JmsTemplateMock(String name) {

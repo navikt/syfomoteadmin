@@ -1,12 +1,10 @@
 package no.nav.syfo.batch.scheduler;
 
-import lombok.extern.slf4j.Slf4j;
 import no.nav.syfo.batch.leaderelection.LeaderElectionService;
-import no.nav.syfo.service.MoteService;
-import no.nav.syfo.service.MotedeltakerService;
+import no.nav.syfo.service.*;
 import no.nav.syfo.service.varselinnhold.ArbeidsgiverVarselService;
-import no.nav.syfo.util.DatoService;
-import no.nav.syfo.util.Toggle;
+import no.nav.syfo.util.*;
+import org.slf4j.*;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -18,9 +16,10 @@ import static no.nav.syfo.domain.model.Varseltype.PAAMINNELSE;
 import static no.nav.syfo.util.time.HelgedagUtil.erHelgedag;
 import static no.nav.syfo.util.time.NorskeHelligDagerUtil.erNorskHelligDag;
 
-@Slf4j
 @Component
 public class PaaminnelseScheduledTask {
+
+    private static final Logger log = LoggerFactory.getLogger(PaaminnelseScheduledTask.class);
 
     private final String SRV_BRUKER = "srvmoteadmin";
 

@@ -1,12 +1,11 @@
 package no.nav.syfo.service;
 
-import lombok.extern.slf4j.Slf4j;
 import no.nav.security.oidc.context.OIDCRequestContextHolder;
 import no.nav.syfo.config.consumer.SykefravaersoppfoelgingConfig;
-import no.nav.syfo.domain.model.Ansatt;
-import no.nav.syfo.domain.model.NaermesteLeder;
+import no.nav.syfo.domain.model.*;
 import no.nav.tjeneste.virksomhet.sykefravaersoppfoelging.v1.*;
 import no.nav.tjeneste.virksomhet.sykefravaersoppfoelging.v1.meldinger.*;
+import org.slf4j.*;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.stereotype.Service;
 
@@ -20,9 +19,10 @@ import static no.nav.syfo.util.MapUtil.map;
 import static no.nav.syfo.util.MapUtil.mapListe;
 import static no.nav.syfo.util.OIDCUtil.getIssuerToken;
 
-@Slf4j
 @Service
 public class SykefravaersoppfoelgingService {
+
+    private static final Logger log = LoggerFactory.getLogger(SykefravaersoppfoelgingService.class);
 
     @Value("${dev}")
     private String dev;

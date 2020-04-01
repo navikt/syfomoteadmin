@@ -1,22 +1,18 @@
 package no.nav.syfo.service;
 
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.*;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import javax.naming.*;
 import javax.naming.directory.*;
-import javax.naming.ldap.InitialLdapContext;
-import javax.naming.ldap.LdapContext;
+import javax.naming.ldap.*;
 import java.util.*;
 
 import static java.util.Optional.ofNullable;
 
 //må bruke Hashtable i InitiallLdapContext dessverre.
 @SuppressWarnings({"squid:S1149"})
-@Slf4j
 @Service
 public class LdapService {
 

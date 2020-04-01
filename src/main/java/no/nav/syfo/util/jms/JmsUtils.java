@@ -1,7 +1,6 @@
 package no.nav.syfo.util.jms;
 
-import lombok.extern.slf4j.Slf4j;
-import org.slf4j.MDC;
+import org.slf4j.*;
 import org.springframework.jms.core.MessageCreator;
 
 import javax.jms.TextMessage;
@@ -9,8 +8,8 @@ import java.security.SecureRandom;
 
 import static java.util.Optional.ofNullable;
 
-@Slf4j
 public class JmsUtils {
+    private static final Logger log = LoggerFactory.getLogger(JmsUtils.class);
 
     public static MessageCreator messageCreator(final String message) {
         String callId = ofNullable(getFromMDC(MDC_CALL_ID))
