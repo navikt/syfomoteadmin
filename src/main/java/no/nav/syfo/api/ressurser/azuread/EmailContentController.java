@@ -96,7 +96,7 @@ public class EmailContentController {
         if (type.equals(Varseltype.AVBRUTT) && Mote.status.equals(MoteStatus.BEKREFTET)) {
             type = Varseltype.AVBRUTT_BEKREFTET;
         }
-        PEpost epost = arbeidsgiverVarselService.varselinnhold(type, Mote, false, getSubjectInternAzure(contextHolder));
+        PEpost epost = arbeidsgiverVarselService.varselinnhold(type, Mote, getSubjectInternAzure(contextHolder));
         return new RSEpostInnhold().emne(epost.emne).innhold(finnInnholdIHTMLTag(epost.innhold));
     }
 

@@ -4,6 +4,7 @@ import no.nav.melding.virksomhet.servicemeldingmedkontaktinformasjon.v1.servicem
 import no.nav.syfo.domain.model.NaermesteLeder;
 import no.nav.syfo.domain.model.TredjepartsVarselType;
 import no.nav.syfo.metric.Metrikk;
+import no.nav.syfo.narmesteleder.NarmesteLederRelasjon;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Service;
@@ -36,9 +37,9 @@ public class TredjepartsvarselService {
         this.metrikk = metrikk;
     }
 
-    public void sendVarselTilNaermesteLeder(TredjepartsVarselType type, NaermesteLeder naermesteleder, List<Parameter> parametere) {
+    public void sendVarselTilNaermesteLeder(TredjepartsVarselType type, NarmesteLederRelasjon narmesteLederRelasjon, List<Parameter> parametere) {
         ServicemeldingMedKontaktinformasjon melding = new ServicemeldingMedKontaktinformasjon();
-        populerServiceMelding(melding, kontaktinformasjon(naermesteleder), naermesteleder, type, parametere);
+        populerServiceMelding(melding, kontaktinformasjon(narmesteLederRelasjon), narmesteLederRelasjon, type, parametere);
 
 
         String xml = marshallTredjepartsServiceMelding(new ObjectFactory().createServicemelding(melding));
@@ -47,20 +48,20 @@ public class TredjepartsvarselService {
         metrikk.tellTredjepartVarselSendt(type.name());
     }
 
-    private List<Kontaktinformasjon> kontaktinformasjon(NaermesteLeder tredjepartsKontaktinfo) {
+    private List<Kontaktinformasjon> kontaktinformasjon(NarmesteLederRelasjon narmesteLederRelasjon) {
         return asList(
-                opprettKontaktinformasjon(tredjepartsKontaktinfo.epost, "EPOST"),
-                opprettKontaktinformasjon(tredjepartsKontaktinfo.tlf, "SMS")
+                opprettKontaktinformasjon(narmesteLederRelasjon.getNarmesteLederEpost(), "EPOST"),
+                opprettKontaktinformasjon(narmesteLederRelasjon.getNarmesteLederTelefonnummer(), "SMS")
         );
     }
 
     private void populerServiceMelding(ServicemeldingMedKontaktinformasjon servicemeldingMedKontaktinformasjon,
                                        List<Kontaktinformasjon> kontaktinformasjon,
-                                       NaermesteLeder naermesteleder,
+                                       NarmesteLederRelasjon narmesteLederRelasjon,
                                        TredjepartsVarselType varseltype,
                                        List<Parameter> parametere) {
-        servicemeldingMedKontaktinformasjon.setMottaker(aktoer(naermesteleder.naermesteLederAktoerId));
-        servicemeldingMedKontaktinformasjon.setTilhoerendeOrganisasjon(organisasjon(naermesteleder.orgnummer));
+        servicemeldingMedKontaktinformasjon.setMottaker(aktoer(narmesteLederRelasjon.getNarmesteLederAktorId()));
+        servicemeldingMedKontaktinformasjon.setTilhoerendeOrganisasjon(organisasjon(narmesteLederRelasjon.getOrgnummer()));
         servicemeldingMedKontaktinformasjon.setVarseltypeId(varseltype.getId());
         servicemeldingMedKontaktinformasjon.getParameterListe().addAll(parametere);
         servicemeldingMedKontaktinformasjon.getKontaktinformasjonListe().addAll(kontaktinformasjon);
