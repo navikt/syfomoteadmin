@@ -88,7 +88,7 @@ public class ArbeidsgiverVarselService {
         }
 
         if (ofNullable(varselNokkel).isPresent()) {
-            NarmesteLederRelasjon narmesteLederRelasjon = narmesteLederConsumer.narmesteleder(mote.sykmeldt().aktorId, mote.arbeidsgiver().orgnummer);
+            NarmesteLederRelasjon narmesteLederRelasjon = narmesteLederConsumer.narmesteLederRelasjonLeder(mote.sykmeldt().aktorId, mote.arbeidsgiver().orgnummer);
             tredjepartsvarselService.sendVarselTilNaermesteLeder(varselNokkel, narmesteLederRelasjon, parameterListe);
         } else {
             log.error("Fant ikke varselnøkkel for varseltype {}", varseltype);

@@ -2,6 +2,7 @@ package no.nav.syfo.narmesteleder
 
 import no.nav.syfo.azuread.AzureAdTokenConsumer
 import no.nav.syfo.config.CacheConfig.CACHENAME_NARMESTELEDER_ANSATTE
+import no.nav.syfo.config.CacheConfig.CACHENAME_NARMESTELEDER_LEDER
 import no.nav.syfo.metric.Metrikk
 import no.nav.syfo.util.NAV_CALL_ID_HEADER
 import no.nav.syfo.util.bearerCredentials
@@ -26,7 +27,8 @@ class NarmesteLederConsumer @Autowired constructor(
         private val restTemplate: RestTemplate,
         @param:Value("\${syfonarmesteleder.id}") private val syfonarmestelederId: String
 ) {
-    fun narmesteleder(aktorId: String, virksomhetsnummer: String): NarmesteLederRelasjon? {
+    @Cacheable(value = [CACHENAME_NARMESTELEDER_LEDER], key = "#aktorId + #virksomhetsnummer", condition = "#aktorId != null && #virksomhetsnummer != null")
+    fun narmesteLederRelasjonLeder(aktorId: String, virksomhetsnummer: String): NarmesteLederRelasjon? {
         try {
             val response = restTemplate.exchange<NarmestelederResponse>(
                     getLederUrl(aktorId, virksomhetsnummer),
@@ -44,7 +46,8 @@ class NarmesteLederConsumer @Autowired constructor(
         }
     }
 
-    fun narmestelederRelasjoner(aktorId: String): List<NarmesteLederRelasjon> {
+    @Cacheable(value = [CACHENAME_NARMESTELEDER_ANSATTE], key = "#aktorId", condition = "#aktorId != null")
+    fun narmestelederRelasjonerAnsatte(aktorId: String): List<NarmesteLederRelasjon> {
         try {
             val response = restTemplate.exchange<List<NarmesteLederRelasjon>>(
                     getAnsatteUrl(aktorId),
@@ -59,16 +62,6 @@ class NarmesteLederConsumer @Autowired constructor(
             LOG.error("Request to get Ansatte from Syfonarmesteleder failed with status " + e.rawStatusCode + " and message: " + e.responseBodyAsString)
             metrikk.countEvent(CALL_SYFONARMESTELEDER_ANSATTE_FAIL)
             throw e
-        }
-    }
-
-    @Cacheable(value = [CACHENAME_NARMESTELEDER_ANSATTE], key = "#aktorId", condition = "#aktorId != null")
-    fun ansatte(aktorId: String): List<Ansatt> {
-        return narmestelederRelasjoner(aktorId).map {
-            Ansatt(
-                    aktoerId = it.aktorId,
-                    virksomhetsnummer = it.orgnummer
-            )
         }
     }
 

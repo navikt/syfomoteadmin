@@ -204,7 +204,7 @@ public class MoterInternController {
             throw new ForbiddenException();
         } else {
             String aktorId = aktorregisterConsumer.getAktorIdForFodselsnummer(new Fodselsnummer(nyttMoteRequest.fnr));
-            NarmesteLederRelasjon narmesteLederRelasjon = Optional.ofNullable(narmesteLederConsumer.narmesteleder(aktorId, nyttMoteRequest.orgnummer))
+            NarmesteLederRelasjon narmesteLederRelasjon = Optional.ofNullable(narmesteLederConsumer.narmesteLederRelasjonLeder(aktorId, nyttMoteRequest.orgnummer))
                     .orElseThrow(() -> new RuntimeException("Fant ikke nærmeste leder"));
             String lederNavn = pdlConsumer.fullName(
                     aktorregisterConsumer.getFnrForAktorId(new AktorId(narmesteLederRelasjon.getNarmesteLederAktorId()))
