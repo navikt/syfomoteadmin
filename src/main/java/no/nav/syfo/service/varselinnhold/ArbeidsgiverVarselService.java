@@ -2,6 +2,7 @@ package no.nav.syfo.service.varselinnhold;
 
 import no.nav.melding.virksomhet.servicemeldingmedkontaktinformasjon.v1.servicemeldingmedkontaktinformasjon.Parameter;
 import no.nav.syfo.domain.model.*;
+import no.nav.syfo.narmesteleder.*;
 import no.nav.syfo.repository.model.PEpost;
 import no.nav.syfo.service.*;
 import org.slf4j.*;
@@ -31,7 +32,7 @@ public class ArbeidsgiverVarselService {
 
     private HendelseService hendelseService;
 
-    private SykefravaersoppfoelgingService sykefravaersoppfoelgingService;
+    private NarmesteLederConsumer narmesteLederConsumer;
 
     private TredjepartsvarselService tredjepartsvarselService;
 
@@ -39,12 +40,12 @@ public class ArbeidsgiverVarselService {
     public ArbeidsgiverVarselService(
             VeilederService veilederService,
             HendelseService hendelseService,
-            SykefravaersoppfoelgingService sykefravaersoppfoelgingService,
+            NarmesteLederConsumer narmesteLederConsumer,
             TredjepartsvarselService tredjepartsvarselService
     ) {
         this.veilederService = veilederService;
         this.hendelseService = hendelseService;
-        this.sykefravaersoppfoelgingService = sykefravaersoppfoelgingService;
+        this.narmesteLederConsumer = narmesteLederConsumer;
         this.tredjepartsvarselService = tredjepartsvarselService;
     }
 
@@ -55,11 +56,10 @@ public class ArbeidsgiverVarselService {
 
 
     private void sendMoteTredjepartsVarsel(Varseltype varseltype, Mote mote, boolean erSystemKall, String innloggetIdent) {
-        NaermesteLeder leder = sykefravaersoppfoelgingService.finnAktorsLederForOrg(mote.sykmeldt().aktorId, mote.arbeidsgiver().orgnummer, erSystemKall);
         TredjepartsVarselType varselNokkel = null;
 
         String veiledernavn = erSystemKall ? "NAV" : veiledernavn(innloggetIdent);
-        String url = finnLenkeUrlForLeder(leder);
+        String url = finnLenkeUrlForLeder();
 
         List<Parameter> parameterListe = new ArrayList<>();
         parameterListe.add(createParameter("veiledernavn", veiledernavn));
@@ -88,26 +88,26 @@ public class ArbeidsgiverVarselService {
         }
 
         if (ofNullable(varselNokkel).isPresent()) {
-            tredjepartsvarselService.sendVarselTilNaermesteLeder(varselNokkel, leder, parameterListe);
+            NarmesteLederRelasjon narmesteLederRelasjon = narmesteLederConsumer.narmesteleder(mote.sykmeldt().aktorId, mote.arbeidsgiver().orgnummer);
+            tredjepartsvarselService.sendVarselTilNaermesteLeder(varselNokkel, narmesteLederRelasjon, parameterListe);
         } else {
             log.error("Fant ikke varselnøkkel for varseltype {}", varseltype);
         }
     }
 
-
-    public PEpost varselinnhold(Varseltype varseltype, Mote mote, boolean erSystemKall, String innloggetIdent) {
+    public PEpost varselinnhold(Varseltype varseltype, Mote mote, String innloggetIdent) {
         if (varseltype == OPPRETTET) {
-            return arbeidsgiverNyttMote(mote.arbeidsgiver().navn, finnLenkeUrl(mote.sykmeldt().aktorId, mote.arbeidsgiver().orgnummer, erSystemKall), veiledernavn(innloggetIdent)).mottaker(mote.arbeidsgiver().epost);
+            return arbeidsgiverNyttMote(mote.arbeidsgiver().navn, finnLenkeUrlForLeder(), veiledernavn(innloggetIdent)).mottaker(mote.arbeidsgiver().epost);
         } else if (varseltype == AVBRUTT_BEKREFTET) {
             return arbeidsgiverAvbrytBekreftetMote(mote.arbeidsgiver().navn, veiledernavn(innloggetIdent), mote).mottaker(mote.arbeidsgiver().epost);
         } else if (varseltype == AVBRUTT) {
             return arbeidsgiverAvbrytMote(mote.arbeidsgiver().navn, veiledernavn(innloggetIdent), mote).mottaker(mote.arbeidsgiver().epost);
         } else if (varseltype == BEKREFTET) {
-            return bekreftelseEpost(mote.arbeidsgiver().navn, finnLenkeUrl(mote.sykmeldt().aktorId, mote.arbeidsgiver().orgnummer, erSystemKall), sted(mote.valgtTidOgSted), mote.valgtTidOgSted.tid, veiledernavn(innloggetIdent)).mottaker(mote.arbeidsgiver().epost);
+            return bekreftelseEpost(mote.arbeidsgiver().navn, finnLenkeUrlForLeder(), sted(mote.valgtTidOgSted), mote.valgtTidOgSted.tid, veiledernavn(innloggetIdent)).mottaker(mote.arbeidsgiver().epost);
         } else if (varseltype == NYE_TIDSPUNKT) {
-            return arbeidsgiverNyeTidspunkt(mote.arbeidsgiver().navn, finnLenkeUrl(mote.sykmeldt().aktorId, mote.arbeidsgiver().orgnummer, erSystemKall), veiledernavn(innloggetIdent)).mottaker(mote.arbeidsgiver().epost);
+            return arbeidsgiverNyeTidspunkt(mote.arbeidsgiver().navn, finnLenkeUrlForLeder(), veiledernavn(innloggetIdent)).mottaker(mote.arbeidsgiver().epost);
         } else if (varseltype == PAAMINNELSE) {
-            return arbeidsgiverPaaminnelseMote(mote.arbeidsgiver().navn, "NAV", finnLenkeUrl(mote.sykmeldt().aktorId, mote.arbeidsgiver().orgnummer, erSystemKall), opprettetTidspunkt(mote))
+            return arbeidsgiverPaaminnelseMote(mote.arbeidsgiver().navn, "NAV", finnLenkeUrlForLeder(), opprettetTidspunkt(mote))
                     .mottaker(mote.arbeidsgiver().epost);
         }
         return null;
@@ -125,12 +125,7 @@ public class ArbeidsgiverVarselService {
         return tilKortDato(Mote.opprettetTidspunkt);
     }
 
-    private String finnLenkeUrlForLeder(NaermesteLeder naermesteLeder) {
-        return tjenesterUrl + "/sykefravaerarbeidsgiver/" + naermesteLeder.naermesteLederId + "/dialogmoter";
-    }
-
-    private String finnLenkeUrl(String aktorId, String orgnummer, boolean erSystemKall) {
-        NaermesteLeder naermesteLeder = sykefravaersoppfoelgingService.finnAktorsLederForOrg(aktorId, orgnummer, erSystemKall);
-        return finnLenkeUrlForLeder(naermesteLeder);
+    private String finnLenkeUrlForLeder() {
+        return tjenesterUrl + "/sykefravaerarbeidsgiver/";
     }
 }
