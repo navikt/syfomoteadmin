@@ -28,7 +28,8 @@ val aspectjweaverVersion = "1.8.8"
 val apacheCommonsVersion = "3.5"
 val javaxMailVersion = "1.5.0-b01"
 
-val ojdbc6Version = "11.2.0.3"
+val flywayVersion = "5.1.4"
+val ojdbc8Version = "19.3.0.0"
 
 plugins {
     kotlin("jvm") version "1.3.50"
@@ -36,8 +37,8 @@ plugins {
     id("org.jetbrains.kotlin.plugin.allopen") version "1.3.50"
     id("java")
     id("com.github.johnrengelman.shadow") version "4.0.3"
-    id("org.springframework.boot") version "2.0.4.RELEASE"
-    id("io.spring.dependency-management") version "1.0.8.RELEASE"
+    id("org.springframework.boot") version "2.1.8.RELEASE"
+    id("io.spring.dependency-management") version "1.0.9.RELEASE"
 }
 
 allOpen {
@@ -99,9 +100,9 @@ dependencies {
     implementation("org.apache.commons:commons-lang3:$apacheCommonsVersion")
     implementation("javax.mail:mail:$javaxMailVersion")
 
-    api("org.flywaydb:flyway-core:4.0.3")
-    runtimeOnly("com.oracle:ojdbc6:$ojdbc6Version")
-    implementation("com.h2database:h2")
+    api("org.flywaydb:flyway-core:$flywayVersion")
+    implementation("com.oracle.ojdbc:ojdbc8:$ojdbc8Version")
+    testImplementation("com.h2database:h2")
 }
 
 tasks {
