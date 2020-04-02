@@ -1,14 +1,9 @@
 package no.nav.syfo.localconfig;
 
 import no.nav.security.spring.oidc.test.TokenGeneratorConfiguration;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.*;
 import org.springframework.core.env.Environment;
-import org.springframework.http.client.ClientHttpRequestInterceptor;
-import org.springframework.web.client.RestTemplate;
 
-import static java.util.Arrays.asList;
 import static java.util.Objects.requireNonNull;
 
 @Configuration
@@ -32,12 +27,5 @@ public class LocalApplicationConfig {
         System.setProperty("VARSELPRODUKSJON_BEST_VARSEL_M_HANDLING_QUEUENAME", requireNonNull(environment.getProperty("varselproduksjon.best.varsel.m.handling.queuename")));
         System.setProperty("VARSELPRODUKSJON_STOPP_VARSEL_UTSENDING_QUEUENAME", requireNonNull(environment.getProperty("varselproduksjon.topp.varsel.utsending.queuename")));
         System.setProperty("VARSELPRODUKSJON_VARSLINGER_QUEUENAME", requireNonNull(environment.getProperty("varselproduksjon.varslinger.queuename")));
-    }
-
-    @Bean
-    public RestTemplate restTemplate(ClientHttpRequestInterceptor... interceptors) {
-        RestTemplate template = new RestTemplate();
-        template.setInterceptors(asList(interceptors));
-        return template;
     }
 }
