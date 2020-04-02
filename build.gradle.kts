@@ -6,8 +6,7 @@ import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 group = "no.nav.syfo"
 version = "1.0.0"
 
-val oidcSpringSupportVersion = "0.2.7"
-val oidcSpringSupportTestVersion = "0.2.4"
+val oidcSupportVersion = "0.2.18"
 val kotlinLibVersion = "1.3.50"
 val kotlinJacksonVersion = "2.9.8"
 
@@ -77,9 +76,8 @@ dependencies {
     testImplementation("org.springframework.kafka:spring-kafka-test")
     implementation("org.springframework:spring-jms")
 
-    implementation("no.nav.security:oidc-support:$oidcSpringSupportVersion")
-    implementation("no.nav.security:oidc-spring-support:$oidcSpringSupportVersion")
-    testImplementation("no.nav.security:oidc-spring-test:$oidcSpringSupportTestVersion")
+    implementation("no.nav.security:oidc-spring-support:$oidcSupportVersion")
+    testImplementation("no.nav.security:oidc-test-support:$oidcSupportVersion")
 
     implementation("com.ibm.mq:com.ibm.mq.allclient:$mqVersion")
     implementation("no.nav.sbl.dialogarena:varsel-inn:$varselInnVersion")
