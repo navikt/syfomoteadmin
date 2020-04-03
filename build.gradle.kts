@@ -11,7 +11,7 @@ val kotlinLibVersion = "1.3.50"
 val kotlinJacksonVersion = "2.9.8"
 
 val mqVersion = "9.0.4.0"
-val varselInnVersion = "1.0.5"
+val tjenesteSpesifikasjonerVersion = "1.2019.09.25-00.21-49b69f0625e0"
 val varselMedHandlingV1Version = "1.0.0"
 val stoppRevarselV1Version = "1.0.1"
 val opprettOppgavehenvendelseV1Verion = "1.0.0"
@@ -51,6 +51,7 @@ repositories {
     jcenter()
     maven(url="https://repo.adeo.no/repository/maven-releases/")
     maven(url="https://dl.bintray.com/kotlin/kotlinx/")
+    maven(url = "https://repo1.maven.org/maven2/")
 }
 
 dependencies {
@@ -80,7 +81,7 @@ dependencies {
     testImplementation("no.nav.security:oidc-test-support:$oidcSupportVersion")
 
     implementation("com.ibm.mq:com.ibm.mq.allclient:$mqVersion")
-    implementation("no.nav.sbl.dialogarena:varsel-inn:$varselInnVersion")
+    implementation("no.nav.tjenestespesifikasjoner:varsel-inn:$tjenesteSpesifikasjonerVersion")
     implementation("no.nav.meldinger.virksomhet:nav-virksomhet-varselMedHandling-v1-meldingsdefinisjon:$varselMedHandlingV1Version:jaxb")
     implementation("no.nav.meldinger.virksomhet:nav-virksomhet-stoppReVarsel-v1-meldingsdefinisjon:$stoppRevarselV1Version:jaxb")
     implementation("no.nav.meldinger.virksomhet:nav-virksomhet-opprettOppgavehenvendelse-v1-meldingsdefinisjon:$opprettOppgavehenvendelseV1Verion:jaxb")
