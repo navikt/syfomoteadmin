@@ -83,7 +83,7 @@ dependencies {
     implementation("com.ibm.mq:com.ibm.mq.allclient:$mqVersion")
     implementation("no.nav.tjenestespesifikasjoner:varsel-inn:$tjenesteSpesifikasjonerVersion")
     implementation("no.nav.meldinger.virksomhet:nav-virksomhet-varselMedHandling-v1-meldingsdefinisjon:$varselMedHandlingV1Version:jaxb")
-    implementation("no.nav.meldinger.virksomhet:nav-virksomhet-stoppReVarsel-v1-meldingsdefinisjon:$stoppRevarselV1Version:jaxb")
+    implementation("no.nav.tjenestespesifikasjoner:nav-virksomhet-stoppReVarsel-v1-meldingsdefinisjon:$tjenesteSpesifikasjonerVersion")
     implementation("no.nav.meldinger.virksomhet:nav-virksomhet-opprettOppgavehenvendelse-v1-meldingsdefinisjon:$opprettOppgavehenvendelseV1Verion:jaxb")
     implementation("no.nav.meldinger.virksomhet:nav-virksomhet-servicemeldingMedKontaktinformasjon-v1-meldingsdefinisjon:$servicemeldingMedKontaktinformasjonV1Version:jaxb")
 
