@@ -38,7 +38,7 @@ public class BrukertilgangService {
         String innloggetIdent = getSubjectEkstern(contextHolder);
         boolean harTilgang = harTilgangTilOppslaattBruker(innloggetIdent, oppslattBrukerIdent);
         if (!harTilgang) {
-            LOG.error("Ikke tilgang");
+            LOG.warn("Innlogget Ident har ikke tilgang til Oppslatt Ident");
             throw new ForbiddenException();
         }
     }
