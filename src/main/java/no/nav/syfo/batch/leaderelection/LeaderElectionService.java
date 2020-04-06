@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import no.nav.syfo.metric.Metrikk;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -19,17 +18,17 @@ public class LeaderElectionService {
     private static final Logger log = LoggerFactory.getLogger(LeaderElectionService.class);
 
     private final Metrikk metrikk;
-    private final RestTemplate restTemplateKubernetes;
+    private final RestTemplate restTemplate;
     private final String electorpath;
 
     @Inject
     public LeaderElectionService(
             Metrikk metrikk,
-            @Qualifier("kubernetes") RestTemplate restTemplateKubernetes,
+            RestTemplate restTemplate,
             @Value("${elector.path}") String electorpath
     ) {
         this.metrikk = metrikk;
-        this.restTemplateKubernetes = restTemplateKubernetes;
+        this.restTemplate = restTemplate;
         this.electorpath = electorpath;
     }
 
@@ -38,7 +37,7 @@ public class LeaderElectionService {
         ObjectMapper objectMapper = new ObjectMapper();
         String url = "http://" + electorpath;
 
-        String response = restTemplateKubernetes.getForObject(url, String.class);
+        String response = restTemplate.getForObject(url, String.class);
 
         try {
             LeaderPod leader = objectMapper.readValue(response, LeaderPod.class);
