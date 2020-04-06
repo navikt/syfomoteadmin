@@ -3,7 +3,6 @@ package no.nav.syfo.config;
 import org.flywaydb.core.Flyway;
 import org.springframework.boot.autoconfigure.flyway.FlywayMigrationStrategy;
 import org.springframework.context.annotation.*;
-import org.springframework.http.client.ClientHttpRequestInterceptor;
 import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -11,8 +10,6 @@ import org.springframework.scheduling.concurrent.ConcurrentTaskScheduler;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.jta.JtaTransactionManager;
 import org.springframework.web.client.RestTemplate;
-
-import static java.util.Arrays.asList;
 
 @Configuration
 @EnableRetry
@@ -35,14 +32,7 @@ public class ApplicationConfig {
 
     @Bean
     @Primary
-    public RestTemplate restTemplate(ClientHttpRequestInterceptor... interceptors) {
-        RestTemplate template = new RestTemplate();
-        template.setInterceptors(asList(interceptors));
-        return template;
-    }
-
-    @Bean(name = "kubernetes")
-    public RestTemplate restTemplateKubernetes() {
+    public RestTemplate restTemplate() {
         return new RestTemplate();
     }
 }
