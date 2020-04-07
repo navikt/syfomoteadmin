@@ -16,6 +16,7 @@ import no.nav.syfo.repository.model.*;
 import no.nav.syfo.service.*;
 import no.nav.syfo.service.varselinnhold.*;
 import no.nav.syfo.sts.StsConsumer;
+import no.nav.syfo.veiledertilgang.VeilederTilgangConsumer;
 import org.junit.*;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Value;
@@ -87,7 +88,7 @@ public class MoterInternControllerTest extends AbstractRessursTilgangTest {
     @MockBean
     private SykmeldtVarselService sykmeldtVarselService;
     @MockBean
-    private TilgangService tilgangService;
+    private VeilederTilgangConsumer tilgangService;
 
     @Inject
     private CacheManager cacheManager;
@@ -148,7 +149,7 @@ public class MoterInternControllerTest extends AbstractRessursTilgangTest {
                 .opprettetTidspunkt(now().minusMonths(2L))
                 .motedeltakere(singletonList(new MotedeltakerAktorId().aktorId(ARBEIDSTAKER_AKTORID)));
 
-        when(tilgangService.harVeilederTilgangTilPersonViaAzure(ARBEIDSTAKER_FNR)).thenReturn(true);
+        when(tilgangService.hasVeilederAccessToPerson(ARBEIDSTAKER_FNR)).thenReturn(true);
 
         when(moteService.findMoterByBrukerAktoerId(ARBEIDSTAKER_AKTORID)).thenReturn(asList(Mote1, Mote2));
         when(hendelseService.sistEndretMoteStatus(anyLong())).thenReturn(empty());
@@ -165,7 +166,7 @@ public class MoterInternControllerTest extends AbstractRessursTilgangTest {
 
     @Test(expected = ForbiddenException.class)
     public void hentMoter_fnr_veileder_har_ikke_tilgang_pga_rolle() {
-        when(tilgangService.harVeilederTilgangTilPersonViaAzure(ARBEIDSTAKER_FNR)).thenReturn(false);
+        when(tilgangService.hasVeilederAccessToPerson(ARBEIDSTAKER_FNR)).thenReturn(false);
 
         when(pdlConsumer.isKode6Or7(ARBEIDSTAKER_FNR)).thenReturn(false);
 
@@ -176,7 +177,7 @@ public class MoterInternControllerTest extends AbstractRessursTilgangTest {
 
     @Test(expected = ForbiddenException.class)
     public void hentMoter_fnr_veileder_har_ikke_tilgang_pga_skjermet_bruker() {
-        when(tilgangService.harVeilederTilgangTilPersonViaAzure(ARBEIDSTAKER_FNR)).thenReturn(true);
+        when(tilgangService.hasVeilederAccessToPerson(ARBEIDSTAKER_FNR)).thenReturn(true);
 
         when(pdlConsumer.isKode6Or7(ARBEIDSTAKER_FNR)).thenReturn(true);
 
@@ -185,7 +186,7 @@ public class MoterInternControllerTest extends AbstractRessursTilgangTest {
 
     @Test(expected = RuntimeException.class)
     public void hentMoter_fnr_veileder_annen_tilgangsfeil() {
-        when(tilgangService.harVeilederTilgangTilPersonViaAzure(ARBEIDSTAKER_FNR)).thenReturn(false);
+        when(tilgangService.hasVeilederAccessToPerson(ARBEIDSTAKER_FNR)).thenReturn(false);
 
         when(pdlConsumer.isKode6Or7(ARBEIDSTAKER_FNR)).thenReturn(false);
 
@@ -196,8 +197,8 @@ public class MoterInternControllerTest extends AbstractRessursTilgangTest {
 
     @Test
     public void hentMoter_navenhet_veileder_har_full_tilgang() {
-        when(tilgangService.harVeilederTilgangTilPersonViaAzure(ARBEIDSTAKER_FNR)).thenReturn(true);
-        when(tilgangService.harVeilederTilgangTilPersonViaAzure(FNR_2)).thenReturn(true);
+        when(tilgangService.hasVeilederAccessToPerson(ARBEIDSTAKER_FNR)).thenReturn(true);
+        when(tilgangService.hasVeilederAccessToPerson(FNR_2)).thenReturn(true);
 
         when(axsysConsumer.enheter(VEILEDER_ID)).thenReturn(singletonList(
                 new AxsysEnhet(
@@ -221,7 +222,7 @@ public class MoterInternControllerTest extends AbstractRessursTilgangTest {
 
     @Test
     public void hentMoter_navenhet_veileder_har_delvis_tilgang_pga_rolle() {
-        when(tilgangService.harVeilederTilgangTilPersonViaAzure(any()))
+        when(tilgangService.hasVeilederAccessToPerson(any()))
                 .thenReturn(true)
                 .thenReturn(false);
 
@@ -246,7 +247,7 @@ public class MoterInternControllerTest extends AbstractRessursTilgangTest {
 
     @Test
     public void hentMoter_navenhet_veileder_har_delvis_tilgang_pga_skjermet_bruker() {
-        when(tilgangService.harVeilederTilgangTilPersonViaAzure(ARBEIDSTAKER_FNR)).thenReturn(true);
+        when(tilgangService.hasVeilederAccessToPerson(ARBEIDSTAKER_FNR)).thenReturn(true);
 
         when(axsysConsumer.enheter(VEILEDER_ID)).thenReturn(singletonList(
                 new AxsysEnhet(
@@ -270,7 +271,7 @@ public class MoterInternControllerTest extends AbstractRessursTilgangTest {
 
     @Test
     public void hentMoter_navenhet_veileder_har_ikke_tilgang_pga_rolle() {
-        when(tilgangService.harVeilederTilgangTilPersonViaAzure(ARBEIDSTAKER_FNR)).thenReturn(false);
+        when(tilgangService.hasVeilederAccessToPerson(ARBEIDSTAKER_FNR)).thenReturn(false);
 
         when(axsysConsumer.enheter(VEILEDER_ID)).thenReturn(singletonList(
                 new AxsysEnhet(
@@ -293,7 +294,7 @@ public class MoterInternControllerTest extends AbstractRessursTilgangTest {
 
     @Test
     public void hentMoter_navenhet_veileder_har_ikke_tilgang_pga_skjerming() {
-        when(tilgangService.harVeilederTilgangTilPersonViaAzure(ARBEIDSTAKER_FNR)).thenReturn(true);
+        when(tilgangService.hasVeilederAccessToPerson(ARBEIDSTAKER_FNR)).thenReturn(true);
 
         when(axsysConsumer.enheter(VEILEDER_ID)).thenReturn(singletonList(
                 new AxsysEnhet(
@@ -315,8 +316,8 @@ public class MoterInternControllerTest extends AbstractRessursTilgangTest {
 
     @Test(expected = RuntimeException.class)
     public void hentMoter_navenhet_annen_tilgangsfeil() {
-        when(tilgangService.harVeilederTilgangTilPersonViaAzure(ARBEIDSTAKER_FNR)).thenReturn(true);
-        doThrow(new RuntimeException()).when(tilgangService).harVeilederTilgangTilPersonViaAzure(ARBEIDSTAKER_FNR);
+        when(tilgangService.hasVeilederAccessToPerson(ARBEIDSTAKER_FNR)).thenReturn(true);
+        doThrow(new RuntimeException()).when(tilgangService).hasVeilederAccessToPerson(ARBEIDSTAKER_FNR);
 
         when(axsysConsumer.enheter(VEILEDER_ID)).thenReturn(singletonList(
                 new AxsysEnhet(
@@ -342,7 +343,7 @@ public class MoterInternControllerTest extends AbstractRessursTilgangTest {
 
         mockBehandlendEnhet(ARBEIDSTAKER_FNR);
 
-        when(tilgangService.harVeilederTilgangTilPersonViaAzure(ARBEIDSTAKER_FNR)).thenReturn(true);
+        when(tilgangService.hasVeilederAccessToPerson(ARBEIDSTAKER_FNR)).thenReturn(true);
 
         when(pdlConsumer.isKode6Or7(ARBEIDSTAKER_FNR)).thenReturn(false);
         when(pdlConsumer.fullName(LEDER_AKTORID)).thenReturn("Frida Frisk");
@@ -362,7 +363,7 @@ public class MoterInternControllerTest extends AbstractRessursTilgangTest {
 
     @Test(expected = ForbiddenException.class)
     public void opprettMoter_ikke_tilgang_pga_skjermet_bruker() {
-        when(tilgangService.harVeilederTilgangTilPersonViaAzure(ARBEIDSTAKER_FNR)).thenReturn(true);
+        when(tilgangService.hasVeilederAccessToPerson(ARBEIDSTAKER_FNR)).thenReturn(true);
 
         when(pdlConsumer.isKode6Or7(ARBEIDSTAKER_FNR)).thenReturn(true);
 
@@ -371,7 +372,7 @@ public class MoterInternControllerTest extends AbstractRessursTilgangTest {
 
     @Test(expected = ForbiddenException.class)
     public void opprettMoter_ikke_tilgang_pga_rolle() {
-        when(tilgangService.harVeilederTilgangTilPersonViaAzure(ARBEIDSTAKER_FNR)).thenReturn(false);
+        when(tilgangService.hasVeilederAccessToPerson(ARBEIDSTAKER_FNR)).thenReturn(false);
 
         when(pdlConsumer.isKode6Or7(ARBEIDSTAKER_FNR)).thenReturn(false);
 
@@ -380,7 +381,7 @@ public class MoterInternControllerTest extends AbstractRessursTilgangTest {
 
     @Test(expected = RuntimeException.class)
     public void opprettMoter_annen_tilgangsfeil() {
-        doThrow(new RuntimeException()).when(tilgangService).harVeilederTilgangTilPersonViaAzure(ARBEIDSTAKER_FNR);
+        doThrow(new RuntimeException()).when(tilgangService).hasVeilederAccessToPerson(ARBEIDSTAKER_FNR);
 
         when(pdlConsumer.isKode6Or7(ARBEIDSTAKER_FNR)).thenReturn(false);
 

@@ -2,14 +2,13 @@ package no.nav.syfo.api.ressurser.azuread;
 
 import no.nav.security.oidc.api.ProtectedWithClaims;
 import no.nav.syfo.aktorregister.AktorregisterConsumer;
-import no.nav.syfo.aktorregister.domain.AktorId;
+import no.nav.syfo.aktorregister.domain.*;
 import no.nav.syfo.api.domain.RSBruker;
 import no.nav.syfo.dkif.DigitalKontaktinfo;
 import no.nav.syfo.dkif.DkifConsumer;
-import no.nav.syfo.domain.Fnr;
 import no.nav.syfo.metric.Metrikk;
 import no.nav.syfo.pdl.PdlConsumer;
-import no.nav.syfo.service.TilgangService;
+import no.nav.syfo.veiledertilgang.VeilederTilgangConsumer;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
@@ -25,7 +24,7 @@ public class PersonController {
     private AktorregisterConsumer aktorregisterConsumer;
     private DkifConsumer dkifConsumer;
     private PdlConsumer pdlConsumer;
-    private TilgangService tilgangService;
+    private VeilederTilgangConsumer tilgangService;
     private Metrikk metrikk;
 
     @Inject
@@ -33,7 +32,7 @@ public class PersonController {
             AktorregisterConsumer aktorregisterConsumer,
             DkifConsumer dkifConsumer,
             PdlConsumer pdlConsumer,
-            TilgangService tilgangService,
+            VeilederTilgangConsumer tilgangService,
             Metrikk metrikk
     ) {
         this.aktorregisterConsumer = aktorregisterConsumer;
@@ -48,24 +47,24 @@ public class PersonController {
     public RSBruker hentBruker(@PathVariable("ident") String ident) {
         metrikk.tellEndepunktKall("bruker_navn");
 
-        Fnr fnr = getFnrForIdent(ident);
+        Fodselsnummer fnr = getFnrForIdent(ident);
 
         tilgangService.throwExceptionIfVeilederWithoutAccess(fnr);
 
         return new RSBruker()
-                .navn(pdlConsumer.fullName(fnr.getFnr()));
+                .navn(pdlConsumer.fullName(fnr.getValue()));
     }
 
     @GetMapping(produces = APPLICATION_JSON_VALUE)
     public RSBruker bruker(@PathVariable("ident") String ident) {
         metrikk.tellEndepunktKall("bruker");
 
-        Fnr fnr = getFnrForIdent(ident);
+        Fodselsnummer fnr = getFnrForIdent(ident);
 
         tilgangService.throwExceptionIfVeilederWithoutAccess(fnr);
 
         RSBruker rsBruker = new RSBruker();
-        DigitalKontaktinfo kontaktinfo = dkifConsumer.kontaktinformasjon(fnr.getFnr());
+        DigitalKontaktinfo kontaktinfo = dkifConsumer.kontaktinformasjon(fnr.getValue());
         rsBruker.kontaktinfo
                 .tlf(kontaktinfo.getMobiltelefonnummer())
                 .epost(kontaktinfo.getEpostadresse())
@@ -73,15 +72,15 @@ public class PersonController {
                         .skalHaVarsel(kontaktinfo.getKanVarsles())
                         .feilAarsak(null));
         return rsBruker
-                .navn(pdlConsumer.fullName(fnr.getFnr()));
+                .navn(pdlConsumer.fullName(fnr.getValue()));
     }
 
-    private Fnr getFnrForIdent(@PathVariable("ident") String ident) {
-        Fnr fnr;
+    private Fodselsnummer getFnrForIdent(@PathVariable("ident") String ident) {
+        Fodselsnummer fnr;
         if (ident.matches("\\d{11}$")) {
-            fnr = Fnr.of(ident);
+            fnr = new Fodselsnummer(ident);
         } else {
-            fnr = Fnr.of(aktorregisterConsumer.getFnrForAktorId(new AktorId(ident)));
+            fnr = new Fodselsnummer(aktorregisterConsumer.getFnrForAktorId(new AktorId(ident)));
         }
         return fnr;
     }

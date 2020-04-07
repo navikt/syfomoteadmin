@@ -3,13 +3,12 @@ package no.nav.syfo.api.ressurser.azuread;
 import no.nav.security.oidc.api.ProtectedWithClaims;
 import no.nav.security.oidc.context.OIDCRequestContextHolder;
 import no.nav.syfo.aktorregister.AktorregisterConsumer;
-import no.nav.syfo.aktorregister.domain.AktorId;
+import no.nav.syfo.aktorregister.domain.*;
 import no.nav.syfo.api.domain.RSEpostInnhold;
-import no.nav.syfo.domain.Fnr;
 import no.nav.syfo.domain.model.*;
 import no.nav.syfo.repository.model.PEpost;
 import no.nav.syfo.service.MoteService;
-import no.nav.syfo.service.TilgangService;
+import no.nav.syfo.veiledertilgang.VeilederTilgangConsumer;
 import no.nav.syfo.service.varselinnhold.ArbeidsgiverVarselService;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,7 +34,7 @@ public class EmailContentController {
 
     private MoteService moteService;
 
-    private TilgangService tilgangService;
+    private VeilederTilgangConsumer tilgangService;
 
     private ArbeidsgiverVarselService arbeidsgiverVarselService;
 
@@ -44,7 +43,7 @@ public class EmailContentController {
             OIDCRequestContextHolder contextHolder,
             AktorregisterConsumer aktorregisterConsumer,
             MoteService moteService,
-            TilgangService tilgangService,
+            VeilederTilgangConsumer tilgangService,
             ArbeidsgiverVarselService arbeidsgiverVarselService
     ) {
         this.contextHolder = contextHolder;
@@ -61,7 +60,7 @@ public class EmailContentController {
             @RequestParam(value = "valgtAlternativId", required = false) String valgtAlternativId
     ) {
         Mote Mote = moteService.findMoteByMotedeltakerUuid(motedeltakeruuid);
-        Fnr sykmeldtFnr = Fnr.of(aktorregisterConsumer.getFnrForAktorId(new AktorId(Mote.sykmeldt().aktorId)));
+        Fodselsnummer sykmeldtFnr = new Fodselsnummer(aktorregisterConsumer.getFnrForAktorId(new AktorId(Mote.sykmeldt().aktorId)));
 
         tilgangService.throwExceptionIfVeilederWithoutAccess(sykmeldtFnr);
 

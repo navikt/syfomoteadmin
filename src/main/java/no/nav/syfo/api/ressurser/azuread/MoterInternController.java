@@ -16,6 +16,7 @@ import no.nav.syfo.repository.dao.*;
 import no.nav.syfo.repository.model.*;
 import no.nav.syfo.service.*;
 import no.nav.syfo.service.varselinnhold.*;
+import no.nav.syfo.veiledertilgang.VeilederTilgangConsumer;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
@@ -58,7 +59,7 @@ public class MoterInternController {
     private ArbeidsgiverVarselService arbeidsgiverVarselService;
     private NarmesteLederConsumer narmesteLederConsumer;
     private SykmeldtVarselService sykmeldtVarselService;
-    private TilgangService tilgangService;
+    private VeilederTilgangConsumer tilgangService;
 
     @Inject
     public MoterInternController(
@@ -76,7 +77,7 @@ public class MoterInternController {
             ArbeidsgiverVarselService arbeidsgiverVarselService,
             NarmesteLederConsumer narmesteLederConsumer,
             SykmeldtVarselService sykmeldtVarselService,
-            TilgangService tilgangService
+            VeilederTilgangConsumer tilgangService
     ) {
         this.contextHolder = contextHolder;
         this.metrikk = metrikk;
@@ -109,7 +110,7 @@ public class MoterInternController {
 
         if (!isEmpty(fnr)) {
             boolean erBrukerSkjermet = pdlConsumer.isKode6Or7(fnr);
-            if (erBrukerSkjermet || !tilgangService.harVeilederTilgangTilPersonViaAzure(fnr)) {
+            if (erBrukerSkjermet || !tilgangService.hasVeilederAccessToPerson(fnr)) {
                 throw new ForbiddenException(status(FORBIDDEN)
                         .entity(erBrukerSkjermet ?
                                 new RSTilgang()
@@ -152,7 +153,7 @@ public class MoterInternController {
 
         moter = moter.stream()
                 .filter(mote -> !pdlConsumer.isKode6Or7(aktorregisterConsumer.getFnrForAktorId(new AktorId(mote.sykmeldt().aktorId))))
-                .filter(mote -> tilgangService.harVeilederTilgangTilPersonViaAzure(
+                .filter(mote -> tilgangService.hasVeilederAccessToPerson(
                         aktorregisterConsumer.getFnrForAktorId(new AktorId(mote.sykmeldt().aktorId)))
                 )
                 .collect(toList());
@@ -200,7 +201,7 @@ public class MoterInternController {
     @PostMapping(consumes = APPLICATION_JSON_VALUE)
     public void opprett(
             @RequestBody RSNyttMoteRequest nyttMoteRequest) {
-        if (pdlConsumer.isKode6Or7(nyttMoteRequest.fnr) || !tilgangService.harVeilederTilgangTilPersonViaAzure(nyttMoteRequest.fnr)) {
+        if (pdlConsumer.isKode6Or7(nyttMoteRequest.fnr) || !tilgangService.hasVeilederAccessToPerson(nyttMoteRequest.fnr)) {
             throw new ForbiddenException();
         } else {
             String aktorId = aktorregisterConsumer.getAktorIdForFodselsnummer(new Fodselsnummer(nyttMoteRequest.fnr));
