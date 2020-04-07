@@ -14,3 +14,7 @@ const val TEMA_HEADER = "Tema"
 const val ALLE_TEMA_HEADERVERDI = "GEN"
 
 fun createCallId(): String = UUID.randomUUID().toString()
+
+fun getOrCreateCallId(callId: String?): String {
+    return callId ?: UUID.randomUUID().toString()
+}

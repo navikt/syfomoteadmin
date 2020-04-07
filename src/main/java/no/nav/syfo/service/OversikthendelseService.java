@@ -30,7 +30,7 @@ public class OversikthendelseService {
 
     public void sendOversikthendelse(Mote mote, OversikthendelseType type) {
         String sykmeldtFnr = aktorregisterConsumer.getFnrForAktorId(new AktorId(mote.sykmeldt().aktorId));
-        String behandlendeEnhet = behandlendeEnhetConsumer.getBehandlendeEnhet(sykmeldtFnr).getEnhetId();
+        String behandlendeEnhet = behandlendeEnhetConsumer.getBehandlendeEnhet(sykmeldtFnr, null).getEnhetId();
 
         KOversikthendelse kOversikthendelse = KOversikthendelse.builder()
                 .fnr(sykmeldtFnr)
