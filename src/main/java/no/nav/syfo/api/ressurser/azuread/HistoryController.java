@@ -4,9 +4,9 @@ import no.nav.security.oidc.api.ProtectedWithClaims;
 import no.nav.syfo.aktorregister.AktorregisterConsumer;
 import no.nav.syfo.aktorregister.domain.Fodselsnummer;
 import no.nav.syfo.api.domain.RSHistorikk;
-import no.nav.syfo.domain.Fnr;
 import no.nav.syfo.domain.model.Mote;
 import no.nav.syfo.service.*;
+import no.nav.syfo.veiledertilgang.VeilederTilgangConsumer;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
@@ -21,7 +21,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @RequestMapping(value = "/api/internad/historikk")
 public class HistoryController {
 
-    private TilgangService tilgangService;
+    private VeilederTilgangConsumer tilgangService;
 
     private AktorregisterConsumer aktorregisterConsumer;
 
@@ -31,7 +31,7 @@ public class HistoryController {
 
     @Inject
     public HistoryController(
-            TilgangService tilgangService,
+            VeilederTilgangConsumer tilgangService,
             AktorregisterConsumer aktorregisterConsumer,
             MoteService moteService,
             HistorikkService historikkService
@@ -48,7 +48,7 @@ public class HistoryController {
     ) {
         Fodselsnummer personFnr = new Fodselsnummer(fnr);
 
-        tilgangService.throwExceptionIfVeilederWithoutAccess(Fnr.of(personFnr.getValue()));
+        tilgangService.throwExceptionIfVeilederWithoutAccess(personFnr);
 
         List<Mote> moter = moteService.findMoterByBrukerAktoerId(aktorregisterConsumer.getAktorIdForFodselsnummer(personFnr));
         List<RSHistorikk> historikk = new ArrayList<>();
