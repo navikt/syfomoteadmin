@@ -4,9 +4,7 @@ import no.nav.syfo.azuread.AzureAdTokenConsumer
 import no.nav.syfo.config.CacheConfig.CACHENAME_NARMESTELEDER_ANSATTE
 import no.nav.syfo.config.CacheConfig.CACHENAME_NARMESTELEDER_LEDER
 import no.nav.syfo.metric.Metrikk
-import no.nav.syfo.util.NAV_CALL_ID_HEADER
-import no.nav.syfo.util.bearerCredentials
-import no.nav.syfo.util.createCallId
+import no.nav.syfo.util.*
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
@@ -70,6 +68,7 @@ class NarmesteLederConsumer @Autowired constructor(
         val headers = HttpHeaders()
         headers[HttpHeaders.AUTHORIZATION] = bearerCredentials(token)
         headers[NAV_CALL_ID_HEADER] = createCallId()
+        headers[NAV_CONSUMER_ID_HEADER] = APP_CONSUMER_ID
         return HttpEntity<Any>(headers)
     }
 
