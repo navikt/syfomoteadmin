@@ -40,7 +40,7 @@ class NarmesteLederConsumer @Autowired constructor(
 
             return response.body!!.narmesteLederRelasjon
         } catch (e: RestClientResponseException) {
-            LOG.error("Request to get Leder from Syfonarmesteleder failed with status " + e.rawStatusCode + " and message: " + e.responseBodyAsString)
+            LOG.error("Request to get Leder from Syfonarmesteleder failed with status ${e.rawStatusCode} and message: ${e.responseBodyAsString}" )
             metrikk.countEvent(CALL_SYFONARMESTELEDER_LEDER_FAIL)
             throw e
         }
@@ -59,7 +59,7 @@ class NarmesteLederConsumer @Autowired constructor(
 
             return response.body!!
         } catch (e: RestClientResponseException) {
-            LOG.error("Request to get Ansatte from Syfonarmesteleder failed with status " + e.rawStatusCode + " and message: " + e.responseBodyAsString)
+            LOG.error("Request to get Ansatte from Syfonarmesteleder failed with status ${e.rawStatusCode} and message: ${e.responseBodyAsString}" )
             metrikk.countEvent(CALL_SYFONARMESTELEDER_ANSATTE_FAIL)
             throw e
         }
