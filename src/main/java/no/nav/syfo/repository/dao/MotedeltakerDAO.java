@@ -3,6 +3,8 @@ package no.nav.syfo.repository.dao;
 import no.nav.syfo.domain.model.*;
 import no.nav.syfo.repository.model.PMotedeltakerAktorId;
 import no.nav.syfo.repository.model.PMotedeltakerArbeidsgiver;
+import org.slf4j.Logger;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -30,10 +32,13 @@ import static no.nav.syfo.util.DbUtil.convert;
 import static no.nav.syfo.util.DbUtil.nesteSekvensverdi;
 import static no.nav.syfo.util.MapUtil.map;
 import static no.nav.syfo.util.MapUtil.mapListe;
+import static org.slf4j.LoggerFactory.getLogger;
 
 @Service
 @Repository
 public class MotedeltakerDAO {
+
+    private static final Logger LOG = getLogger(MotedeltakerDAO.class);
 
     private JdbcTemplate jdbcTemplate;
     private NamedParameterJdbcTemplate namedParameterJdbcTemplate;
@@ -114,21 +119,26 @@ public class MotedeltakerDAO {
     }
 
     public List<Motedeltaker> motedeltakereByMoteId(long moteId) {
-        MotedeltakerArbeidsgiver arbeidsgiver = map(jdbcTemplate.queryForObject("select * from motedeltaker_arbeidsgiver " +
-                        "inner join motedeltaker on motedeltaker.motedeltaker_id = motedeltaker_arbeidsgiver.motedeltaker_id " +
-                        "where mote_id = ? and motedeltakertype = 'arbeidsgiver'",
-                new MotedeltakerArbeidsgiverMapper(), moteId), p2Arbeidsgiver);
-        arbeidsgiver.tidOgStedAlternativer = tidOgStedDAO.finnAlternativerMedBrukersValg(moteId, arbeidsgiver.id);
+        try {
+            MotedeltakerArbeidsgiver arbeidsgiver = map(jdbcTemplate.queryForObject("select * from motedeltaker_arbeidsgiver " +
+                            "inner join motedeltaker on motedeltaker.motedeltaker_id = motedeltaker_arbeidsgiver.motedeltaker_id " +
+                            "where mote_id = ? and motedeltakertype = 'arbeidsgiver'",
+                    new MotedeltakerArbeidsgiverMapper(), moteId), p2Arbeidsgiver);
+            arbeidsgiver.tidOgStedAlternativer = tidOgStedDAO.finnAlternativerMedBrukersValg(moteId, arbeidsgiver.id);
 
-        MotedeltakerAktorId sykmeldt = map(jdbcTemplate.queryForObject("select * from motedeltaker_aktorid " +
-                "inner join motedeltaker on motedeltaker.motedeltaker_id = motedeltaker_aktorid.motedeltaker_id " +
-                "where mote_id = ? and motedeltakertype = 'Bruker'", new MotedeltakerAktorMapper(), moteId), p2Aktoer);
-        sykmeldt.tidOgStedAlternativer(tidOgStedDAO.finnAlternativerMedBrukersValg(moteId, sykmeldt.id));
+            MotedeltakerAktorId sykmeldt = map(jdbcTemplate.queryForObject("select * from motedeltaker_aktorid " +
+                    "inner join motedeltaker on motedeltaker.motedeltaker_id = motedeltaker_aktorid.motedeltaker_id " +
+                    "where mote_id = ? and motedeltakertype = 'Bruker'", new MotedeltakerAktorMapper(), moteId), p2Aktoer);
+            sykmeldt.tidOgStedAlternativer(tidOgStedDAO.finnAlternativerMedBrukersValg(moteId, sykmeldt.id));
 
-        List<Motedeltaker> motedeltakere = new ArrayList<>();
-        motedeltakere.add(arbeidsgiver);
-        motedeltakere.add(sykmeldt);
-        return motedeltakere;
+            List<Motedeltaker> motedeltakere = new ArrayList<>();
+            motedeltakere.add(arbeidsgiver);
+            motedeltakere.add(sykmeldt);
+            return motedeltakere;
+        } catch (EmptyResultDataAccessException e) {
+            LOG.error("EmptyResultDataAccessException for mote {}", moteId);
+            throw e;
+        }
     }
 
     public MotedeltakerAktorId arbeidstakerMotedeltakerAktorIdByMoteId(long moteId) {
