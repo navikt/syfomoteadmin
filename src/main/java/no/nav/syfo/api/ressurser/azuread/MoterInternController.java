@@ -17,6 +17,7 @@ import no.nav.syfo.repository.model.*;
 import no.nav.syfo.service.*;
 import no.nav.syfo.service.varselinnhold.*;
 import no.nav.syfo.veiledertilgang.VeilederTilgangConsumer;
+import org.springframework.transaction.annotation.*;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
@@ -218,35 +219,47 @@ public class MoterInternController {
             String innloggetIdent = getSubjectInternAzure(contextHolder);
             nyttMote.opprettetAv(innloggetIdent);
             nyttMote.eier(innloggetIdent);
-            Mote Mote = moteService.opprettMote(nyttMote);
-
-            List<TidOgSted> alternativer = nyttMoteRequest.alternativer.stream().map(nyttAlternativ -> tidOgStedDAO.create(map(nyttAlternativ, opprett2TidOgSted).moteId(Mote.id))).collect(toList());
-            Mote.alternativer(alternativer);
-
-            MotedeltakerAktorId sykmeldt = motedeltakerDAO.create(new PMotedeltakerAktorId()
-                    .aktorId(aktorId)
-                    .motedeltakertype("Bruker")
-                    .moteId(Mote.id)
-                    .status(SENDT.name()));
-            MotedeltakerArbeidsgiver arbeidsgiver = motedeltakerDAO.create(new PMotedeltakerArbeidsgiver()
-                    .navn(lederNavn)
-                    .orgnummer(narmesteLederRelasjon.getOrgnummer())
-                    .epost(narmesteLederRelasjon.getNarmesteLederEpost())
-                    .motedeltakertype("arbeidsgiver")
-                    .moteId(Mote.id)
-                    .status(SENDT.name())
+            Mote mote = opprettNyttMote(
+                    nyttMote,
+                    nyttMoteRequest,
+                    new PMotedeltakerAktorId()
+                            .aktorId(aktorId)
+                            .motedeltakertype("Bruker")
+                            .status(SENDT.name()),
+                    new PMotedeltakerArbeidsgiver()
+                            .navn(lederNavn)
+                            .orgnummer(narmesteLederRelasjon.getOrgnummer())
+                            .epost(narmesteLederRelasjon.getNarmesteLederEpost())
+                            .motedeltakertype("arbeidsgiver")
+                            .status(SENDT.name())
             );
-
-            Mote.motedeltakere(asList(
-                    sykmeldt,
-                    arbeidsgiver
-            ));
-
-            arbeidsgiverVarselService.sendVarsel(OPPRETTET, Mote, false, innloggetIdent);
-            sykmeldtVarselService.sendVarsel(OPPRETTET, Mote);
+            arbeidsgiverVarselService.sendVarsel(OPPRETTET, mote, false, innloggetIdent);
+            sykmeldtVarselService.sendVarsel(OPPRETTET, mote);
 
             metrikk.tellEndepunktKall("opprettet_mote");
         }
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public Mote opprettNyttMote(
+            Mote nyttMote,
+            RSNyttMoteRequest nyttMoteRequest,
+            PMotedeltakerAktorId pMotedeltakerAktorId,
+            PMotedeltakerArbeidsgiver pMotedeltakerArbeidsgiver
+    ) {
+        Mote mote = moteService.opprettMote(nyttMote);
+
+        List<TidOgSted> alternativer = nyttMoteRequest.alternativer.stream().map(nyttAlternativ -> tidOgStedDAO.create(map(nyttAlternativ, opprett2TidOgSted).moteId(mote.id))).collect(toList());
+        mote.alternativer(alternativer);
+
+        MotedeltakerAktorId sykmeldt = motedeltakerDAO.create(pMotedeltakerAktorId.moteId(mote.id));
+        MotedeltakerArbeidsgiver arbeidsgiver = motedeltakerDAO.create(pMotedeltakerArbeidsgiver.moteId(mote.id));
+
+        mote.motedeltakere(asList(
+                sykmeldt,
+                arbeidsgiver
+        ));
+        return mote;
     }
 
     private List<Mote> intersection(List<Mote> liste1, List<Mote> liste2) {
