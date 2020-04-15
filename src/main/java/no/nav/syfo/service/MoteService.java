@@ -12,7 +12,9 @@ import no.nav.syfo.repository.model.PFeedHendelse;
 import no.nav.syfo.service.mq.MqStoppRevarslingService;
 import no.nav.syfo.service.varselinnhold.ArbeidsgiverVarselService;
 import no.nav.syfo.service.varselinnhold.SykmeldtVarselService;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,9 +32,12 @@ import static no.nav.syfo.repository.model.PFeedHendelse.FeedHendelseType.ALLE_S
 import static no.nav.syfo.service.MotedeltakerService.finnAktoerIMote;
 import static no.nav.syfo.util.MoterUtil.filtrerBortAlternativerSomAlleredeErLagret;
 import static no.nav.syfo.util.MoterUtil.hentSisteSvartidspunkt;
+import static org.slf4j.LoggerFactory.getLogger;
 
 @Service
 public class MoteService {
+
+    private static final Logger LOG = getLogger(MoteService.class);
 
     private MoteDAO moteDAO;
     private FeedDAO feedDAO;
@@ -257,7 +262,12 @@ public class MoteService {
     }
 
     public List<Mote> findMoterByBrukerNavEnhet(String navenhet) {
-        return moteDAO.findMoterByNavEnhet(navenhet);
+        try {
+            return moteDAO.findMoterByNavEnhet(navenhet);
+        } catch (EmptyResultDataAccessException e) {
+            LOG.error("EmptyResultDataAccessException for Enhet {}", navenhet);
+            throw e;
+        }
     }
 
     private void opprettFeedHendelseAvTypen(PFeedHendelse.FeedHendelseType type, Mote Mote, String veilederIdent) {
