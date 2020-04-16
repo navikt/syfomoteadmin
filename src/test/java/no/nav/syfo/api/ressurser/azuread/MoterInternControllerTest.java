@@ -31,7 +31,7 @@ import org.springframework.web.client.RestTemplate;
 import javax.inject.Inject;
 import javax.ws.rs.ForbiddenException;
 import java.text.ParseException;
-import java.util.List;
+import java.util.*;
 
 import static java.time.LocalDateTime.now;
 import static java.util.Arrays.asList;
@@ -354,7 +354,7 @@ public class MoterInternControllerTest extends AbstractRessursTilgangTest {
         when(tidOgStedDAO.create(any())).thenReturn(new TidOgSted());
         when(motedeltakerDAO.create(any(PMotedeltakerAktorId.class))).thenReturn(new MotedeltakerAktorId());
         when(motedeltakerDAO.create(any(PMotedeltakerArbeidsgiver.class))).thenReturn(new MotedeltakerArbeidsgiver());
-        when(veilederService.hentVeileder(any())).thenReturn(new Veileder());
+        when(veilederService.hentVeilederNavn(any())).thenReturn(Optional.of(VEILEDER_NAVN));
 
         moterController.opprett(nyttMoteRequest);
 

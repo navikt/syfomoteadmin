@@ -1,15 +1,14 @@
 package no.nav.syfo.service;
 
-
-import no.nav.syfo.domain.model.Veileder;
+import no.nav.syfo.service.ldap.*;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
-import java.util.Map;
+import java.util.*;
 
 import static java.util.Arrays.asList;
-import static no.nav.syfo.config.CacheConfig.CACHENAME_LDAP_VEILEDER;
+import static no.nav.syfo.config.CacheConfig.CACHENAME_LDAP_VEILEDER_NAVN;
 
 @Service
 public class VeilederService {
@@ -21,20 +20,17 @@ public class VeilederService {
         this.ldapService = ldapService;
     }
 
-    private String hentVeilederEpost(String veilederUid) {
-        return ldapService.hentVeilederAttributter(veilederUid, asList("mail")).get("mail").toString();
-    }
-
-    private String hentVeilederNavn(String veilederUid) {
+    @Cacheable(value = CACHENAME_LDAP_VEILEDER_NAVN, key = "#veilederUid", condition = "#veilederUid != null")
+    public String hentNavn(String veilederUid) {
         Map map = ldapService.hentVeilederAttributter(veilederUid, asList("givenname", "sn"));
         return map.get("givenname").toString() + " " + map.get("sn").toString();
     }
 
-    @Cacheable(value = CACHENAME_LDAP_VEILEDER, key = "#veilederUid", condition = "#veilederUid != null")
-    public Veileder hentVeileder(String veilederUid) {
-        return new Veileder()
-                .userId(veilederUid)
-                .navn(hentVeilederNavn(veilederUid))
-                .epost(hentVeilederEpost(veilederUid));
+    public Optional<String> hentVeilederNavn(String veilederUid) {
+        try {
+            return Optional.of(hentNavn(veilederUid));
+        } catch (LdapNoAttributesFoundException e) {
+            return Optional.empty();
+        }
     }
 }

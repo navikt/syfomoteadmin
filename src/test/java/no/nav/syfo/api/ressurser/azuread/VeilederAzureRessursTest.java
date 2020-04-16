@@ -5,7 +5,6 @@ import no.nav.syfo.api.ressurser.AbstractRessursTilgangTest;
 import no.nav.syfo.axsys.AxsysConsumer;
 import no.nav.syfo.axsys.AxsysEnhet;
 import no.nav.syfo.controller.internad.veileder.*;
-import no.nav.syfo.domain.model.Veileder;
 import no.nav.syfo.service.VeilederService;
 import org.junit.Before;
 import org.junit.Test;
@@ -17,6 +16,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 
 import javax.inject.Inject;
 import java.text.ParseException;
+import java.util.Optional;
 
 import static java.util.Arrays.asList;
 import static no.nav.syfo.testhelper.OidcTestHelper.loggInnVeilederAzure;
@@ -52,8 +52,7 @@ public class VeilederAzureRessursTest extends AbstractRessursTilgangTest {
         } catch (ParseException e) {
             e.printStackTrace();
         }
-        Veileder veileder = new Veileder().navn(VEILEDER_NAVN);
-        when(veilederService.hentVeileder(VEILEDER_ID)).thenReturn(veileder);
+        when(veilederService.hentVeilederNavn(VEILEDER_ID)).thenReturn(Optional.of(VEILEDER_NAVN));
     }
 
     @Test

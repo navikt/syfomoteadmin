@@ -28,7 +28,7 @@ class VeilederAzureRessurs @Inject constructor(
     @GetMapping(value = ["/{ident}"], produces = [MediaType.APPLICATION_JSON_VALUE])
     fun hentIdent(@PathVariable("ident") ident: String): RSVeilederInfo {
         return RSVeilederInfo(
-                navn = veilederService.hentVeileder(ident).navn,
+                navn = veilederService.hentVeilederNavn(ident).orElse("Fant ikke navn"),
                 ident = ident
         )
     }
