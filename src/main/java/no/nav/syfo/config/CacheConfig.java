@@ -17,7 +17,7 @@ public class CacheConfig {
     public static final String CACHENAME_BEHANDLENDEENHET_FNR = "behandlendeenhetfnr";
     public static final String CACHENAME_DKIF_IDENT = "dkifident";
     public static final String CACHENAME_EREG_VIRKSOMHETSNAVN = "virksomhetsnavn";
-    public static final String CACHENAME_LDAP_VEILEDER = "ldapveileder";
+    public static final String CACHENAME_LDAP_VEILEDER_NAVN = "ldapveiledernavn";
     public static final String CACHENAME_AXSYS_ENHETER = "axsysenheter";
     public static final String CACHENAME_NARMESTELEDER_ANSATTE = "ansatte";
     public static final String CACHENAME_NARMESTELEDER_LEDER = "leder";
@@ -35,7 +35,7 @@ public class CacheConfig {
                 new ConcurrentMapCache(CACHENAME_BEHANDLENDEENHET_FNR),
                 new ConcurrentMapCache(CACHENAME_DKIF_IDENT),
                 new ConcurrentMapCache(CACHENAME_EREG_VIRKSOMHETSNAVN),
-                new ConcurrentMapCache(CACHENAME_LDAP_VEILEDER),
+                new ConcurrentMapCache(CACHENAME_LDAP_VEILEDER_NAVN),
                 new ConcurrentMapCache(CACHENAME_NARMESTELEDER_ANSATTE),
                 new ConcurrentMapCache(CACHENAME_NARMESTELEDER_LEDER),
                 new ConcurrentMapCache(CACHENAME_NORG_ENHETER),

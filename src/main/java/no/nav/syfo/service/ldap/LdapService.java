@@ -1,5 +1,6 @@
-package no.nav.syfo.service;
+package no.nav.syfo.service.ldap;
 
+import org.slf4j.*;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,8 @@ import static java.util.Optional.ofNullable;
 @SuppressWarnings({"squid:S1149"})
 @Service
 public class LdapService {
+
+    private static final Logger LOG = LoggerFactory.getLogger(LdapService.class);
 
     private static Hashtable<String, String> env = new Hashtable<>();
     @Value("${ldap.basedn}")
@@ -45,7 +48,9 @@ public class LdapService {
                 Attributes ldapAttributes = result.next().getAttributes();
                 populateAttributtMap(attributter, map, ldapAttributes);
             } else {
-                throw new RuntimeException("Fant ingen attributter i resultat fra ldap for veileder " + veilederUid);
+                String message = "Fant ingen attributter i resultat fra ldap for veileder " + veilederUid;
+                LOG.warn(message);
+                throw new LdapNoAttributesFoundException(message);
             }
         } catch (NamingException e) {
             throw new RuntimeException(e);

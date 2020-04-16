@@ -114,7 +114,7 @@ public class ArbeidsgiverVarselService {
     }
 
     private String veiledernavn(String innloggetIdent) {
-        return veilederService.hentVeileder(innloggetIdent).navn;
+        return veilederService.hentVeilederNavn(innloggetIdent).orElse("NAV");
     }
 
     private String sted(TidOgSted valgtTidOgSted) {
