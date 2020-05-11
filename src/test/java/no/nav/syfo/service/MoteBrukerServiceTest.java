@@ -2,6 +2,7 @@ package no.nav.syfo.service;
 
 import no.nav.security.oidc.context.OIDCRequestContextHolder;
 import no.nav.syfo.aktorregister.AktorregisterConsumer;
+import no.nav.syfo.aktorregister.domain.Fodselsnummer;
 import no.nav.syfo.api.domain.bruker.BrukerMote;
 import no.nav.syfo.domain.model.*;
 import no.nav.syfo.pdl.PdlConsumer;
@@ -18,6 +19,7 @@ import java.time.LocalDateTime;
 import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static no.nav.syfo.testhelper.UserConstants.ARBEIDSTAKER_AKTORID;
+import static no.nav.syfo.testhelper.UserConstants.ARBEIDSTAKER_FNR;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
@@ -81,6 +83,7 @@ public class MoteBrukerServiceTest {
                                 .sted("Oslo")
                                 .valgt(false)))
                         .motedeltakertype("Bruker")));
+        when(aktorregisterConsumer.getAktorIdForFodselsnummer(new Fodselsnummer(ARBEIDSTAKER_FNR))).thenReturn(ARBEIDSTAKER_AKTORID);
     }
 
     @Test
@@ -123,5 +126,79 @@ public class MoteBrukerServiceTest {
 
         assertThat(funnetBrukerMote).isNotNull();
         assertThat(funnetBrukerMote.moteUuid).isEqualToIgnoringCase(RIKTIG_UUID);
+    }
+
+    @Test
+    public void harMoteplanleggerIBrukEtterDato_false_mote_opprettet_opprettet_for_grensedato() {
+        LocalDateTime datoEldreEnnGrensedato = mottattDatoTiDagerSiden.minusDays(1);
+        Mote nyesteMote = mote.opprettetTidspunkt(datoEldreEnnGrensedato);
+
+        when(moteService.findMoterByBrukerAktoerId(anyString())).thenReturn(singletonList(nyesteMote));
+
+        Boolean harMoteplanleggerIBrukEtterDato = moteBrukerService.harMoteplanleggerIBruk(new Fodselsnummer(ARBEIDSTAKER_FNR), brukerkontekst, mottattDatoTiDagerSiden);
+        assertThat(harMoteplanleggerIBrukEtterDato).isFalse();
+    }
+
+    @Test
+    public void harMoteplanleggerIBrukEtterDato_false_mote_opprettet_etter_grensedato_status_bekreftet() {
+        LocalDateTime datoEldreEnnGrenseDato = mottattDatoTiDagerSiden.plusDays(1);
+        Mote nyesteMote = mote
+                .status(MoteStatus.BEKREFTET)
+                .opprettetTidspunkt(datoEldreEnnGrenseDato);
+
+        when(moteService.findMoterByBrukerAktoerId(anyString())).thenReturn(singletonList(nyesteMote));
+
+
+        Boolean harMoteplanleggerIBrukEtterDato = moteBrukerService.harMoteplanleggerIBruk(new Fodselsnummer(ARBEIDSTAKER_FNR), brukerkontekst, mottattDatoTiDagerSiden);
+        assertThat(harMoteplanleggerIBrukEtterDato).isFalse();
+    }
+
+    @Test
+    public void harMoteplanleggerIBrukEtterDato_true_hvis_mote_opprettet_etter_grensedato_status_opprettet() {
+        LocalDateTime datoEldreEnnGrensedato = mottattDatoTiDagerSiden.plusDays(1);
+        Mote nyesteMote = mote
+                .status(MoteStatus.OPPRETTET)
+                .opprettetTidspunkt(datoEldreEnnGrensedato);
+
+        when(moteService.findMoterByBrukerAktoerId(anyString())).thenReturn(singletonList(nyesteMote));
+
+        Boolean harMoteplanleggerIBrukEtterDato = moteBrukerService.harMoteplanleggerIBruk(new Fodselsnummer(ARBEIDSTAKER_FNR), brukerkontekst, mottattDatoTiDagerSiden);
+
+        assertThat(harMoteplanleggerIBrukEtterDato).isTrue();
+    }
+
+    @Test
+    public void harMoteplanleggerIBrukEtterDato_true_hvis_mote_opprettet_etter_grensedato_status_flere_tidspunkt() {
+        LocalDateTime datoEtterGrensedato = mottattDatoTiDagerSiden.plusDays(1);
+        Mote nyesteMote = mote
+                .status(MoteStatus.FLERE_TIDSPUNKT)
+                .opprettetTidspunkt(datoEtterGrensedato);
+
+        when(moteService.findMoterByBrukerAktoerId(anyString())).thenReturn(singletonList(nyesteMote));
+
+        Boolean harMoteplanleggerIBrukEtterDato = moteBrukerService.harMoteplanleggerIBruk(new Fodselsnummer(ARBEIDSTAKER_FNR), brukerkontekst, mottattDatoTiDagerSiden);
+
+        assertThat(harMoteplanleggerIBrukEtterDato).isTrue();
+    }
+
+    @Test
+    public void harMoteplanleggerIBrukEtterDato_true_hvis_flere_moter_opprettet_etter_grensedato() {
+        LocalDateTime eldsteDatoEtterGrensedato = mottattDatoTiDagerSiden.plusDays(1);
+        LocalDateTime nyesteDatoEtterGrensedato = mottattDatoTiDagerSiden.plusDays(5);
+        final String RIKTIG_UUID = "111-aaa";
+
+        Mote eldsteMoteOpprettetEtterMottatDato = mote
+                .status(MoteStatus.OPPRETTET)
+                .opprettetTidspunkt(eldsteDatoEtterGrensedato);
+        Mote nyesteMote = mote
+                .status(MoteStatus.OPPRETTET)
+                .uuid(RIKTIG_UUID)
+                .opprettetTidspunkt(nyesteDatoEtterGrensedato);
+
+        when(moteService.findMoterByBrukerAktoerId(anyString())).thenReturn(asList(eldsteMoteOpprettetEtterMottatDato, nyesteMote));
+
+        Boolean harMoteplanleggerIBrukEtterDato = moteBrukerService.harMoteplanleggerIBruk(new Fodselsnummer(ARBEIDSTAKER_FNR), brukerkontekst, mottattDatoTiDagerSiden);
+
+        assertThat(harMoteplanleggerIBrukEtterDato).isTrue();
     }
 }

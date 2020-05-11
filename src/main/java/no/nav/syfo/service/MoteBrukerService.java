@@ -2,22 +2,27 @@ package no.nav.syfo.service;
 
 import no.nav.security.oidc.context.OIDCRequestContextHolder;
 import no.nav.syfo.aktorregister.AktorregisterConsumer;
-import no.nav.syfo.aktorregister.domain.*;
+import no.nav.syfo.aktorregister.domain.AktorId;
+import no.nav.syfo.aktorregister.domain.Fodselsnummer;
 import no.nav.syfo.api.domain.bruker.*;
 import no.nav.syfo.domain.model.*;
 import no.nav.syfo.exception.ConflictException;
 import no.nav.syfo.pdl.PdlConsumer;
 import no.nav.syfo.util.Brukerkontekst;
-import org.slf4j.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;
 import javax.ws.rs.NotFoundException;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
 
 import static java.util.stream.Collectors.toList;
 import static no.nav.syfo.api.mappers.BrukerMoteMapper.mote2BrukerMote;
+import static no.nav.syfo.domain.model.MoteStatus.FLERE_TIDSPUNKT;
+import static no.nav.syfo.domain.model.MoteStatus.OPPRETTET;
 import static no.nav.syfo.util.MapUtil.mapListe;
 import static no.nav.syfo.util.OIDCUtil.getSubjectEkstern;
 
@@ -72,6 +77,16 @@ public class MoteBrukerService {
                 .filter((mote) -> mote.opprettetTidspunkt.isAfter(dato))
                 .min((o1, o2) -> o2.opprettetTidspunkt.compareTo(o1.opprettetTidspunkt)))
                 .orElse(Optional.empty());
+    }
+
+    public Boolean harMoteplanleggerIBruk(Fodselsnummer fnr, String brukerkontekst, LocalDateTime tidligsteOpprettetGrense) {
+        String aktorId = aktorregisterConsumer.getAktorIdForFodselsnummer(fnr);
+        return Optional.of(hentBrukerMoteListe(aktorId, brukerkontekst)
+                .stream()
+                .filter((mote) -> mote.status.equals(OPPRETTET.name()) || mote.status.equals(FLERE_TIDSPUNKT.name()))
+                .filter((mote) -> mote.opprettetTidspunkt.isAfter(tidligsteOpprettetGrense))
+                .min((o1, o2) -> o2.opprettetTidspunkt.compareTo(o1.opprettetTidspunkt)))
+                .orElse(Optional.empty()).isPresent();
     }
 
     public List<BrukerMote> hentBrukerMoteListe(String aktorId, String brukerkontekst) {
