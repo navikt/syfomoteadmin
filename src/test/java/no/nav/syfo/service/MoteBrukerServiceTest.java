@@ -138,19 +138,36 @@ public class MoteBrukerServiceTest {
         Boolean harMoteplanleggerIBrukEtterDato = moteBrukerService.harMoteplanleggerIBruk(new Fodselsnummer(ARBEIDSTAKER_FNR), brukerkontekst, mottattDatoTiDagerSiden);
         assertThat(harMoteplanleggerIBrukEtterDato).isFalse();
     }
-
     @Test
-    public void harMoteplanleggerIBrukEtterDato_false_mote_opprettet_etter_grensedato_status_bekreftet() {
+    public void harMoteplanleggerIBrukEtterDato_false_mote_opprettet_etter_grensedato_status_bekreftet_dato_passert() {
         LocalDateTime datoEldreEnnGrenseDato = mottattDatoTiDagerSiden.plusDays(1);
         Mote nyesteMote = mote
                 .status(MoteStatus.BEKREFTET)
+                .valgtTidOgSted(new TidOgSted()
+                        .tid(LocalDateTime.now().minusDays(1))
+                )
                 .opprettetTidspunkt(datoEldreEnnGrenseDato);
 
         when(moteService.findMoterByBrukerAktoerId(anyString())).thenReturn(singletonList(nyesteMote));
 
-
         Boolean harMoteplanleggerIBrukEtterDato = moteBrukerService.harMoteplanleggerIBruk(new Fodselsnummer(ARBEIDSTAKER_FNR), brukerkontekst, mottattDatoTiDagerSiden);
         assertThat(harMoteplanleggerIBrukEtterDato).isFalse();
+    }
+
+    @Test
+    public void harMoteplanleggerIBrukEtterDato_true_mote_opprettet_etter_grensedato_status_bekreftet_dato_ikke_passert() {
+        LocalDateTime datoEldreEnnGrenseDato = mottattDatoTiDagerSiden.plusDays(1);
+        Mote nyesteMote = mote
+                .status(MoteStatus.BEKREFTET)
+                .valgtTidOgSted(new TidOgSted()
+                        .tid(LocalDateTime.now())
+                )
+                .opprettetTidspunkt(datoEldreEnnGrenseDato);
+
+        when(moteService.findMoterByBrukerAktoerId(anyString())).thenReturn(singletonList(nyesteMote));
+
+        Boolean harMoteplanleggerIBrukEtterDato = moteBrukerService.harMoteplanleggerIBruk(new Fodselsnummer(ARBEIDSTAKER_FNR), brukerkontekst, mottattDatoTiDagerSiden);
+        assertThat(harMoteplanleggerIBrukEtterDato).isTrue();
     }
 
     @Test
