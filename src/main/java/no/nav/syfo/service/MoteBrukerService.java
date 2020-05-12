@@ -21,8 +21,7 @@ import java.util.Optional;
 
 import static java.util.stream.Collectors.toList;
 import static no.nav.syfo.api.mappers.BrukerMoteMapper.mote2BrukerMote;
-import static no.nav.syfo.domain.model.MoteStatus.FLERE_TIDSPUNKT;
-import static no.nav.syfo.domain.model.MoteStatus.OPPRETTET;
+import static no.nav.syfo.domain.model.MoteStatus.*;
 import static no.nav.syfo.util.MapUtil.mapListe;
 import static no.nav.syfo.util.OIDCUtil.getSubjectEkstern;
 
@@ -81,9 +80,14 @@ public class MoteBrukerService {
 
     public Boolean harMoteplanleggerIBruk(Fodselsnummer fnr, String brukerkontekst, LocalDateTime tidligsteOpprettetGrense) {
         String aktorId = aktorregisterConsumer.getAktorIdForFodselsnummer(fnr);
+        LocalDateTime today = LocalDateTime.now();
         return Optional.of(hentBrukerMoteListe(aktorId, brukerkontekst)
                 .stream()
-                .filter((mote) -> mote.status.equals(OPPRETTET.name()) || mote.status.equals(FLERE_TIDSPUNKT.name()))
+                .filter((mote) ->
+                        mote.status.equals(OPPRETTET.name())
+                                || mote.status.equals(FLERE_TIDSPUNKT.name())
+                                || (mote.status.equals(BEKREFTET.name()) && today.isBefore(mote.bekreftetAlternativ.tid.plusDays(1)))
+                )
                 .filter((mote) -> mote.opprettetTidspunkt.isAfter(tidligsteOpprettetGrense))
                 .min((o1, o2) -> o2.opprettetTidspunkt.compareTo(o1.opprettetTidspunkt)))
                 .orElse(Optional.empty()).isPresent();
