@@ -55,8 +55,6 @@ spec:
       value: '443'
     - name: APPDYNAMICS_CONTROLLER_SSL_ENABLED
       value: 'true'
-    - name: APPDYNAMICS_AGENT_ACCOUNT_NAME
-      value: PROD
     - name: SECURITYTOKENSERVICE_URL
       value: https://sts.adeo.no/SecurityTokenServiceProvider/
     - name: MODAPP_URL
