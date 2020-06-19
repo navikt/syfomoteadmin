@@ -1,6 +1,6 @@
 package no.nav.syfo.service.varselinnhold;
 
-import no.nav.melding.virksomhet.servicemeldingmedkontaktinformasjon.v1.servicemeldingmedkontaktinformasjon.Parameter;
+import no.nav.melding.virksomhet.servicemeldingmedkontaktinformasjon.v1.servicemeldingmedkontaktinformasjon.WSParameter;
 import no.nav.syfo.domain.model.*;
 import no.nav.syfo.narmesteleder.*;
 import no.nav.syfo.repository.model.PEpost;
@@ -61,7 +61,7 @@ public class ArbeidsgiverVarselService {
         String veiledernavn = erSystemKall ? "NAV" : veiledernavn(innloggetIdent);
         String url = finnLenkeUrlForLeder();
 
-        List<Parameter> parameterListe = new ArrayList<>();
+        List<WSParameter> parameterListe = new ArrayList<>();
         parameterListe.add(createParameter("veiledernavn", veiledernavn));
         parameterListe.add(createParameter("navn", mote.arbeidsgiver().navn.trim()));
 

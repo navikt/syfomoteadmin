@@ -1,0 +1,131 @@
+apiVersion: "nais.io/v1alpha1"
+kind: "Application"
+metadata:
+  name: syfomoteadmin
+  namespace: default
+  labels:
+    team: teamsykefravr
+spec:
+  image: {{ image }}
+  port: 8080
+  team: teamsykefravr
+  liveness:
+    path: /syfomoteadmin/internal/isAlive
+    initialDelay: 20
+    timeout: 1
+    periodSeconds: 10
+    failureThreshold: 3
+  readiness:
+    path: /syfomoteadmin/internal/isReady
+    initialDelay: 20
+    timeout: 1
+  resources:
+    limits:
+      cpu: 3000m
+      memory: 2048Mi
+    requests:
+      cpu: 1000m
+      memory: 1536Mi
+  replicas:
+    min: 2
+    max: 4
+    cpuThresholdPercentage: 80
+  prometheus:
+    enabled: true
+    path: /syfomoteadmin/internal/prometheus
+  ingresses:
+    - "https://syfomoteadmin.nais.preprod.local"
+    - "https://app-q1.adeo.no/syfomoteadmin"
+  vault:
+    enabled: true
+    paths:
+      - kvPath: "/azuread/data/dev/creds/syfomoteadmin"
+        mountPath: "/secrets/azuread/syfomoteadmin"
+      - kvPath: "serviceuser/data/dev/srvssolinux"
+        mountPath: "/secrets/ldap/ldap"
+      - kvPath: "/kv/preprod/fss/syfomoteadmin/default"
+        mountPath: "/var/run/secrets/nais.io/vault"
+  leaderElection: true
+  env:
+    - name: APP_NAME
+      value: "syfomoteadmin"
+    - name: APPDYNAMICS_CONTROLLER_HOST_NAME
+      value: appdynamics.adeo.no
+    - name: APPDYNAMICS_CONTROLLER_PORT
+      value: '443'
+    - name: APPDYNAMICS_CONTROLLER_SSL_ENABLED
+      value: 'true'
+    - name: APPDYNAMICS_AGENT_ACCOUNT_NAME
+      value: NON-PROD
+    - name: SECURITYTOKENSERVICE_URL
+      value: https://sts-q1.preprod.local/SecurityTokenServiceProvider/
+    - name: MODAPP_URL
+      value: https://modapp-q1.adeo.no
+    - name: TJENESTER_URL
+      value: https://tjenester-q1.nav.no
+    - name: TOGGLE_ENABLE_BATCH_PAAMINNELSE
+      value: 'true'
+    - name: SPRING_KAFKA_BOOTSTRAP_SERVERS
+      value: SSL://b27apvl00045.preprod.local:8443,SSL://b27apvl00046.preprod.local:8443,SSL://b27apvl00047.preprod.local:8443
+    - name: SMTPSERVER_HOST
+      value: smtp.preprod.local
+    - name: SMTPSERVER_PORT
+      value: '25'
+    - name: MQGATEWAY03_HOSTNAME
+      value: b27apvl173.preprod.local
+    - name: MQGATEWAY03_PORT
+      value: '1413'
+    - name: MQGATEWAY03_NAME
+      value: MQ1LSC03
+    - name: SYFOMOTEADMIN_CHANNEL_QUEUEMANAGER
+      value: mq://b27apvl173.preprod.local:1413/MQ1LSC03
+    - name: SYFOMOTEADMIN_CHANNEL_NAME
+      value: Q1_SYFOMOTEADMIN
+    - name: SERVICEVARSEL_QUEUENAME
+      value: QA.Q1_VARSELPRODUKSJON.SEND_VARSEL
+    - name: BESTVARSELMHANDLING_QUEUENAME
+      value: QA.Q1_VARSELPRODUKSJON.BEST_VARSEL_M_HANDLING
+    - name: STOPPREVARSEL_QUEUENAME
+      value: QA.Q1_VARSELPRODUKSJON.STOPP_VARSEL_UTSENDING
+    - name: HENVENDELSEOPPGAVEVARSEL_QUEUENAME
+      value: QA.Q1_HENVENDELSE_OPPGAVE.HENVENDELSE
+    - name: TREDJEPARTSVARSEL_QUEUENAME
+      value: QA.Q1_VARSELPRODUKSJON.BEST_SRVMLD_M_KONTAKT
+    - name: NO_NAV_SECURITY_OIDC_ISSUER_INTERN_DISCOVERYURL
+      value: https://isso-q.adeo.no:443/isso/oauth2/.well-known/openid-configuration
+    - name: NO_NAV_SECURITY_OIDC_ISSUER_VEILEDER_DISCOVERYURL
+      value: https://login.microsoftonline.com/966ac572-f5b7-4bbe-aa88-c76419c0f851/.well-known/openid-configuration
+    - name: NO_NAV_SECURITY_OIDC_ISSUER_VEILEDER_ACCEPTEDAUDIENCE
+      value: 38e07d31-659d-4595-939a-f18dce3446c5,595e0237-37db-4d5e-8dde-4fb3d0bf8839,33ad42cc-b88c-45c9-b640-8c8a4c93d3a1
+    - name: NO_NAV_SECURITY_OIDC_ISSUER_SELVBETJENING_DISCOVERYURL
+      value: https://login.microsoftonline.com/NAVtestB2C.onmicrosoft.com/v2.0/.well-known/openid-configuration?p=B2C_1A_idporten_ver1
+    - name: NO_NAV_SECURITY_OIDC_ISSUER_SELVBETJENING_ACCEPTEDAUDIENCE
+      value: 0090b6e1-ffcc-4c37-bc21-049f7d1f0fe5
+    - name: NO_NAV_SECURITY_OIDC_ISSUER_STS_DISCOVERYURL
+      value: http://security-token-service/rest/v1/sts/.well-known/openid-configuration
+    - name: NO_NAV_SECURITY_OIDC_ISSUER_STS_ACCEPTEDAUDIENCE
+      value: srvsyfomotebehov,srvsyfoservice
+    - name: AD_ACCESSTOKEN_URL
+      value: https://login.microsoftonline.com/navq.onmicrosoft.com/oauth2/token
+    - name: AKTORREGISTER_REST_URL
+      value: https://app-q1.adeo.no/aktoerregister/api/v1
+    - name: EREG_BASEURL
+      value: https://modapp-q1.adeo.no
+    - name: PDL_URL
+      value: https://pdl-api.nais.preprod.local/graphql
+    - name: TILGANGSKONTROLLAPI_URL
+      value: https://syfo-tilgangskontroll.nais.preprod.local/syfo-tilgangskontroll/api/tilgang
+    - name: SECURITY_TOKEN_SERVICE_REST_URL
+      value: https://security-token-service.nais.preprod.local
+    - name: SYFOBEHANDLENDEENHET_URL
+      value: https://syfobehandlendeenhet.nais.preprod.local
+    - name: SYFOBRUKERTILGANG_URL
+      value: https://syfobrukertilgang.nais.preprod.local
+    - name: SYFONARMESTELEDER_ID
+      value: a7e7ad0e-4e17-4f19-8aa6-39d73e62fff8
+    - name: LDAP_URL
+      value: ldaps://ldapgw.preprod.local
+    - name: LDAP_BASEDN
+      value: dc=preprod,dc=local
+    - name: KAFKA_ENV_NAME
+      value: q1
