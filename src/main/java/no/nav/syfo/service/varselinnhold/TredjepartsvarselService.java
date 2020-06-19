@@ -36,8 +36,8 @@ public class TredjepartsvarselService {
         this.metrikk = metrikk;
     }
 
-    public void sendVarselTilNaermesteLeder(TredjepartsVarselType type, NarmesteLederRelasjon narmesteLederRelasjon, List<Parameter> parametere) {
-        ServicemeldingMedKontaktinformasjon melding = new ServicemeldingMedKontaktinformasjon();
+    public void sendVarselTilNaermesteLeder(TredjepartsVarselType type, NarmesteLederRelasjon narmesteLederRelasjon, List<WSParameter> parametere) {
+        WSServicemeldingMedKontaktinformasjon melding = new WSServicemeldingMedKontaktinformasjon();
         populerServiceMelding(melding, kontaktinformasjon(narmesteLederRelasjon), narmesteLederRelasjon, type, parametere);
 
 
@@ -47,18 +47,18 @@ public class TredjepartsvarselService {
         metrikk.tellTredjepartVarselSendt(type.name());
     }
 
-    private List<Kontaktinformasjon> kontaktinformasjon(NarmesteLederRelasjon narmesteLederRelasjon) {
+    private List<WSKontaktinformasjon> kontaktinformasjon(NarmesteLederRelasjon narmesteLederRelasjon) {
         return asList(
                 opprettKontaktinformasjon(narmesteLederRelasjon.getNarmesteLederEpost(), "EPOST"),
                 opprettKontaktinformasjon(narmesteLederRelasjon.getNarmesteLederTelefonnummer(), "SMS")
         );
     }
 
-    private void populerServiceMelding(ServicemeldingMedKontaktinformasjon servicemeldingMedKontaktinformasjon,
-                                       List<Kontaktinformasjon> kontaktinformasjon,
+    private void populerServiceMelding(WSServicemeldingMedKontaktinformasjon servicemeldingMedKontaktinformasjon,
+                                       List<WSKontaktinformasjon> kontaktinformasjon,
                                        NarmesteLederRelasjon narmesteLederRelasjon,
                                        TredjepartsVarselType varseltype,
-                                       List<Parameter> parametere) {
+                                       List<WSParameter> parametere) {
         servicemeldingMedKontaktinformasjon.setMottaker(aktoer(narmesteLederRelasjon.getNarmesteLederAktorId()));
         servicemeldingMedKontaktinformasjon.setTilhoerendeOrganisasjon(organisasjon(narmesteLederRelasjon.getOrgnummer()));
         servicemeldingMedKontaktinformasjon.setVarseltypeId(varseltype.getId());
@@ -66,33 +66,33 @@ public class TredjepartsvarselService {
         servicemeldingMedKontaktinformasjon.getKontaktinformasjonListe().addAll(kontaktinformasjon);
     }
 
-    private Kontaktinformasjon opprettKontaktinformasjon(String kontaktinfo, String type) {
-        Kommunikasjonskanaler kanal = new Kommunikasjonskanaler();
+    private WSKontaktinformasjon opprettKontaktinformasjon(String kontaktinfo, String type) {
+        WSKommunikasjonskanaler kanal = new WSKommunikasjonskanaler();
         kanal.setValue(type);
 
-        Kontaktinformasjon kontaktinformasjon = new Kontaktinformasjon();
+        WSKontaktinformasjon kontaktinformasjon = new WSKontaktinformasjon();
         kontaktinformasjon.setKanal(kanal);
         kontaktinformasjon.setKontaktinformasjon(kontaktinfo);
 
         return kontaktinformasjon;
     }
 
-    private Organisasjon organisasjon(String orgnummer) {
-        Organisasjon organisasjon = new Organisasjon();
+    private WSOrganisasjon organisasjon(String orgnummer) {
+        WSOrganisasjon organisasjon = new WSOrganisasjon();
         organisasjon.setOrgnummer(orgnummer);
 
         return organisasjon;
     }
 
-    private Aktoer aktoer(String aktoerId) {
-        AktoerId aktoer = new AktoerId();
+    private WSAktoer aktoer(String aktoerId) {
+        WSAktoerId aktoer = new WSAktoerId();
         aktoer.setAktoerId(aktoerId);
 
         return aktoer;
     }
 
-    public static Parameter createParameter(String key, String value) {
-        Parameter urlParameter = new Parameter();
+    public static WSParameter createParameter(String key, String value) {
+        WSParameter urlParameter = new WSParameter();
         urlParameter.setKey(key);
         urlParameter.setValue(value);
         return urlParameter;
