@@ -28,7 +28,7 @@ val ojdbc8Version = "19.3.0.0"
 
 plugins {
     kotlin("jvm") version "1.3.50"
-    id("io.freefair.lombok") version "4.1.2"
+    id("io.freefair.lombok") version "5.1.0"
     id("org.jetbrains.kotlin.plugin.allopen") version "1.3.50"
     id("java")
     id("com.github.johnrengelman.shadow") version "4.0.3"
