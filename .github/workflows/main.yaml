@@ -3,9 +3,7 @@ name: main
 on: push
 
 env:
-  APP_NAME: syfomoteadmin
   IMAGE: docker.pkg.github.com/${{ github.repository }}/syfomoteadmin:${{ github.sha }}
-  COMMITER_NAME: ${{ github.event.pusher.name }}
 
 jobs:
   build:
@@ -72,14 +70,3 @@ jobs:
           APIKEY: ${{ secrets.NAIS_DEPLOY_APIKEY }}
           CLUSTER: prod-fss
           RESOURCE: naiserator-prod.yaml
-
-  pling:
-    if: github.ref == 'refs/heads/master'
-    name: Pling!
-    needs: deploy-prod
-    runs-on: ubuntu-latest
-    steps:
-      - name: Pling
-        run: |
-          curl -s "https://syfoping.herokuapp.com/regDeploy?deployedBy=${COMMITER_NAME}&app=${APP_NAME}"
-
