@@ -1,8 +1,7 @@
 package no.nav.syfo.narmesteleder
 
 import no.nav.syfo.azuread.AzureAdTokenConsumer
-import no.nav.syfo.config.CacheConfig.CACHENAME_NARMESTELEDER_ANSATTE
-import no.nav.syfo.config.CacheConfig.CACHENAME_NARMESTELEDER_LEDER
+import no.nav.syfo.config.CacheConfig.*
 import no.nav.syfo.metric.Metrikk
 import no.nav.syfo.util.*
 import org.slf4j.LoggerFactory
@@ -63,6 +62,25 @@ class NarmesteLederConsumer @Autowired constructor(
         }
     }
 
+    @Cacheable(value = [CACHENAME_NARMESTELEDER_LEDERE], key = "#aktorId", condition = "#aktorId != null")
+    fun narmestelederRelasjonerLedere(aktorId: String): List<NarmesteLederRelasjon> {
+        try {
+            val response = restTemplate.exchange<List<NarmesteLederRelasjon>>(
+                    getLedereUrl(aktorId),
+                    HttpMethod.GET,
+                    entity(),
+                    object : ParameterizedTypeReference<List<NarmesteLederRelasjon>>() {}
+            )
+            metrikk.countEvent(CALL_SYFONARMESTELEDER_LEDERE_SUCCESS)
+
+            return response.body!!
+        } catch (e: RestClientResponseException) {
+            LOG.error("Request to get Ledere from Syfonarmesteleder failed with status ${e.rawStatusCode} and message: ${e.responseBodyAsString}" )
+            metrikk.countEvent(CALL_SYFONARMESTELEDER_LEDERE_FAIL)
+            throw e
+        }
+    }
+
     private fun entity(): HttpEntity<*> {
         val token = azureAdTokenConsumer.accessToken(syfonarmestelederId)
         val headers = HttpHeaders()
@@ -83,6 +101,10 @@ class NarmesteLederConsumer @Autowired constructor(
                 .toUriString()
     }
 
+    private fun getLedereUrl(aktorId: String): String {
+        return "$SYFONARMESTELEDER_BASEURL/sykmeldt/$aktorId/narmesteledere"
+    }
+
     companion object {
         private val LOG = LoggerFactory.getLogger(NarmesteLederConsumer::class.java)
         private const val SYFONARMESTELEDER_BASEURL = "http://syfonarmesteleder/syfonarmesteleder"
@@ -94,5 +116,9 @@ class NarmesteLederConsumer @Autowired constructor(
         private const val CALL_SYFONARMESTELEDER_LEDER_BASE = "call_syfonarmesteleder_leder"
         private const val CALL_SYFONARMESTELEDER_LEDER_FAIL = "${CALL_SYFONARMESTELEDER_LEDER_BASE}_fail"
         private const val CALL_SYFONARMESTELEDER_LEDER_SUCCESS = "${CALL_SYFONARMESTELEDER_LEDER_BASE}_success"
+
+        private const val CALL_SYFONARMESTELEDER_LEDERE_BASE = "call_syfonarmesteledere_leder"
+        private const val CALL_SYFONARMESTELEDER_LEDERE_FAIL = "${CALL_SYFONARMESTELEDER_LEDER_BASE}_fail"
+        private const val CALL_SYFONARMESTELEDER_LEDERE_SUCCESS = "${CALL_SYFONARMESTELEDER_LEDER_BASE}_success"
     }
 }
