@@ -28,7 +28,7 @@ class NarmesteLederUtilTest {
     }
 
     @Test(expected = RuntimeException::class)
-    fun `Throw Exception when no leaders are from correct orgnummer`() {
+    fun `Throw Exception when all leaders are from wrong virksomhet`() {
         val ledere = listOf(generateNarmesteLederRelasjon(orgnummer = WRONG_ORGNUMMER))
         val mote = mockMote
 
@@ -47,7 +47,7 @@ class NarmesteLederUtilTest {
     }
 
     @Test
-    fun `Return correct leader when one leader is old eanough, and one has aktivFom after mote is created`() {
+    fun `Return correct leader when one leader is old enough, and one has aktivFom after mote is created`() {
         val correctLeader = generateNarmesteLederRelasjon(orgnummer = ORGNUMMER, aktivFom = FIFTEEN_DAYS_AGO)
         val wrongLeader = generateNarmesteLederRelasjon(orgnummer = ORGNUMMER, aktivFom = FIVE_DAYS_AGO)
         val ledere = listOf(wrongLeader, correctLeader)

@@ -1,6 +1,6 @@
 package no.nav.syfo.util
 
-import no.nav.syfo.domain.model.*
+import no.nav.syfo.domain.model.Mote
 import no.nav.syfo.narmesteleder.NarmesteLederRelasjon
 import java.time.LocalDate
 
@@ -9,8 +9,9 @@ fun narmesteLederForMeeting(narmesteLedere: List<NarmesteLederRelasjon>, mote: M
     val wantedOrgnummer = mote.arbeidsgiver().orgnummer
     val moteOpprettetDate = mote.opprettetTidspunkt.toLocalDate()
 
-    val narmesteLeder = narmesteLedere.filter { isLeaderForOrgnummerAndAktivFomBeforeDate(it, wantedOrgnummer, moteOpprettetDate) }
-            .maxBy { it.aktivFom }
+    val narmesteLeder = narmesteLedere.filter {
+        isLeaderForOrgnummerAndAktivFomBeforeDate(it, wantedOrgnummer, moteOpprettetDate)
+    }.maxBy { it.aktivFom }
 
     return narmesteLeder ?: throw RuntimeException("Kunne ikke finne leder for det gitte møtet")
 }
