@@ -7,7 +7,7 @@ import java.time.LocalDate
 
 fun narmesteLederForMeeting(narmesteLedere: List<NarmesteLederRelasjon>, mote: Mote): NarmesteLederRelasjon? {
     val wantedOrgnummer = mote.arbeidsgiver().orgnummer
-    val moteOpprettetDate = mote.opprettetTidspunkt.toLocalDate()
+    val moteOpprettetDate = mote.opprettetTidspunkt?.toLocalDate() ?: LocalDate.now()
 
     val narmesteLeder = narmesteLedere.filter {
         isLeaderForOrgnummerAndAktivFomBeforeDate(it, wantedOrgnummer, moteOpprettetDate)
