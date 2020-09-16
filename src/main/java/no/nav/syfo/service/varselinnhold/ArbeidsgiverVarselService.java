@@ -9,14 +9,17 @@ import org.slf4j.*;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.*;
 
 import static java.util.Arrays.asList;
+import static java.util.Comparator.comparing;
 import static java.util.Optional.ofNullable;
 import static no.nav.syfo.domain.model.TredjepartsVarselType.*;
 import static no.nav.syfo.domain.model.Varseltype.*;
 import static no.nav.syfo.service.varselinnhold.TredjepartsvarselService.createParameter;
 import static no.nav.syfo.util.EpostInnholdUtil.*;
+import static no.nav.syfo.util.NarmesteLederUtilKt.narmesteLederForMeeting;
 import static no.nav.syfo.util.time.DateUtil.tilKortDato;
 import static no.nav.syfo.util.time.DateUtil.tilLangDatoMedKlokkeslettPostfixDagPrefix;
 
@@ -88,7 +91,8 @@ public class ArbeidsgiverVarselService {
         }
 
         if (ofNullable(varselNokkel).isPresent()) {
-            NarmesteLederRelasjon narmesteLederRelasjon = narmesteLederConsumer.narmesteLederRelasjonLeder(mote.sykmeldt().aktorId, mote.arbeidsgiver().orgnummer);
+            List<NarmesteLederRelasjon> narmesteLedere = narmesteLederConsumer.narmestelederRelasjonerLedere(mote.sykmeldt().aktorId);
+            NarmesteLederRelasjon narmesteLederRelasjon = narmesteLederForMeeting(narmesteLedere, mote);
             tredjepartsvarselService.sendVarselTilNaermesteLeder(varselNokkel, narmesteLederRelasjon, parameterListe);
         } else {
             log.error("Fant ikke varselnøkkel for varseltype {}", varseltype);
