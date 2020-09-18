@@ -3,21 +3,27 @@ package no.nav.syfo.api.ressurser.azuread;
 import no.nav.security.oidc.api.ProtectedWithClaims;
 import no.nav.security.oidc.context.OIDCRequestContextHolder;
 import no.nav.syfo.aktorregister.AktorregisterConsumer;
-import no.nav.syfo.aktorregister.domain.*;
-import no.nav.syfo.api.domain.*;
+import no.nav.syfo.aktorregister.domain.AktorId;
+import no.nav.syfo.aktorregister.domain.Fodselsnummer;
+import no.nav.syfo.api.domain.RSMote;
+import no.nav.syfo.api.domain.RSTilgang;
 import no.nav.syfo.api.domain.nyttmoterequest.RSNyttMoteRequest;
 import no.nav.syfo.axsys.AxsysConsumer;
 import no.nav.syfo.behandlendeenhet.BehandlendeEnhetConsumer;
 import no.nav.syfo.domain.model.*;
 import no.nav.syfo.metric.Metrikk;
-import no.nav.syfo.narmesteleder.*;
+import no.nav.syfo.narmesteleder.NarmesteLederConsumer;
+import no.nav.syfo.narmesteleder.NarmesteLederRelasjon;
 import no.nav.syfo.pdl.PdlConsumer;
-import no.nav.syfo.repository.dao.*;
-import no.nav.syfo.repository.model.*;
+import no.nav.syfo.repository.dao.MotedeltakerDAO;
+import no.nav.syfo.repository.dao.TidOgStedDAO;
+import no.nav.syfo.repository.model.PMotedeltakerAktorId;
+import no.nav.syfo.repository.model.PMotedeltakerArbeidsgiver;
 import no.nav.syfo.service.*;
-import no.nav.syfo.service.varselinnhold.*;
+import no.nav.syfo.service.varselinnhold.ArbeidsgiverVarselService;
+import no.nav.syfo.service.varselinnhold.SykmeldtVarselService;
 import no.nav.syfo.veiledertilgang.VeilederTilgangConsumer;
-import org.springframework.transaction.annotation.*;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
@@ -37,6 +43,7 @@ import static no.nav.syfo.domain.model.Varseltype.OPPRETTET;
 import static no.nav.syfo.oidc.OIDCIssuer.AZURE;
 import static no.nav.syfo.util.MapUtil.map;
 import static no.nav.syfo.util.MapUtil.mapListe;
+import static no.nav.syfo.util.MoteUtilKt.erRSMotePassert;
 import static no.nav.syfo.util.OIDCUtil.getSubjectInternAzure;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.util.StringUtils.isEmpty;
@@ -182,7 +189,8 @@ public class MoterInternController {
     private boolean trengerBehandling(RSMote rsMote) {
         return moteService.harAlleSvartPaSisteForesporselRs(rsMote)
                 && !"bekreftet".equalsIgnoreCase(rsMote.status)
-                && !"avbrutt".equalsIgnoreCase(rsMote.status);
+                && !"avbrutt".equalsIgnoreCase(rsMote.status)
+                && !erRSMotePassert(rsMote);
     }
 
     private List<Mote> populerMedTpsData(List<Mote> moter) {
