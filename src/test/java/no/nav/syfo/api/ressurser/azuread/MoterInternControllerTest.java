@@ -2,19 +2,24 @@ package no.nav.syfo.api.ressurser.azuread;
 
 import no.nav.syfo.LocalApplication;
 import no.nav.syfo.aktorregister.AktorregisterConsumer;
-import no.nav.syfo.aktorregister.domain.*;
+import no.nav.syfo.aktorregister.domain.AktorId;
+import no.nav.syfo.aktorregister.domain.Fodselsnummer;
 import no.nav.syfo.api.domain.RSMote;
 import no.nav.syfo.api.domain.nyttmoterequest.RSNyttMoteRequest;
 import no.nav.syfo.api.ressurser.AbstractRessursTilgangTest;
-import no.nav.syfo.axsys.*;
+import no.nav.syfo.axsys.AxsysConsumer;
+import no.nav.syfo.axsys.AxsysEnhet;
 import no.nav.syfo.domain.model.*;
 import no.nav.syfo.metric.Metrikk;
 import no.nav.syfo.narmesteleder.NarmesteLederConsumer;
 import no.nav.syfo.pdl.PdlConsumer;
-import no.nav.syfo.repository.dao.*;
-import no.nav.syfo.repository.model.*;
+import no.nav.syfo.repository.dao.MotedeltakerDAO;
+import no.nav.syfo.repository.dao.TidOgStedDAO;
+import no.nav.syfo.repository.model.PMotedeltakerAktorId;
+import no.nav.syfo.repository.model.PMotedeltakerArbeidsgiver;
 import no.nav.syfo.service.*;
-import no.nav.syfo.service.varselinnhold.*;
+import no.nav.syfo.service.varselinnhold.ArbeidsgiverVarselService;
+import no.nav.syfo.service.varselinnhold.SykmeldtVarselService;
 import no.nav.syfo.sts.StsConsumer;
 import no.nav.syfo.veiledertilgang.VeilederTilgangConsumer;
 import org.junit.*;
@@ -31,7 +36,8 @@ import org.springframework.web.client.RestTemplate;
 import javax.inject.Inject;
 import javax.ws.rs.ForbiddenException;
 import java.text.ParseException;
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
 
 import static java.time.LocalDateTime.now;
 import static java.util.Arrays.asList;
@@ -114,6 +120,7 @@ public class MoterInternControllerTest extends AbstractRessursTilgangTest {
         when(aktorregisterConsumer.getFnrForAktorId(new AktorId(AKTOER_ID_2))).thenReturn(FNR_2);
         when(aktorregisterConsumer.getFnrForAktorId(new AktorId(LEDER_AKTORID))).thenReturn(LEDER_FNR);
         when(moteService.findMoterByBrukerNavEnhet(NAV_ENHET)).thenReturn(MoteList);
+        when(moteService.moterWithMaxTwoMonthOldTidEnhet(NAV_ENHET)).thenReturn(MoteList);
     }
 
     @After
