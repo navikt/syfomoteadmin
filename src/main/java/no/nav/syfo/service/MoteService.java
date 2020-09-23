@@ -28,6 +28,7 @@ import static no.nav.syfo.kafka.producer.OversikthendelseType.MOTEPLANLEGGER_ALL
 import static no.nav.syfo.kafka.producer.OversikthendelseType.MOTEPLANLEGGER_ALLE_SVAR_MOTTATT;
 import static no.nav.syfo.repository.model.PFeedHendelse.FeedHendelseType.ALLE_SVAR_MOTTATT;
 import static no.nav.syfo.service.MotedeltakerService.finnAktoerIMote;
+import static no.nav.syfo.util.MoteUtilKt.moterAfterGivenDate;
 import static no.nav.syfo.util.MoterUtil.filtrerBortAlternativerSomAlleredeErLagret;
 import static no.nav.syfo.util.MoterUtil.hentSisteSvartidspunkt;
 
@@ -256,8 +257,22 @@ public class MoteService {
         return moteDAO.findMoterByNavAnsatt(navansatt);
     }
 
+    public List<Mote> maxTwoMonthOldMoterVeileder(String navansatt) {
+        List<Mote> allNavAnsattMoter = findMoterByBrukerNavAnsatt(navansatt);
+
+        LocalDateTime twoMonthsAgo = LocalDateTime.now().minusMonths(2);
+        return moterAfterGivenDate(allNavAnsattMoter, twoMonthsAgo);
+    }
+
     public List<Mote> findMoterByBrukerNavEnhet(String navenhet) {
         return moteDAO.findMoterByNavEnhet(navenhet);
+    }
+
+    public List<Mote> maxTwoMonthOldMoterEnhet(String navenhet) {
+        List<Mote> allEnhetMoter = findMoterByBrukerNavEnhet(navenhet);
+
+        LocalDateTime twoMonthsAgo = LocalDateTime.now().minusMonths(2);
+        return moterAfterGivenDate(allEnhetMoter, twoMonthsAgo);
     }
 
     private void opprettFeedHendelseAvTypen(PFeedHendelse.FeedHendelseType type, Mote Mote, String veilederIdent) {
