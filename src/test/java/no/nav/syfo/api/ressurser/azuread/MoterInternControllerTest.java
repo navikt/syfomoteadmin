@@ -120,7 +120,7 @@ public class MoterInternControllerTest extends AbstractRessursTilgangTest {
         when(aktorregisterConsumer.getFnrForAktorId(new AktorId(AKTOER_ID_2))).thenReturn(FNR_2);
         when(aktorregisterConsumer.getFnrForAktorId(new AktorId(LEDER_AKTORID))).thenReturn(LEDER_FNR);
         when(moteService.findMoterByBrukerNavEnhet(NAV_ENHET)).thenReturn(MoteList);
-        when(moteService.moterWithMaxTwoMonthOldTidEnhet(NAV_ENHET)).thenReturn(MoteList);
+        when(moteService.maxTwoMonthOldMoterEnhet(NAV_ENHET)).thenReturn(MoteList);
     }
 
     @After

@@ -9,6 +9,6 @@ fun newestTidFromMoteAlternativ(mote: Mote): LocalDateTime {
     return alternativWithBiggestTid!!.tid
 }
 
-fun moterWithTidAfterGivenDate(moter: List<Mote>, date: LocalDateTime): List<Mote> {
+fun moterAfterGivenDate(moter: List<Mote>, date: LocalDateTime): List<Mote> {
     return moter.filter { newestTidFromMoteAlternativ(it).isAfter(date) }
 }

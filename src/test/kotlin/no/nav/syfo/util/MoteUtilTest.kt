@@ -19,7 +19,7 @@ class MoteUtilTest {
     @Test
     fun `moterWithTidAfterGivenDate Return empty list when empty list is provided`() {
         val emptyMoterList = emptyList<Mote>()
-        val actualMoteList = moterWithTidAfterGivenDate(emptyMoterList, NOW)
+        val actualMoteList = moterAfterGivenDate(emptyMoterList, NOW)
 
         assertThat(actualMoteList.size).isEqualTo(0)
     }
@@ -27,7 +27,7 @@ class MoteUtilTest {
     @Test
     fun `moterWithTidAfterGivenDate Return empty list when all moter is before given date`() {
         val moterWithOldTid = listOf(createMoteWithGivenTid(TEN_DAYS_AGO))
-        val actualMoteList = moterWithTidAfterGivenDate(moterWithOldTid, NOW)
+        val actualMoteList = moterAfterGivenDate(moterWithOldTid, NOW)
 
         assertThat(actualMoteList.size).isEqualTo(0)
     }
@@ -35,7 +35,7 @@ class MoteUtilTest {
     @Test
     fun `moterWithTidAfterGivenDate Return list with one element when one mote is after given date`() {
         val moterWithNewTid = listOf(createMoteWithGivenTid(TEN_DAYS_FROM_NOW))
-        val actualMoteList = moterWithTidAfterGivenDate(moterWithNewTid, NOW)
+        val actualMoteList = moterAfterGivenDate(moterWithNewTid, NOW)
 
         assertThat(actualMoteList.size).isEqualTo(1)
     }
@@ -46,7 +46,7 @@ class MoteUtilTest {
                 createMoteWithGivenTid(TEN_DAYS_FROM_NOW),
                 createMoteWithGivenTid(TEN_DAYS_AGO)
         )
-        val actualMoteList = moterWithTidAfterGivenDate(moterWithMixedTid, NOW)
+        val actualMoteList = moterAfterGivenDate(moterWithMixedTid, NOW)
 
         assertThat(actualMoteList.size).isEqualTo(1)
     }

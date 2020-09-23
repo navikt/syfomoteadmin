@@ -132,13 +132,13 @@ public class MoterInternController {
 
         List<Mote> moterByVeileder = new ArrayList<>();
         if (!isEmpty(veiledersMoter) && veiledersMoter) {
-            moterByVeileder.addAll(moteService.moterWithMaxTwoMonthOldTidVeileder(getSubjectInternAzure(contextHolder)));
+            moterByVeileder.addAll(moteService.maxTwoMonthOldMoterVeileder(getSubjectInternAzure(contextHolder)));
             moter.addAll(moterByVeileder);
         }
 
         List<Mote> moterByNavEnhet = new ArrayList<>();
         if (!isEmpty(navenhet) && hoererNavEnhetTilBruker(navenhet, getSubjectInternAzure(contextHolder))) {
-            moterByNavEnhet.addAll(moteService.moterWithMaxTwoMonthOldTidEnhet(navenhet));
+            moterByNavEnhet.addAll(moteService.maxTwoMonthOldMoterEnhet(navenhet));
             moter.addAll(moterByNavEnhet);
         }
 
