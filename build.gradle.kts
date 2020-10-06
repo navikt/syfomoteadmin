@@ -28,13 +28,13 @@ val flywayVersion = "5.1.4"
 val ojdbc8Version = "19.3.0.0"
 
 plugins {
-    kotlin("jvm") version "1.3.50"
+    kotlin("jvm") version "1.4.10"
     id("io.freefair.lombok") version "5.1.0"
-    id("org.jetbrains.kotlin.plugin.allopen") version "1.3.50"
+    id("org.jetbrains.kotlin.plugin.allopen") version "1.4.10"
     id("java")
     id("com.github.johnrengelman.shadow") version "4.0.3"
     id("org.springframework.boot") version "2.1.8.RELEASE"
-    id("io.spring.dependency-management") version "1.0.9.RELEASE"
+    id("io.spring.dependency-management") version "1.0.10.RELEASE"
 }
 
 allOpen {
