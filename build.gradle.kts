@@ -49,8 +49,6 @@ val githubUser: String by project
 val githubPassword: String by project
 repositories {
     mavenCentral()
-    jcenter()
-    maven(url="https://dl.bintray.com/kotlin/kotlinx/")
     maven(url = "https://repo1.maven.org/maven2/")
     maven {
         url = uri("https://maven.pkg.github.com/navikt/tjenestespesifikasjoner")
