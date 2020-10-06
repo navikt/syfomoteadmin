@@ -22,7 +22,9 @@ val javaxInjectVersion = "1"
 val jose4jVersion = "0.5.0"
 val aspectjweaverVersion = "1.8.8"
 val apacheCommonsVersion = "3.5"
+val javaxActivationVersion = "1.2.0"
 val javaxMailVersion = "1.5.0-b01"
+val jaxRiVersion = "2.3.2"
 
 val flywayVersion = "5.1.4"
 val ojdbc8Version = "19.3.0.0"
@@ -82,6 +84,9 @@ dependencies {
     testImplementation("org.springframework.kafka:spring-kafka-test")
     implementation("org.springframework:spring-jms")
 
+    implementation("com.sun.xml.ws:jaxws-ri:$jaxRiVersion")
+    implementation("com.sun.activation:javax.activation:$javaxActivationVersion")
+
     implementation("com.nimbusds:oauth2-oidc-sdk:$nimbusSDKVersion")
     implementation("no.nav.security:oidc-spring-support:$oidcSupportVersion")
     testImplementation("no.nav.security:oidc-test-support:$oidcSupportVersion")
@@ -134,11 +139,7 @@ tasks {
     }
 
 
-    named<KotlinCompile>("compileKotlin") {
-        kotlinOptions.jvmTarget = "1.8"
-    }
-
-    named<KotlinCompile>("compileTestKotlin") {
-        kotlinOptions.jvmTarget = "1.8"
+    withType<KotlinCompile> {
+        kotlinOptions.jvmTarget = "11"
     }
 }
