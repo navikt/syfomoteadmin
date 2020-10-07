@@ -3,7 +3,8 @@ package no.nav.syfo.util;
 import com.nimbusds.jwt.JWTClaimsSet;
 import no.nav.security.oidc.OIDCConstants;
 import no.nav.security.oidc.context.*;
-import no.nav.syfo.oidc.*;
+import no.nav.syfo.oidc.OIDCClaim;
+import no.nav.syfo.oidc.OIDCIssuer;
 
 import java.text.ParseException;
 import java.util.Optional;
@@ -33,13 +34,6 @@ public class OIDCUtil {
         return Optional.ofNullable(claimSet(contextHolder, OIDCIssuer.EKSTERN))
                 .map(JWTClaimsSet::getSubject)
                 .orElse(null);
-    }
-
-    public static String getIssuerToken(OIDCRequestContextHolder contextHolder, String issuer) {
-        OIDCValidationContext context = (OIDCValidationContext) contextHolder
-                .getRequestAttribute(OIDC_VALIDATION_CONTEXT);
-        TokenContext tokenContext = context.getToken(issuer);
-        return tokenContext.getIdToken();
     }
 
     public static String getSubjectInternAzure(OIDCRequestContextHolder contextHolder) {
