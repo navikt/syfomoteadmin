@@ -3,9 +3,8 @@ package no.nav.syfo.util
 import no.nav.syfo.domain.model.Mote
 import java.time.LocalDateTime
 
-
 fun newestTidFromMoteAlternativ(mote: Mote): LocalDateTime {
-    val alternativWithBiggestTid = mote.alternativer.maxBy { it.tid }
+    val alternativWithBiggestTid = mote.alternativer.maxByOrNull { it.tid }
     return alternativWithBiggestTid!!.tid
 }
 

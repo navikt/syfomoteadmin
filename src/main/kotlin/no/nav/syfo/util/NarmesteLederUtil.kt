@@ -11,7 +11,7 @@ fun narmesteLederForMeeting(narmesteLedere: List<NarmesteLederRelasjon>, mote: M
 
     val narmesteLeder = narmesteLedere.filter {
         isLeaderForOrgnummerAndAktivFomBeforeDate(it, wantedOrgnummer, moteOpprettetDate)
-    }.maxBy { it.aktivFom }
+    }.maxByOrNull { it.aktivFom }
 
     return narmesteLeder ?: throw RuntimeException("Kunne ikke finne leder for det gitte møtet")
 }
