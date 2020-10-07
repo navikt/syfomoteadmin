@@ -6,10 +6,10 @@ import no.nav.syfo.api.domain.nyttmoterequest.RSNyttAlternativ
 import no.nav.syfo.api.mappers.RSNyttMoteMapper.opprett2TidOgSted
 import no.nav.syfo.domain.model.TidOgSted
 import no.nav.syfo.metric.Metrikk
-import no.nav.syfo.oidc.OIDCIssuer.AZURE
+import no.nav.syfo.api.auth.OIDCIssuer.AZURE
 import no.nav.syfo.service.MoteService
 import no.nav.syfo.util.MapUtil.mapListe
-import no.nav.syfo.util.OIDCUtil.getSubjectInternAzure
+import no.nav.syfo.api.auth.OIDCUtil.getSubjectInternAzure
 import org.springframework.http.MediaType.APPLICATION_JSON_VALUE
 import org.springframework.web.bind.annotation.*
 import javax.inject.Inject

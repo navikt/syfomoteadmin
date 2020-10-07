@@ -2,7 +2,7 @@ package no.nav.syfo.controller.internad
 
 import no.nav.security.oidc.context.OIDCRequestContextHolder
 import no.nav.syfo.LocalApplication
-import no.nav.syfo.oidc.OIDCIssuer
+import no.nav.syfo.api.auth.OIDCIssuer
 import no.nav.syfo.testhelper.OidcTestHelper.loggUtAlle
 import no.nav.syfo.veiledertilgang.VeilederTilgangConsumer
 import org.junit.After

@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import java.time.LocalDateTime;
 
-import static no.nav.syfo.oidc.OIDCIssuer.STS;
+import static no.nav.syfo.api.auth.OIDCIssuer.STS;
 import static no.nav.syfo.util.RequestUtilKt.NAV_PERSONIDENTER_HEADER;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 

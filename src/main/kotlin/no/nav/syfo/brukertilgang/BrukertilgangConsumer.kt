@@ -2,7 +2,8 @@ package no.nav.syfo.brukertilgang
 
 import no.nav.security.oidc.context.OIDCRequestContextHolder
 import no.nav.syfo.metric.Metrikk
-import no.nav.syfo.oidc.OIDCIssuer
+import no.nav.syfo.api.auth.OIDCIssuer
+import no.nav.syfo.api.auth.OIDCUtil
 import no.nav.syfo.util.*
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value

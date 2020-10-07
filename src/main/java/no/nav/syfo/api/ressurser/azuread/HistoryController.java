@@ -13,7 +13,7 @@ import javax.inject.Inject;
 import java.util.ArrayList;
 import java.util.List;
 
-import static no.nav.syfo.oidc.OIDCIssuer.AZURE;
+import static no.nav.syfo.api.auth.OIDCIssuer.AZURE;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController

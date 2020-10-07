@@ -13,8 +13,8 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 import java.util.List;
 
-import static no.nav.syfo.oidc.OIDCIssuer.EKSTERN;
-import static no.nav.syfo.util.OIDCUtil.getSubjectEkstern;
+import static no.nav.syfo.api.auth.OIDCIssuer.EKSTERN;
+import static no.nav.syfo.api.auth.OIDCUtil.getSubjectEkstern;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
 @RestController

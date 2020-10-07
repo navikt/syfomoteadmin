@@ -2,7 +2,7 @@ package no.nav.syfo.controller.internad.virksomhet
 
 import no.nav.security.oidc.api.ProtectedWithClaims
 import no.nav.syfo.ereg.EregConsumer
-import no.nav.syfo.oidc.OIDCIssuer.AZURE
+import no.nav.syfo.api.auth.OIDCIssuer.AZURE
 import org.apache.commons.lang3.text.WordUtils.capitalize
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.*

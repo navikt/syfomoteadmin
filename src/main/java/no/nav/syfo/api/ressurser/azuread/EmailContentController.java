@@ -14,8 +14,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;
 
-import static no.nav.syfo.oidc.OIDCIssuer.AZURE;
-import static no.nav.syfo.util.OIDCUtil.getSubjectInternAzure;
+import static no.nav.syfo.api.auth.OIDCIssuer.AZURE;
+import static no.nav.syfo.api.auth.OIDCUtil.getSubjectInternAzure;
 import static no.nav.syfo.util.ServiceVarselInnholdUtil.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 

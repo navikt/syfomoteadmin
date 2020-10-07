@@ -4,7 +4,7 @@ import com.nimbusds.jwt.JWTClaimsSet
 import com.nimbusds.jwt.SignedJWT
 import no.nav.security.oidc.context.*
 import no.nav.security.oidc.test.support.JwtTokenGenerator
-import no.nav.syfo.oidc.OIDCIssuer
+import no.nav.syfo.api.auth.OIDCIssuer
 import java.text.ParseException
 
 object OidcTestHelper {

@@ -4,9 +4,9 @@ import no.nav.security.oidc.api.ProtectedWithClaims
 import no.nav.security.oidc.context.OIDCRequestContextHolder
 import no.nav.syfo.axsys.AxsysConsumer
 import no.nav.syfo.axsys.AxsysEnhet
-import no.nav.syfo.oidc.OIDCIssuer
+import no.nav.syfo.api.auth.OIDCIssuer
 import no.nav.syfo.service.VeilederService
-import no.nav.syfo.util.OIDCUtil
+import no.nav.syfo.api.auth.OIDCUtil
 import org.springframework.http.MediaType
 import org.springframework.web.bind.annotation.*
 import java.util.stream.Collectors.toList

@@ -23,7 +23,7 @@ import static java.util.stream.Collectors.toList;
 import static no.nav.syfo.api.mappers.BrukerMoteMapper.mote2BrukerMote;
 import static no.nav.syfo.domain.model.MoteStatus.*;
 import static no.nav.syfo.util.MapUtil.mapListe;
-import static no.nav.syfo.util.OIDCUtil.getSubjectEkstern;
+import static no.nav.syfo.api.auth.OIDCUtil.getSubjectEkstern;
 
 @Service
 public class MoteBrukerService {
