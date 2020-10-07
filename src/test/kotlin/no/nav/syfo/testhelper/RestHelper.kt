@@ -1,9 +1,8 @@
-package no.nav.syfo.controller.testhelper
+package no.nav.syfo.testhelper
 
 import com.fasterxml.jackson.core.JsonProcessingException
 import com.fasterxml.jackson.databind.ObjectMapper
 import no.nav.syfo.behandlendeenhet.BehandlendeEnhet
-import no.nav.syfo.testhelper.UserConstants
 import no.nav.syfo.testhelper.UserConstants.STS_TOKEN
 import no.nav.syfo.util.basicCredentials
 import no.nav.syfo.util.bearerCredentials

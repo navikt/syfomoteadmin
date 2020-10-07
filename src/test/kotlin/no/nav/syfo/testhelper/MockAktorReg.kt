@@ -1,4 +1,4 @@
-package no.nav.syfo.controller.testhelper
+package no.nav.syfo.testhelper
 
 private const val MOCK_AKTORID_PREFIX = "10"
 

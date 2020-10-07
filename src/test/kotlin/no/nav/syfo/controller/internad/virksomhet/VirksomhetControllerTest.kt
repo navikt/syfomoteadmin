@@ -5,7 +5,6 @@ import no.nav.syfo.ereg.EregConsumer
 import no.nav.syfo.testhelper.UserConstants
 import org.junit.*
 import org.junit.runner.RunWith
-import org.mockito.Mockito
 import org.mockito.Mockito.`when`
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.boot.test.mock.mockito.MockBean
