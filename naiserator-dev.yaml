@@ -89,8 +89,6 @@ spec:
       value: QA.Q1_HENVENDELSE_OPPGAVE.HENVENDELSE
     - name: TREDJEPARTSVARSEL_QUEUENAME
       value: QA.Q1_VARSELPRODUKSJON.BEST_SRVMLD_M_KONTAKT
-    - name: NO_NAV_SECURITY_OIDC_ISSUER_INTERN_DISCOVERYURL
-      value: https://isso-q.adeo.no:443/isso/oauth2/.well-known/openid-configuration
     - name: NO_NAV_SECURITY_OIDC_ISSUER_VEILEDER_DISCOVERYURL
       value: https://login.microsoftonline.com/966ac572-f5b7-4bbe-aa88-c76419c0f851/.well-known/openid-configuration
     - name: NO_NAV_SECURITY_OIDC_ISSUER_VEILEDER_ACCEPTEDAUDIENCE

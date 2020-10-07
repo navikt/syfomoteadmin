@@ -1,14 +1,10 @@
 no.nav.security.oidc:
-  issuers: selvbetjening,intern,veileder,sts
+  issuers: selvbetjening,veileder,sts
   issuer:
     selvbetjening:
       discoveryurl: <SETTES FRA MILJØCONFIG>
       accepted_audience: <SETTES FRA MILJØCONFIG>
       cookie_name: selvbetjening-idtoken
-    intern:
-      discoveryurl: <SETTES FRA MILJØCONFIG>
-      accepted_audience: modiabrukerdialog-p,modiabrukerdialog-q1,veilarblogin-p,veilarblogin-q1,fpsak-frontend-p,fpsak-frontend-q1,fplos-p,fplos-q1
-      cookie_name: ID_token
     veileder:
       discoveryurl: <SETTES FRA MILJØCONFIG>
       accepted_audience: <SETTES FRA MILJØCONFIG>
