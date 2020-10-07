@@ -1,11 +1,11 @@
 package no.nav.syfo.controller.internad
 
 import no.nav.syfo.LocalApplication
-import no.nav.syfo.aktorregister.AktorregisterConsumer
-import no.nav.syfo.aktorregister.domain.AktorId
+import no.nav.syfo.consumer.aktorregister.AktorregisterConsumer
+import no.nav.syfo.consumer.aktorregister.domain.AktorId
 import no.nav.syfo.api.ressurser.azuread.PersonController
-import no.nav.syfo.dkif.DkifConsumer
-import no.nav.syfo.pdl.PdlConsumer
+import no.nav.syfo.consumer.dkif.DkifConsumer
+import no.nav.syfo.consumer.pdl.PdlConsumer
 import no.nav.syfo.testhelper.OidcTestHelper.loggInnVeilederAzure
 import no.nav.syfo.testhelper.OidcTestHelper.loggUtAlle
 import no.nav.syfo.testhelper.UserConstants.ARBEIDSTAKER_AKTORID

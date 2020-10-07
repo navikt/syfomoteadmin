@@ -1,12 +1,12 @@
 package no.nav.syfo.api.ressurser.azuread;
 
 import no.nav.security.oidc.api.ProtectedWithClaims;
-import no.nav.syfo.aktorregister.AktorregisterConsumer;
-import no.nav.syfo.aktorregister.domain.Fodselsnummer;
+import no.nav.syfo.consumer.aktorregister.AktorregisterConsumer;
+import no.nav.syfo.consumer.aktorregister.domain.Fodselsnummer;
 import no.nav.syfo.api.domain.RSHistorikk;
 import no.nav.syfo.domain.model.Mote;
 import no.nav.syfo.service.*;
-import no.nav.syfo.veiledertilgang.VeilederTilgangConsumer;
+import no.nav.syfo.consumer.veiledertilgang.VeilederTilgangConsumer;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;

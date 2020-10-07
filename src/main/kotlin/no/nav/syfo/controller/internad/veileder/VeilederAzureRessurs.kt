@@ -2,8 +2,8 @@ package no.nav.syfo.controller.internad.veileder
 
 import no.nav.security.oidc.api.ProtectedWithClaims
 import no.nav.security.oidc.context.OIDCRequestContextHolder
-import no.nav.syfo.axsys.AxsysConsumer
-import no.nav.syfo.axsys.AxsysEnhet
+import no.nav.syfo.consumer.axsys.AxsysConsumer
+import no.nav.syfo.consumer.axsys.AxsysEnhet
 import no.nav.syfo.api.auth.OIDCIssuer
 import no.nav.syfo.service.VeilederService
 import no.nav.syfo.api.auth.OIDCUtil

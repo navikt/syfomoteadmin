@@ -2,21 +2,21 @@ package no.nav.syfo.api.ressurser.azuread;
 
 import no.nav.security.oidc.api.ProtectedWithClaims;
 import no.nav.security.oidc.context.OIDCRequestContextHolder;
-import no.nav.syfo.aktorregister.AktorregisterConsumer;
-import no.nav.syfo.aktorregister.domain.*;
+import no.nav.syfo.consumer.aktorregister.AktorregisterConsumer;
+import no.nav.syfo.consumer.aktorregister.domain.*;
 import no.nav.syfo.api.domain.*;
 import no.nav.syfo.api.domain.nyttmoterequest.RSNyttMoteRequest;
-import no.nav.syfo.axsys.AxsysConsumer;
-import no.nav.syfo.behandlendeenhet.BehandlendeEnhetConsumer;
+import no.nav.syfo.consumer.axsys.AxsysConsumer;
+import no.nav.syfo.consumer.behandlendeenhet.BehandlendeEnhetConsumer;
 import no.nav.syfo.domain.model.*;
 import no.nav.syfo.metric.Metric;
-import no.nav.syfo.narmesteleder.*;
-import no.nav.syfo.pdl.PdlConsumer;
+import no.nav.syfo.consumer.narmesteleder.*;
+import no.nav.syfo.consumer.pdl.PdlConsumer;
 import no.nav.syfo.repository.dao.*;
 import no.nav.syfo.repository.model.*;
 import no.nav.syfo.service.*;
 import no.nav.syfo.service.varselinnhold.*;
-import no.nav.syfo.veiledertilgang.VeilederTilgangConsumer;
+import no.nav.syfo.consumer.veiledertilgang.VeilederTilgangConsumer;
 import org.springframework.transaction.annotation.*;
 import org.springframework.web.bind.annotation.*;
 

@@ -1,7 +1,7 @@
 package no.nav.syfo.service
 
-import no.nav.syfo.brukertilgang.BrukertilgangConsumer
-import no.nav.syfo.pdl.PdlConsumer
+import no.nav.syfo.consumer.brukertilgang.BrukertilgangConsumer
+import no.nav.syfo.consumer.pdl.PdlConsumer
 import org.assertj.core.api.Assertions
 import org.junit.Test
 import org.junit.runner.RunWith

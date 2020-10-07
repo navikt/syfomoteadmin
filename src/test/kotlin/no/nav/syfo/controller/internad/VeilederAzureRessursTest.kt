@@ -1,8 +1,8 @@
 package no.nav.syfo.controller.internad
 
 import no.nav.syfo.LocalApplication
-import no.nav.syfo.axsys.AxsysConsumer
-import no.nav.syfo.axsys.AxsysEnhet
+import no.nav.syfo.consumer.axsys.AxsysConsumer
+import no.nav.syfo.consumer.axsys.AxsysEnhet
 import no.nav.syfo.controller.internad.veileder.VeilederAzureRessurs
 import no.nav.syfo.service.VeilederService
 import no.nav.syfo.testhelper.OidcTestHelper.loggInnVeilederAzure

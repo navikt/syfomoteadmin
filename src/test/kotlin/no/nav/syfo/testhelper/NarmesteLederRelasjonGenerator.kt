@@ -1,7 +1,7 @@
 package no.nav.syfo.testhelper
 
-import no.nav.syfo.narmesteleder.NarmesteLederRelasjon
-import no.nav.syfo.narmesteleder.Tilgang
+import no.nav.syfo.consumer.narmesteleder.NarmesteLederRelasjon
+import no.nav.syfo.consumer.narmesteleder.Tilgang
 import no.nav.syfo.testhelper.UserConstants.LEDER_AKTORID
 import java.time.LocalDate
 

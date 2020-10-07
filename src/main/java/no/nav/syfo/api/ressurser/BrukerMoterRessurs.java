@@ -2,8 +2,8 @@ package no.nav.syfo.api.ressurser;
 
 import no.nav.security.oidc.api.ProtectedWithClaims;
 import no.nav.security.oidc.context.OIDCRequestContextHolder;
-import no.nav.syfo.aktorregister.AktorregisterConsumer;
-import no.nav.syfo.aktorregister.domain.Fodselsnummer;
+import no.nav.syfo.consumer.aktorregister.AktorregisterConsumer;
+import no.nav.syfo.consumer.aktorregister.domain.Fodselsnummer;
 import no.nav.syfo.api.domain.bruker.*;
 import no.nav.syfo.metric.Metric;
 import no.nav.syfo.service.*;

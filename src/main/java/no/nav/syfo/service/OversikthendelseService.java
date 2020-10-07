@@ -1,8 +1,8 @@
 package no.nav.syfo.service;
 
-import no.nav.syfo.aktorregister.AktorregisterConsumer;
-import no.nav.syfo.aktorregister.domain.AktorId;
-import no.nav.syfo.behandlendeenhet.BehandlendeEnhetConsumer;
+import no.nav.syfo.consumer.aktorregister.AktorregisterConsumer;
+import no.nav.syfo.consumer.aktorregister.domain.AktorId;
+import no.nav.syfo.consumer.behandlendeenhet.BehandlendeEnhetConsumer;
 import no.nav.syfo.domain.model.Mote;
 import no.nav.syfo.kafka.producer.OversikthendelseProducer;
 import no.nav.syfo.kafka.producer.OversikthendelseType;

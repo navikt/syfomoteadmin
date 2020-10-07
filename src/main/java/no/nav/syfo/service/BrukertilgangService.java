@@ -1,8 +1,8 @@
 package no.nav.syfo.service;
 
 import no.nav.security.oidc.context.OIDCRequestContextHolder;
-import no.nav.syfo.brukertilgang.BrukertilgangConsumer;
-import no.nav.syfo.pdl.PdlConsumer;
+import no.nav.syfo.consumer.brukertilgang.BrukertilgangConsumer;
+import no.nav.syfo.consumer.pdl.PdlConsumer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

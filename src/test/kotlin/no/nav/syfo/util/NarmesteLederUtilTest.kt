@@ -2,7 +2,7 @@ package no.nav.syfo.util
 
 import no.nav.syfo.domain.model.Mote
 import no.nav.syfo.domain.model.MotedeltakerArbeidsgiver
-import no.nav.syfo.narmesteleder.NarmesteLederRelasjon
+import no.nav.syfo.consumer.narmesteleder.NarmesteLederRelasjon
 import no.nav.syfo.testhelper.generateNarmesteLederRelasjon
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test

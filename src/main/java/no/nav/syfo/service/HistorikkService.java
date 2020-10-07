@@ -1,10 +1,10 @@
 package no.nav.syfo.service;
 
-import no.nav.syfo.aktorregister.AktorregisterConsumer;
-import no.nav.syfo.aktorregister.domain.AktorId;
+import no.nav.syfo.consumer.aktorregister.AktorregisterConsumer;
+import no.nav.syfo.consumer.aktorregister.domain.AktorId;
 import no.nav.syfo.api.domain.RSHistorikk;
 import no.nav.syfo.domain.model.*;
-import no.nav.syfo.pdl.PdlConsumer;
+import no.nav.syfo.consumer.pdl.PdlConsumer;
 import no.nav.syfo.repository.dao.HendelseDAO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

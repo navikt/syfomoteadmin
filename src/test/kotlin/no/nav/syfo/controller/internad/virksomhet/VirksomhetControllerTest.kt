@@ -1,7 +1,7 @@
 package no.nav.syfo.controller.internad.virksomhet
 
 import no.nav.syfo.LocalApplication
-import no.nav.syfo.ereg.EregConsumer
+import no.nav.syfo.consumer.ereg.EregConsumer
 import no.nav.syfo.testhelper.UserConstants
 import org.junit.*
 import org.junit.runner.RunWith

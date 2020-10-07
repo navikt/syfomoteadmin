@@ -1,6 +1,7 @@
 package no.nav.syfo.exception;
 
 import no.nav.security.spring.oidc.validation.interceptor.OIDCUnauthorizedException;
+import no.nav.syfo.api.exception.ConflictException;
 import no.nav.syfo.metric.Metric;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

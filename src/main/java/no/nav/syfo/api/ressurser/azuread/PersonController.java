@@ -1,14 +1,14 @@
 package no.nav.syfo.api.ressurser.azuread;
 
 import no.nav.security.oidc.api.ProtectedWithClaims;
-import no.nav.syfo.aktorregister.AktorregisterConsumer;
-import no.nav.syfo.aktorregister.domain.*;
+import no.nav.syfo.consumer.aktorregister.AktorregisterConsumer;
+import no.nav.syfo.consumer.aktorregister.domain.*;
 import no.nav.syfo.api.domain.RSBruker;
-import no.nav.syfo.dkif.DigitalKontaktinfo;
-import no.nav.syfo.dkif.DkifConsumer;
+import no.nav.syfo.consumer.dkif.DigitalKontaktinfo;
+import no.nav.syfo.consumer.dkif.DkifConsumer;
+import no.nav.syfo.consumer.veiledertilgang.VeilederTilgangConsumer;
 import no.nav.syfo.metric.Metric;
-import no.nav.syfo.pdl.PdlConsumer;
-import no.nav.syfo.veiledertilgang.VeilederTilgangConsumer;
+import no.nav.syfo.consumer.pdl.PdlConsumer;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;

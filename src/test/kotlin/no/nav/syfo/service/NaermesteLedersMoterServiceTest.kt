@@ -2,8 +2,8 @@ package no.nav.syfo.service
 
 import no.nav.syfo.domain.model.Mote
 import no.nav.syfo.domain.model.TidOgSted
-import no.nav.syfo.narmesteleder.NarmesteLederConsumer
-import no.nav.syfo.narmesteleder.NarmesteLederRelasjon
+import no.nav.syfo.consumer.narmesteleder.NarmesteLederConsumer
+import no.nav.syfo.consumer.narmesteleder.NarmesteLederRelasjon
 import no.nav.syfo.testhelper.UserConstants.LEDER_AKTORID
 import no.nav.syfo.testhelper.generateNarmesteLederRelasjon
 import org.assertj.core.api.Assertions

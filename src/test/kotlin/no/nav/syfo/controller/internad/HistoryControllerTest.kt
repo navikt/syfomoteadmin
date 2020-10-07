@@ -1,7 +1,7 @@
 package no.nav.syfo.controller.internad
 
 import no.nav.syfo.LocalApplication
-import no.nav.syfo.aktorregister.AktorregisterConsumer
+import no.nav.syfo.consumer.aktorregister.AktorregisterConsumer
 import no.nav.syfo.api.ressurser.azuread.HistoryController
 import no.nav.syfo.service.HistorikkService
 import no.nav.syfo.service.MoteService

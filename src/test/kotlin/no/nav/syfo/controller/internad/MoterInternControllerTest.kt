@@ -1,17 +1,17 @@
 package no.nav.syfo.controller.internad
 
 import no.nav.syfo.LocalApplication
-import no.nav.syfo.aktorregister.AktorregisterConsumer
-import no.nav.syfo.aktorregister.domain.AktorId
-import no.nav.syfo.aktorregister.domain.Fodselsnummer
+import no.nav.syfo.consumer.aktorregister.AktorregisterConsumer
+import no.nav.syfo.consumer.aktorregister.domain.AktorId
+import no.nav.syfo.consumer.aktorregister.domain.Fodselsnummer
 import no.nav.syfo.api.domain.nyttmoterequest.RSNyttMoteRequest
 import no.nav.syfo.api.ressurser.azuread.MoterInternController
-import no.nav.syfo.axsys.AxsysConsumer
-import no.nav.syfo.axsys.AxsysEnhet
+import no.nav.syfo.consumer.axsys.AxsysConsumer
+import no.nav.syfo.consumer.axsys.AxsysEnhet
 import no.nav.syfo.domain.model.*
 import no.nav.syfo.metric.Metric
-import no.nav.syfo.narmesteleder.NarmesteLederConsumer
-import no.nav.syfo.pdl.PdlConsumer
+import no.nav.syfo.consumer.narmesteleder.NarmesteLederConsumer
+import no.nav.syfo.consumer.pdl.PdlConsumer
 import no.nav.syfo.repository.dao.MotedeltakerDAO
 import no.nav.syfo.repository.dao.TidOgStedDAO
 import no.nav.syfo.repository.model.PMotedeltakerAktorId
@@ -19,7 +19,7 @@ import no.nav.syfo.repository.model.PMotedeltakerArbeidsgiver
 import no.nav.syfo.service.*
 import no.nav.syfo.service.varselinnhold.ArbeidsgiverVarselService
 import no.nav.syfo.service.varselinnhold.SykmeldtVarselService
-import no.nav.syfo.sts.StsConsumer
+import no.nav.syfo.consumer.sts.StsConsumer
 import no.nav.syfo.testhelper.*
 import no.nav.syfo.testhelper.OidcTestHelper.loggInnVeilederAzure
 import no.nav.syfo.testhelper.UserConstants.ARBEIDSTAKER_AKTORID
@@ -30,7 +30,7 @@ import no.nav.syfo.testhelper.UserConstants.NAV_ENHET
 import no.nav.syfo.testhelper.UserConstants.NAV_ENHET_NAVN
 import no.nav.syfo.testhelper.UserConstants.VEILEDER_ID
 import no.nav.syfo.testhelper.UserConstants.VEILEDER_NAVN
-import no.nav.syfo.veiledertilgang.VeilederTilgangConsumer
+import no.nav.syfo.consumer.veiledertilgang.VeilederTilgangConsumer
 import org.junit.*
 import org.junit.runner.RunWith
 import org.mockito.ArgumentMatchers

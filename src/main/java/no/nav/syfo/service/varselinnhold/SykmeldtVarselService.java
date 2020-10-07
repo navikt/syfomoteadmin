@@ -1,7 +1,7 @@
 package no.nav.syfo.service.varselinnhold;
 
-import no.nav.syfo.dkif.DigitalKontaktinfo;
-import no.nav.syfo.dkif.DkifConsumer;
+import no.nav.syfo.consumer.dkif.DigitalKontaktinfo;
+import no.nav.syfo.consumer.dkif.DkifConsumer;
 import no.nav.syfo.domain.model.Mote;
 import no.nav.syfo.domain.model.Varseltype;
 import no.nav.syfo.service.ServiceVarselService;

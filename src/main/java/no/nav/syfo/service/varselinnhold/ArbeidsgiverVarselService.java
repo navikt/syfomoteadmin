@@ -2,14 +2,13 @@ package no.nav.syfo.service.varselinnhold;
 
 import no.nav.melding.virksomhet.servicemeldingmedkontaktinformasjon.v1.servicemeldingmedkontaktinformasjon.WSParameter;
 import no.nav.syfo.domain.model.*;
-import no.nav.syfo.narmesteleder.*;
+import no.nav.syfo.consumer.narmesteleder.*;
 import no.nav.syfo.repository.model.PEpost;
 import no.nav.syfo.service.*;
 import org.slf4j.*;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDate;
 import java.util.*;
 
 import static java.util.Arrays.asList;

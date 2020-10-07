@@ -3,7 +3,7 @@ package no.nav.syfo.service.varselinnhold;
 import no.nav.melding.virksomhet.servicemeldingmedkontaktinformasjon.v1.servicemeldingmedkontaktinformasjon.*;
 import no.nav.syfo.domain.model.TredjepartsVarselType;
 import no.nav.syfo.metric.Metric;
-import no.nav.syfo.narmesteleder.NarmesteLederRelasjon;
+import no.nav.syfo.consumer.narmesteleder.NarmesteLederRelasjon;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Service;

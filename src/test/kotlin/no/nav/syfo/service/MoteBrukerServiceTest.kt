@@ -1,10 +1,10 @@
 package no.nav.syfo.service
 
 import no.nav.security.oidc.context.OIDCRequestContextHolder
-import no.nav.syfo.aktorregister.AktorregisterConsumer
-import no.nav.syfo.aktorregister.domain.Fodselsnummer
+import no.nav.syfo.consumer.aktorregister.AktorregisterConsumer
+import no.nav.syfo.consumer.aktorregister.domain.Fodselsnummer
 import no.nav.syfo.domain.model.*
-import no.nav.syfo.pdl.PdlConsumer
+import no.nav.syfo.consumer.pdl.PdlConsumer
 import no.nav.syfo.testhelper.UserConstants.ARBEIDSTAKER_AKTORID
 import no.nav.syfo.testhelper.UserConstants.ARBEIDSTAKER_FNR
 import no.nav.syfo.util.Brukerkontekst
@@ -15,7 +15,6 @@ import org.junit.runner.RunWith
 import org.mockito.*
 import org.mockito.junit.MockitoJUnitRunner
 import java.time.LocalDateTime
-import java.util.*
 
 @RunWith(MockitoJUnitRunner::class)
 class MoteBrukerServiceTest {

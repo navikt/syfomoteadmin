@@ -2,9 +2,9 @@ package no.nav.syfo.service;
 
 import no.nav.syfo.api.domain.RSMote;
 import no.nav.syfo.api.domain.RSMotedeltaker;
-import no.nav.syfo.axsys.AxsysConsumer;
-import no.nav.syfo.axsys.AxsysEnhet;
-import no.nav.syfo.dkif.DkifConsumer;
+import no.nav.syfo.consumer.axsys.AxsysConsumer;
+import no.nav.syfo.consumer.axsys.AxsysEnhet;
+import no.nav.syfo.consumer.dkif.DkifConsumer;
 import no.nav.syfo.domain.model.*;
 import no.nav.syfo.metric.Metric;
 import no.nav.syfo.repository.dao.*;

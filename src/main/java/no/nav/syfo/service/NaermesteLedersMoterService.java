@@ -1,7 +1,7 @@
 package no.nav.syfo.service;
 
 import no.nav.syfo.domain.model.*;
-import no.nav.syfo.narmesteleder.*;
+import no.nav.syfo.consumer.narmesteleder.*;
 import org.springframework.stereotype.Service;
 
 import javax.inject.Inject;

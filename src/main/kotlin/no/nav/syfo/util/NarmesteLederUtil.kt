@@ -1,9 +1,8 @@
 package no.nav.syfo.util
 
 import no.nav.syfo.domain.model.Mote
-import no.nav.syfo.narmesteleder.NarmesteLederRelasjon
+import no.nav.syfo.consumer.narmesteleder.NarmesteLederRelasjon
 import java.time.LocalDate
-
 
 fun narmesteLederForMeeting(narmesteLedere: List<NarmesteLederRelasjon>, mote: Mote): NarmesteLederRelasjon? {
     val wantedOrgnummer = mote.arbeidsgiver().orgnummer

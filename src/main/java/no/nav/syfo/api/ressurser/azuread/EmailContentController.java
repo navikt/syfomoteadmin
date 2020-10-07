@@ -2,13 +2,13 @@ package no.nav.syfo.api.ressurser.azuread;
 
 import no.nav.security.oidc.api.ProtectedWithClaims;
 import no.nav.security.oidc.context.OIDCRequestContextHolder;
-import no.nav.syfo.aktorregister.AktorregisterConsumer;
-import no.nav.syfo.aktorregister.domain.*;
+import no.nav.syfo.consumer.aktorregister.AktorregisterConsumer;
+import no.nav.syfo.consumer.aktorregister.domain.*;
 import no.nav.syfo.api.domain.RSEpostInnhold;
 import no.nav.syfo.domain.model.*;
 import no.nav.syfo.repository.model.PEpost;
 import no.nav.syfo.service.MoteService;
-import no.nav.syfo.veiledertilgang.VeilederTilgangConsumer;
+import no.nav.syfo.consumer.veiledertilgang.VeilederTilgangConsumer;
 import no.nav.syfo.service.varselinnhold.ArbeidsgiverVarselService;
 import org.springframework.web.bind.annotation.*;
 
