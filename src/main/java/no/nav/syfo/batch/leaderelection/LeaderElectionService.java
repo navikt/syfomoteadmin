@@ -1,7 +1,7 @@
 package no.nav.syfo.batch.leaderelection;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import no.nav.syfo.metric.Metrikk;
+import no.nav.syfo.metric.Metric;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,23 +17,23 @@ import java.net.InetAddress;
 public class LeaderElectionService {
     private static final Logger log = LoggerFactory.getLogger(LeaderElectionService.class);
 
-    private final Metrikk metrikk;
+    private final Metric metric;
     private final RestTemplate restTemplate;
     private final String electorpath;
 
     @Inject
     public LeaderElectionService(
-            Metrikk metrikk,
+            Metric metric,
             RestTemplate restTemplate,
             @Value("${elector.path}") String electorpath
     ) {
-        this.metrikk = metrikk;
+        this.metric = metric;
         this.restTemplate = restTemplate;
         this.electorpath = electorpath;
     }
 
     public boolean isLeader() {
-        metrikk.countEvent("isLeader_kalt");
+        metric.countEvent("isLeader_kalt");
         ObjectMapper objectMapper = new ObjectMapper();
         String url = "http://" + electorpath;
 
@@ -44,11 +44,11 @@ public class LeaderElectionService {
             return isHostLeader(leader);
         } catch (IOException e) {
             log.error("Couldn't map response from electorPath to LeaderPod object", e);
-            metrikk.countEvent("isLeader_feilet");
+            metric.countEvent("isLeader_feilet");
             throw new RuntimeException("Couldn't map response from electorpath to LeaderPod object", e);
         } catch (Exception e) {
             log.error("Something went wrong when trying to check leader", e);
-            metrikk.countEvent("isLeader_feilet");
+            metric.countEvent("isLeader_feilet");
             throw new RuntimeException("Got exception when trying to find leader", e);
         }
     }

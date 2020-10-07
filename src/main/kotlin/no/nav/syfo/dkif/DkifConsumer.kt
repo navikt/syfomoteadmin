@@ -1,7 +1,7 @@
 package no.nav.syfo.dkif
 
 import no.nav.syfo.config.CacheConfig
-import no.nav.syfo.metric.Metrikk
+import no.nav.syfo.metric.Metric
 import no.nav.syfo.sts.StsConsumer
 import no.nav.syfo.util.*
 import org.slf4j.LoggerFactory
@@ -14,9 +14,9 @@ import org.springframework.web.client.RestTemplate
 
 @Service
 class DkifConsumer(
-        private val metric: Metrikk,
-        private val stsConsumer: StsConsumer,
-        private val template: RestTemplate
+    private val metric: Metric,
+    private val stsConsumer: StsConsumer,
+    private val template: RestTemplate
 ) {
     @Cacheable(cacheNames = [CacheConfig.CACHENAME_DKIF_IDENT], key = "#ident", condition = "#ident != null")
     fun kontaktinformasjon(ident: String): DigitalKontaktinfo {

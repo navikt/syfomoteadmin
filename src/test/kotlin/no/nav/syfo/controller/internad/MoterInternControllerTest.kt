@@ -9,7 +9,7 @@ import no.nav.syfo.api.ressurser.azuread.MoterInternController
 import no.nav.syfo.axsys.AxsysConsumer
 import no.nav.syfo.axsys.AxsysEnhet
 import no.nav.syfo.domain.model.*
-import no.nav.syfo.metric.Metrikk
+import no.nav.syfo.metric.Metric
 import no.nav.syfo.narmesteleder.NarmesteLederConsumer
 import no.nav.syfo.pdl.PdlConsumer
 import no.nav.syfo.repository.dao.MotedeltakerDAO
@@ -73,7 +73,7 @@ class MoterInternControllerTest : AbstractRessursTilgangTest() {
     private lateinit var moteService: MoteService
 
     @MockBean
-    private lateinit var metrikk: Metrikk
+    private lateinit var metric: Metric
 
     @MockBean
     private lateinit var tidOgStedDAO: TidOgStedDAO

@@ -1,7 +1,7 @@
 package no.nav.syfo.brukertilgang
 
 import no.nav.security.oidc.context.OIDCRequestContextHolder
-import no.nav.syfo.metric.Metrikk
+import no.nav.syfo.metric.Metric
 import no.nav.syfo.api.auth.OIDCIssuer
 import no.nav.syfo.api.auth.OIDCUtil
 import no.nav.syfo.util.*
@@ -14,10 +14,10 @@ import org.springframework.web.client.RestTemplate
 
 @Service
 class BrukertilgangConsumer(
-        private val oidcContextHolder: OIDCRequestContextHolder,
-        private val restTemplate: RestTemplate,
-        private val metrikk: Metrikk,
-        @Value("\${syfobrukertilgang.url}") private val baseUrl: String
+    private val oidcContextHolder: OIDCRequestContextHolder,
+    private val restTemplate: RestTemplate,
+    private val metric: Metric,
+    @Value("\${syfobrukertilgang.url}") private val baseUrl: String
 ) {
     fun hasAccessToAnsatt(ansattFnr: String): Boolean {
         val httpEntity = entity()
@@ -29,10 +29,10 @@ class BrukertilgangConsumer(
                     Boolean::class.java
             )
             val responseBody = response.body!!
-            metrikk.countOutgoingReponses(METRIC_CALL_BRUKERTILGANG, response.statusCodeValue)
+            metric.countOutgoingReponses(METRIC_CALL_BRUKERTILGANG, response.statusCodeValue)
             return responseBody
         } catch (e: RestClientResponseException) {
-            metrikk.countOutgoingReponses(METRIC_CALL_BRUKERTILGANG, e.rawStatusCode)
+            metric.countOutgoingReponses(METRIC_CALL_BRUKERTILGANG, e.rawStatusCode)
             if (e.rawStatusCode == 401) {
                 throw RequestUnauthorizedException("Unauthorized request to get access to Ansatt from Syfobrukertilgang")
             } else {

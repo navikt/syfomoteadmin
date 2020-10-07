@@ -6,7 +6,7 @@ import no.nav.syfo.axsys.AxsysConsumer;
 import no.nav.syfo.axsys.AxsysEnhet;
 import no.nav.syfo.dkif.DkifConsumer;
 import no.nav.syfo.domain.model.*;
-import no.nav.syfo.metric.Metrikk;
+import no.nav.syfo.metric.Metric;
 import no.nav.syfo.repository.dao.*;
 import no.nav.syfo.repository.model.PFeedHendelse;
 import no.nav.syfo.service.mq.MqStoppRevarslingService;
@@ -42,7 +42,7 @@ public class MoteService {
     private HendelseService hendelseService;
     private OversikthendelseService oversikthendelseService;
     private VeilederService veilederService;
-    private Metrikk metrikk;
+    private Metric metric;
     private ArbeidsgiverVarselService arbeidsgiverVarselService;
     private DkifConsumer dkifConsumer;
     private SykmeldtVarselService sykmeldtVarselService;
@@ -58,7 +58,7 @@ public class MoteService {
             HendelseService hendelseService,
             OversikthendelseService oversikthendelseService,
             VeilederService veilederService,
-            Metrikk metrikk,
+            Metric metric,
             ArbeidsgiverVarselService arbeidsgiverVarselService,
             DkifConsumer dkifConsumer,
             SykmeldtVarselService sykmeldtVarselService,
@@ -71,7 +71,7 @@ public class MoteService {
         this.hendelseService = hendelseService;
         this.oversikthendelseService = oversikthendelseService;
         this.veilederService = veilederService;
-        this.metrikk = metrikk;
+        this.metric = metric;
         this.arbeidsgiverVarselService = arbeidsgiverVarselService;
         this.sykmeldtVarselService = sykmeldtVarselService;
         this.axsysConsumer = axsysConsumer;
@@ -111,15 +111,15 @@ public class MoteService {
             opprettFeedHendelseAvTypen(PFeedHendelse.FeedHendelseType.AVBRUTT, mote, veilederIdent);
         }
         behandleMote(mote);
-        metrikk.reportAntallDagerSiden(hentSisteSvartidspunkt(mote).orElse(mote.opprettetTidspunkt), "antallDagerVeilederSvar");
+        metric.reportAntallDagerSiden(hentSisteSvartidspunkt(mote).orElse(mote.opprettetTidspunkt), "antallDagerVeilederSvar");
     }
 
     @Transactional
     public void bekreftMote(String moteUuid, Long tidOgStedId, String veilederIdent) {
         Mote mote = moteDAO.findMoteByUUID(moteUuid);
 
-        metrikk.reportAntallDagerSiden(mote.opprettetTidspunkt, "antallDagerForSvar");
-        metrikk.reportAntallDagerSiden(hentSisteSvartidspunkt(mote).orElse(mote.opprettetTidspunkt), "antallDagerVeilederSvar");
+        metric.reportAntallDagerSiden(mote.opprettetTidspunkt, "antallDagerForSvar");
+        metric.reportAntallDagerSiden(hentSisteSvartidspunkt(mote).orElse(mote.opprettetTidspunkt), "antallDagerVeilederSvar");
 
         moteDAO.bekreftMote(mote.id, tidOgStedId);
         mote.valgtTidOgSted(mote.alternativer.stream().filter(tidOgSted -> tidOgSted.id.equals(tidOgStedId)).findFirst().orElseThrow(() -> new RuntimeException("Fant ikke tidspunktet!")));
@@ -153,7 +153,7 @@ public class MoteService {
             opprettFeedHendelseAvTypen(PFeedHendelse.FeedHendelseType.FLERE_TIDSPUNKT, mote, veilederIdent);
         }
         behandleMote(mote);
-        metrikk.reportAntallDagerSiden(hentSisteSvartidspunkt(mote).orElse(mote.opprettetTidspunkt), "antallDagerVeilederSvar");
+        metric.reportAntallDagerSiden(hentSisteSvartidspunkt(mote).orElse(mote.opprettetTidspunkt), "antallDagerVeilederSvar");
     }
 
     private void behandleMote(Mote mote) {
@@ -232,9 +232,9 @@ public class MoteService {
 
         if ("Bruker".equals(brukerSomSvarte.motedeltakertype)) {
             mqStoppRevarslingService.stoppReVarsel(brukerSomSvarte.uuid);
-            metrikk.reportAntallDagerSiden(mote.opprettetTidspunkt, "antallDagerBrukerSvar");
+            metric.reportAntallDagerSiden(mote.opprettetTidspunkt, "antallDagerBrukerSvar");
         } else if ("arbeidsgiver".equals(brukerSomSvarte.motedeltakertype)) {
-            metrikk.reportAntallDagerSiden(mote.opprettetTidspunkt, "antallDagerArbeidsgiverSvar");
+            metric.reportAntallDagerSiden(mote.opprettetTidspunkt, "antallDagerArbeidsgiverSvar");
         }
 
         if (harAlleSvartPaaSisteForespoersel(mote)) {

@@ -5,7 +5,7 @@ import no.nav.security.oidc.context.OIDCRequestContextHolder
 import no.nav.syfo.api.domain.nyttmoterequest.RSNyttAlternativ
 import no.nav.syfo.api.mappers.RSNyttMoteMapper.opprett2TidOgSted
 import no.nav.syfo.domain.model.TidOgSted
-import no.nav.syfo.metric.Metrikk
+import no.nav.syfo.metric.Metric
 import no.nav.syfo.api.auth.OIDCIssuer.AZURE
 import no.nav.syfo.service.MoteService
 import no.nav.syfo.util.MapUtil.mapListe
@@ -19,9 +19,9 @@ import javax.inject.Inject
 @RequestMapping(value = ["/api/internad/moter/{moteUuid}"])
 class MoteActionsController @Inject
 constructor(
-        private val contextHolder: OIDCRequestContextHolder,
-        private val metrikk: Metrikk,
-        private val moteService: MoteService
+    private val contextHolder: OIDCRequestContextHolder,
+    private val metric: Metric,
+    private val moteService: MoteService
 ) {
 
     @PostMapping(consumes = [APPLICATION_JSON_VALUE], produces = [APPLICATION_JSON_VALUE])
@@ -36,7 +36,7 @@ constructor(
                 getSubjectInternAzure(contextHolder)
         )
 
-        metrikk.tellEndepunktKall("avbryt_mote")
+        metric.tellEndepunktKall("avbryt_mote")
     }
 
     @PostMapping(consumes = [APPLICATION_JSON_VALUE], produces = [APPLICATION_JSON_VALUE])
@@ -51,7 +51,7 @@ constructor(
                 getSubjectInternAzure(contextHolder)
         )
 
-        metrikk.tellEndepunktKall("bekreft_mote")
+        metric.tellEndepunktKall("bekreft_mote")
     }
 
     @PostMapping(consumes = [APPLICATION_JSON_VALUE], produces = [APPLICATION_JSON_VALUE])
@@ -66,6 +66,6 @@ constructor(
                 getSubjectInternAzure(contextHolder)
         )
 
-        metrikk.tellEndepunktKall("nye_alternativer")
+        metric.tellEndepunktKall("nye_alternativer")
     }
 }

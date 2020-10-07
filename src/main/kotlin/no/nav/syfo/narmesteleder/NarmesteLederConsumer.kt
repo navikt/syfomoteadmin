@@ -2,7 +2,7 @@ package no.nav.syfo.narmesteleder
 
 import no.nav.syfo.azuread.AzureAdTokenConsumer
 import no.nav.syfo.config.CacheConfig.*
-import no.nav.syfo.metric.Metrikk
+import no.nav.syfo.metric.Metric
 import no.nav.syfo.util.*
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
@@ -19,10 +19,10 @@ import org.springframework.web.util.UriComponentsBuilder
 
 @Component
 class NarmesteLederConsumer @Autowired constructor(
-        private val azureAdTokenConsumer: AzureAdTokenConsumer,
-        private val metrikk: Metrikk,
-        private val restTemplate: RestTemplate,
-        @param:Value("\${syfonarmesteleder.id}") private val syfonarmestelederId: String
+    private val azureAdTokenConsumer: AzureAdTokenConsumer,
+    private val metric: Metric,
+    private val restTemplate: RestTemplate,
+    @param:Value("\${syfonarmesteleder.id}") private val syfonarmestelederId: String
 ) {
     @Cacheable(value = [CACHENAME_NARMESTELEDER_LEDER], key = "#aktorId + #virksomhetsnummer", condition = "#aktorId != null && #virksomhetsnummer != null")
     fun narmesteLederRelasjonLeder(aktorId: String, virksomhetsnummer: String): NarmesteLederRelasjon? {
@@ -33,12 +33,12 @@ class NarmesteLederConsumer @Autowired constructor(
                     entity(),
                     NarmestelederResponse::class.java
             )
-            metrikk.countEvent(CALL_SYFONARMESTELEDER_LEDER_SUCCESS)
+            metric.countEvent(CALL_SYFONARMESTELEDER_LEDER_SUCCESS)
 
             return response.body!!.narmesteLederRelasjon
         } catch (e: RestClientResponseException) {
             LOG.error("Request to get Leder from Syfonarmesteleder failed with status ${e.rawStatusCode} and message: ${e.responseBodyAsString}" )
-            metrikk.countEvent(CALL_SYFONARMESTELEDER_LEDER_FAIL)
+            metric.countEvent(CALL_SYFONARMESTELEDER_LEDER_FAIL)
             throw e
         }
     }
@@ -52,12 +52,12 @@ class NarmesteLederConsumer @Autowired constructor(
                     entity(),
                     object : ParameterizedTypeReference<List<NarmesteLederRelasjon>>() {}
             )
-            metrikk.countEvent(CALL_SYFONARMESTELEDER_ANSATTE_SUCCESS)
+            metric.countEvent(CALL_SYFONARMESTELEDER_ANSATTE_SUCCESS)
 
             return response.body!!
         } catch (e: RestClientResponseException) {
             LOG.error("Request to get Ansatte from Syfonarmesteleder failed with status ${e.rawStatusCode} and message: ${e.responseBodyAsString}" )
-            metrikk.countEvent(CALL_SYFONARMESTELEDER_ANSATTE_FAIL)
+            metric.countEvent(CALL_SYFONARMESTELEDER_ANSATTE_FAIL)
             throw e
         }
     }
@@ -71,12 +71,12 @@ class NarmesteLederConsumer @Autowired constructor(
                     entity(),
                     object : ParameterizedTypeReference<List<NarmesteLederRelasjon>>() {}
             )
-            metrikk.countEvent(CALL_SYFONARMESTELEDER_LEDERE_SUCCESS)
+            metric.countEvent(CALL_SYFONARMESTELEDER_LEDERE_SUCCESS)
 
             return response.body!!
         } catch (e: RestClientResponseException) {
             LOG.error("Request to get Ledere from Syfonarmesteleder failed with status ${e.rawStatusCode} and message: ${e.responseBodyAsString}" )
-            metrikk.countEvent(CALL_SYFONARMESTELEDER_LEDERE_FAIL)
+            metric.countEvent(CALL_SYFONARMESTELEDER_LEDERE_FAIL)
             throw e
         }
     }

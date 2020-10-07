@@ -2,7 +2,7 @@ package no.nav.syfo.veiledertilgang
 
 import no.nav.security.oidc.context.OIDCRequestContextHolder
 import no.nav.syfo.aktorregister.domain.Fodselsnummer
-import no.nav.syfo.metric.Metrikk
+import no.nav.syfo.metric.Metric
 import no.nav.syfo.api.auth.OIDCIssuer
 import no.nav.syfo.api.auth.OIDCUtil
 import no.nav.syfo.util.*
@@ -21,10 +21,10 @@ import javax.ws.rs.ForbiddenException
 
 @Service
 class VeilederTilgangConsumer(
-        @Value("\${tilgangskontrollapi.url}") tilgangskontrollUrl: String,
-        private val metric: Metrikk,
-        private val template: RestTemplate,
-        private val contextHolder: OIDCRequestContextHolder
+    @Value("\${tilgangskontrollapi.url}") tilgangskontrollUrl: String,
+    private val metric: Metric,
+    private val template: RestTemplate,
+    private val contextHolder: OIDCRequestContextHolder
 ) {
     private val tilgangTilBrukerViaAzureUriTemplate: UriComponentsBuilder
 

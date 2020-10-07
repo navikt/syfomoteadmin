@@ -3,7 +3,7 @@ package no.nav.syfo.api.ressurser.azuread.actions;
 import no.nav.security.oidc.api.ProtectedWithClaims;
 import no.nav.security.oidc.context.OIDCRequestContextHolder;
 import no.nav.syfo.api.domain.RSOverforMoter;
-import no.nav.syfo.metric.Metrikk;
+import no.nav.syfo.metric.Metric;
 import no.nav.syfo.service.MoteService;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,17 +19,17 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 public class MoterActionsController {
 
     private OIDCRequestContextHolder contextHolder;
-    private Metrikk metrikk;
+    private Metric metric;
     private MoteService moteService;
 
     @Inject
     public MoterActionsController(
             OIDCRequestContextHolder contextHolder,
-            Metrikk metrikk,
+            Metric metric,
             MoteService moteService
     ) {
         this.contextHolder = contextHolder;
-        this.metrikk = metrikk;
+        this.metric = metric;
         this.moteService = moteService;
     }
 
@@ -39,6 +39,6 @@ public class MoterActionsController {
         String innloggetIdent = getSubjectInternAzure(contextHolder);
         rsOverforMoter.moteUuidListe.forEach(moteUuid -> moteService.overforMoteTil(moteUuid, innloggetIdent));
 
-        metrikk.tellEndepunktKall("overfor_mote");
+        metric.tellEndepunktKall("overfor_mote");
     }
 }

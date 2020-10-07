@@ -1,6 +1,6 @@
 package no.nav.syfo.azuread
 
-import no.nav.syfo.metric.Metrikk
+import no.nav.syfo.metric.Metric
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Qualifier
@@ -20,11 +20,11 @@ import java.util.*
 
 @Component
 class AzureAdTokenConsumer @Autowired constructor(
-        private val metrikk: Metrikk,
-        @param:Qualifier("restTemplateWithProxy") private val restTemplateWithProxy: RestTemplate,
-        @param:Value("\${ad.accesstoken.url}") private val url: String,
-        @param:Value("\${client.id}") private val clientId: String,
-        @param:Value("\${client.secret}") private val clientSecret: String
+    private val metric: Metric,
+    @param:Qualifier("restTemplateWithProxy") private val restTemplateWithProxy: RestTemplate,
+    @param:Value("\${ad.accesstoken.url}") private val url: String,
+    @param:Value("\${client.id}") private val clientId: String,
+    @param:Value("\${client.secret}") private val clientSecret: String
 ) {
     private val azureAdTokenMap: MutableMap<String, AzureAdResponse> = HashMap()
 
@@ -41,10 +41,10 @@ class AzureAdTokenConsumer @Autowired constructor(
                         AzureAdResponse::class.java
                 )
                 azureAdTokenMap[resource] = result.body!!
-                metrikk.countEvent(CALL_AZUREAD_TOKEN_SYSTEM_SUCCESS)
+                metric.countEvent(CALL_AZUREAD_TOKEN_SYSTEM_SUCCESS)
             } catch (e: RestClientResponseException) {
                 LOG.error("Request to get token for Azure AD failed with status " + e.rawStatusCode + " and message: " + e.responseBodyAsString)
-                metrikk.countEvent(CALL_AZUREAD_TOKEN_SYSTEM_FAIL)
+                metric.countEvent(CALL_AZUREAD_TOKEN_SYSTEM_FAIL)
                 throw e
             }
         }

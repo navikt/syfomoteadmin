@@ -1,7 +1,7 @@
 package no.nav.syfo.ereg
 
 import no.nav.syfo.config.CacheConfig
-import no.nav.syfo.metric.Metrikk
+import no.nav.syfo.metric.Metric
 import no.nav.syfo.sts.StsConsumer
 import no.nav.syfo.util.*
 import org.slf4j.LoggerFactory
@@ -15,10 +15,10 @@ import javax.inject.Inject
 
 @Service
 class EregConsumer @Inject constructor(
-        @Value("\${ereg.baseurl}") private val baseUrl: String,
-        private val metric: Metrikk,
-        private val restTemplate: RestTemplate,
-        private val stsConsumer: StsConsumer
+    @Value("\${ereg.baseurl}") private val baseUrl: String,
+    private val metric: Metric,
+    private val restTemplate: RestTemplate,
+    private val stsConsumer: StsConsumer
 ) {
     fun eregReponse(virksomhetsnummer: String): EregOrganisasjonResponse {
         try {

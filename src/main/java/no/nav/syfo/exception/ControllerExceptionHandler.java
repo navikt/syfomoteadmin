@@ -1,7 +1,7 @@
 package no.nav.syfo.exception;
 
 import no.nav.security.spring.oidc.validation.interceptor.OIDCUnauthorizedException;
-import no.nav.syfo.metric.Metrikk;
+import no.nav.syfo.metric.Metric;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.*;
@@ -27,11 +27,11 @@ public class ControllerExceptionHandler {
     private final String UNAUTHORIZED_MSG = "Autorisasjonsfeil";
     private final String NOT_FOUND_MSG = "Fant ikke ressurs";
 
-    private Metrikk metrikk;
+    private Metric metric;
 
     @Inject
-    public ControllerExceptionHandler(Metrikk metrikk) {
-        this.metrikk = metrikk;
+    public ControllerExceptionHandler(Metric metric) {
+        this.metric = metric;
     }
 
     @ExceptionHandler({
@@ -106,7 +106,7 @@ public class ControllerExceptionHandler {
     }
 
     private ResponseEntity<ApiError> handleExceptionInternal(Exception ex, ApiError body, HttpHeaders headers, HttpStatus status, WebRequest request) {
-        metrikk.tellHttpKall(status.value());
+        metric.tellHttpKall(status.value());
 
         if (HttpStatus.INTERNAL_SERVER_ERROR.equals(status)) {
             log.error("Uventet feil: {} : {}", ex.getClass().toString(), ex.getMessage(), ex);

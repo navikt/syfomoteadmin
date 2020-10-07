@@ -9,7 +9,7 @@ import no.nav.syfo.api.domain.nyttmoterequest.RSNyttMoteRequest;
 import no.nav.syfo.axsys.AxsysConsumer;
 import no.nav.syfo.behandlendeenhet.BehandlendeEnhetConsumer;
 import no.nav.syfo.domain.model.*;
-import no.nav.syfo.metric.Metrikk;
+import no.nav.syfo.metric.Metric;
 import no.nav.syfo.narmesteleder.*;
 import no.nav.syfo.pdl.PdlConsumer;
 import no.nav.syfo.repository.dao.*;
@@ -47,7 +47,7 @@ import static org.springframework.util.StringUtils.isEmpty;
 public class MoterInternController {
 
     private OIDCRequestContextHolder contextHolder;
-    private Metrikk metrikk;
+    private Metric metric;
     private final AktorregisterConsumer aktorregisterConsumer;
     private final BehandlendeEnhetConsumer behandlendeEnhetConsumer;
     private MoteService moteService;
@@ -65,7 +65,7 @@ public class MoterInternController {
     @Inject
     public MoterInternController(
             OIDCRequestContextHolder contextHolder,
-            Metrikk metrikk,
+            Metric metric,
             AktorregisterConsumer aktorregisterConsumer,
             BehandlendeEnhetConsumer behandlendeEnhetConsumer,
             MoteService moteService,
@@ -81,7 +81,7 @@ public class MoterInternController {
             VeilederTilgangConsumer tilgangService
     ) {
         this.contextHolder = contextHolder;
-        this.metrikk = metrikk;
+        this.metric = metric;
         this.aktorregisterConsumer = aktorregisterConsumer;
         this.behandlendeEnhetConsumer = behandlendeEnhetConsumer;
         this.moteService = moteService;
@@ -168,7 +168,7 @@ public class MoterInternController {
             moter = populerMedTpsData(moter);
         }
 
-        metrikk.tellEndepunktKall("hent_moter");
+        metric.tellEndepunktKall("hent_moter");
 
         return mapListe(moter, mote2rs)
                 .stream()
@@ -236,7 +236,7 @@ public class MoterInternController {
             arbeidsgiverVarselService.sendVarsel(OPPRETTET, mote, false, innloggetIdent);
             sykmeldtVarselService.sendVarsel(OPPRETTET, mote);
 
-            metrikk.tellEndepunktKall("opprettet_mote");
+            metric.tellEndepunktKall("opprettet_mote");
         }
     }
 

@@ -2,7 +2,7 @@ package no.nav.syfo.service.varselinnhold;
 
 import no.nav.melding.virksomhet.servicemeldingmedkontaktinformasjon.v1.servicemeldingmedkontaktinformasjon.*;
 import no.nav.syfo.domain.model.TredjepartsVarselType;
-import no.nav.syfo.metric.Metrikk;
+import no.nav.syfo.metric.Metric;
 import no.nav.syfo.narmesteleder.NarmesteLederRelasjon;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.jms.core.JmsTemplate;
@@ -24,16 +24,16 @@ public class TredjepartsvarselService {
     private String tjenesterUrl;
 
     private JmsTemplate tredjepartsvarselqueue;
-    private Metrikk metrikk;
+    private Metric metric;
 
     @Autowired
     public TredjepartsvarselService(
             @Qualifier("tredjepartsvarselqueue") JmsTemplate tredjepartsvarselqueue,
-            Metrikk metrikk
+            Metric metric
 
     ) {
         this.tredjepartsvarselqueue = tredjepartsvarselqueue;
-        this.metrikk = metrikk;
+        this.metric = metric;
     }
 
     public void sendVarselTilNaermesteLeder(TredjepartsVarselType type, NarmesteLederRelasjon narmesteLederRelasjon, List<WSParameter> parametere) {
@@ -44,7 +44,7 @@ public class TredjepartsvarselService {
         String xml = marshallTredjepartsServiceMelding(new ObjectFactory().createServicemelding(melding));
         tredjepartsvarselqueue.send(messageCreator(xml, randomUUID().toString()));
 
-        metrikk.tellTredjepartVarselSendt(type.name());
+        metric.tellTredjepartVarselSendt(type.name());
     }
 
     private List<WSKontaktinformasjon> kontaktinformasjon(NarmesteLederRelasjon narmesteLederRelasjon) {

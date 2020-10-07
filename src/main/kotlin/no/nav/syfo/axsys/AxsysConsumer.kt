@@ -1,7 +1,7 @@
 package no.nav.syfo.axsys
 
 import no.nav.syfo.config.CacheConfig
-import no.nav.syfo.metric.Metrikk
+import no.nav.syfo.metric.Metric
 import no.nav.syfo.util.*
 import org.slf4j.LoggerFactory
 import org.springframework.cache.annotation.Cacheable
@@ -13,8 +13,8 @@ import javax.inject.Inject
 
 @Service
 class AxsysConsumer @Inject constructor(
-        private val metric: Metrikk,
-        private val restTemplate: RestTemplate
+    private val metric: Metric,
+    private val restTemplate: RestTemplate
 ) {
     fun axsysTilgangerResponse(navIdent: String): AxsysTilgangerResponse {
         try {

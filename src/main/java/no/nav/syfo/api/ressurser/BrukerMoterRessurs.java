@@ -5,7 +5,7 @@ import no.nav.security.oidc.context.OIDCRequestContextHolder;
 import no.nav.syfo.aktorregister.AktorregisterConsumer;
 import no.nav.syfo.aktorregister.domain.Fodselsnummer;
 import no.nav.syfo.api.domain.bruker.*;
-import no.nav.syfo.metric.Metrikk;
+import no.nav.syfo.metric.Metric;
 import no.nav.syfo.service.*;
 import no.nav.syfo.util.Brukerkontekst;
 import org.springframework.web.bind.annotation.*;
@@ -24,7 +24,7 @@ public class BrukerMoterRessurs {
 
     private OIDCRequestContextHolder contextHolder;
 
-    private final Metrikk metrikk;
+    private final Metric metric;
 
     private AktorregisterConsumer aktorregisterConsumer;
 
@@ -35,13 +35,13 @@ public class BrukerMoterRessurs {
     @Inject
     public BrukerMoterRessurs(
             OIDCRequestContextHolder contextHolder,
-            Metrikk metrikk,
+            Metric metric,
             AktorregisterConsumer aktorregisterConsumer,
             BrukertilgangService brukertilgangService,
             MoteBrukerService moteBrukerService
     ) {
         this.contextHolder = contextHolder;
-        this.metrikk = metrikk;
+        this.metric = metric;
         this.aktorregisterConsumer = aktorregisterConsumer;
         this.brukertilgangService = brukertilgangService;
         this.moteBrukerService = moteBrukerService;
@@ -53,7 +53,7 @@ public class BrukerMoterRessurs {
         String innloggetIdent = getSubjectEkstern(contextHolder);
         String innloggetAktorId = aktorregisterConsumer.getAktorIdForFodselsnummer(new Fodselsnummer(innloggetIdent));
 
-        metrikk.tellEndepunktKall("hent_mote_arbeidsgiver");
+        metric.tellEndepunktKall("hent_mote_arbeidsgiver");
 
         return moteBrukerService.hentBrukerMoteListe(innloggetAktorId, Brukerkontekst.ARBEIDSGIVER);
     }
@@ -66,7 +66,7 @@ public class BrukerMoterRessurs {
 
         brukertilgangService.kastExceptionHvisIkkeTilgang(innloggetIdent);
 
-        metrikk.tellEndepunktKall("hent_mote_arbeidstaker");
+        metric.tellEndepunktKall("hent_mote_arbeidstaker");
 
         return moteBrukerService.hentSisteBrukerMote(innloggetAktorId, Brukerkontekst.ARBEIDSTAKER);
     }
@@ -83,9 +83,9 @@ public class BrukerMoterRessurs {
 
     private void tellMoteSvar(BrukerMoteSvar motesvar) {
         if (Brukerkontekst.ARBEIDSTAKER.equals(motesvar.deltakertype)) {
-            metrikk.tellEndepunktKall("svar_mote_arbeidstaker");
+            metric.tellEndepunktKall("svar_mote_arbeidstaker");
         } else {
-            metrikk.tellEndepunktKall("svar_mote_arbeidsgiver");
+            metric.tellEndepunktKall("svar_mote_arbeidsgiver");
         }
     }
 }

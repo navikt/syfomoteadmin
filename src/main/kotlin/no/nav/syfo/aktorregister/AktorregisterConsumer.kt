@@ -3,7 +3,7 @@ package no.nav.syfo.aktorregister
 import no.nav.syfo.aktorregister.domain.*
 import no.nav.syfo.config.CacheConfig.CACHENAME_AKTOR_FNR
 import no.nav.syfo.config.CacheConfig.CACHENAME_AKTOR_ID
-import no.nav.syfo.metric.Metrikk
+import no.nav.syfo.metric.Metric
 import no.nav.syfo.sts.StsConsumer
 import no.nav.syfo.util.*
 import org.slf4j.LoggerFactory
@@ -19,10 +19,10 @@ import javax.inject.Inject
 
 @Service
 class AktorregisterConsumer @Inject constructor(
-        @Value("\${aktorregister.rest.url}") private val baseUrl: String,
-        private val metric: Metrikk,
-        private val restTemplate: RestTemplate,
-        private val stsConsumer: StsConsumer
+    @Value("\${aktorregister.rest.url}") private val baseUrl: String,
+    private val metric: Metric,
+    private val restTemplate: RestTemplate,
+    private val stsConsumer: StsConsumer
 ) {
     private val responseType: ParameterizedTypeReference<Map<String, IdentinfoListe>> = object : ParameterizedTypeReference<Map<String, IdentinfoListe>>() {}
 

@@ -6,7 +6,7 @@ import no.nav.syfo.aktorregister.domain.*;
 import no.nav.syfo.api.domain.RSBruker;
 import no.nav.syfo.dkif.DigitalKontaktinfo;
 import no.nav.syfo.dkif.DkifConsumer;
-import no.nav.syfo.metric.Metrikk;
+import no.nav.syfo.metric.Metric;
 import no.nav.syfo.pdl.PdlConsumer;
 import no.nav.syfo.veiledertilgang.VeilederTilgangConsumer;
 import org.springframework.web.bind.annotation.*;
@@ -25,7 +25,7 @@ public class PersonController {
     private DkifConsumer dkifConsumer;
     private PdlConsumer pdlConsumer;
     private VeilederTilgangConsumer tilgangService;
-    private Metrikk metrikk;
+    private Metric metric;
 
     @Inject
     public PersonController(
@@ -33,19 +33,19 @@ public class PersonController {
             DkifConsumer dkifConsumer,
             PdlConsumer pdlConsumer,
             VeilederTilgangConsumer tilgangService,
-            Metrikk metrikk
+            Metric metric
     ) {
         this.aktorregisterConsumer = aktorregisterConsumer;
         this.dkifConsumer = dkifConsumer;
         this.pdlConsumer = pdlConsumer;
         this.tilgangService = tilgangService;
-        this.metrikk = metrikk;
+        this.metric = metric;
     }
 
     @GetMapping(produces = APPLICATION_JSON_VALUE)
     @RequestMapping(value = "/navn")
     public RSBruker hentBruker(@PathVariable("ident") String ident) {
-        metrikk.tellEndepunktKall("bruker_navn");
+        metric.tellEndepunktKall("bruker_navn");
 
         Fodselsnummer fnr = getFnrForIdent(ident);
 
@@ -57,7 +57,7 @@ public class PersonController {
 
     @GetMapping(produces = APPLICATION_JSON_VALUE)
     public RSBruker bruker(@PathVariable("ident") String ident) {
-        metrikk.tellEndepunktKall("bruker");
+        metric.tellEndepunktKall("bruker");
 
         Fodselsnummer fnr = getFnrForIdent(ident);
 
