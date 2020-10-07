@@ -26,7 +26,7 @@ import javax.inject.Inject
 @RunWith(SpringRunner::class)
 @SpringBootTest(classes = [LocalApplication::class])
 @DirtiesContext
-class MoterActionsControllerTest {
+class MoteActionsControllerTest {
 
     @MockBean
     private lateinit var moteService: MoteService
@@ -50,7 +50,7 @@ class MoterActionsControllerTest {
 
         moteActionsController.avbryt(uuid.toString(), varsle)
 
-        verify<MoteService>(moteService).avbrytMote(uuid.toString(), varsle, VEILEDER_ID)
+        verify(moteService).avbrytMote(uuid.toString(), varsle, VEILEDER_ID)
     }
 
     @Test(expected = RuntimeException::class)
@@ -67,7 +67,7 @@ class MoterActionsControllerTest {
 
         moteActionsController.bekreft(uuid.toString(), alternativId)
 
-        verify<MoteService>(moteService).bekreftMote(uuid.toString(), alternativId, VEILEDER_ID)
+        verify(moteService).bekreftMote(uuid.toString(), alternativId, VEILEDER_ID)
     }
 
     @Test(expected = RuntimeException::class)
@@ -86,14 +86,14 @@ class MoterActionsControllerTest {
         val alternativeListe = listOf(
                 alternativ
         )
-        val tidStedListe = MapUtil.mapListe<RSNyttAlternativ, TidOgSted>(
+        val tidStedListe = MapUtil.mapListe(
                 alternativeListe,
                 RSNyttMoteMapper.opprett2TidOgSted
         )
 
         moteActionsController.nyeAlternativer(uuid.toString(), alternativeListe)
 
-        verify<MoteService>(moteService).nyeAlternativer(uuid.toString(), tidStedListe, VEILEDER_ID)
+        verify(moteService).nyeAlternativer(uuid.toString(), tidStedListe, VEILEDER_ID)
     }
 
     @Test(expected = RuntimeException::class)

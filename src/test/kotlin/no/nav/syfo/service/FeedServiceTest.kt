@@ -35,7 +35,7 @@ class FeedServiceTest {
 
     @Test
     fun skalOppretteHendelseBekreftetOgTidligereFeedErAlleSvarMottatt() {
-        Mockito.`when`(feedDAO.finnFeedHendelserIMote(1L)).thenReturn(Arrays.asList(
+        Mockito.`when`(feedDAO.finnFeedHendelserIMote(1L)).thenReturn(listOf(
             PFeedHendelse()
                 .created(LocalDateTime.now().minusDays(7))
                 .type(FeedHendelseType.ALLE_SVAR_MOTTATT.name)
@@ -46,7 +46,7 @@ class FeedServiceTest {
 
     @Test
     fun skalIkkeOppretteHendelseBekreftetOgTidligereFeedIkkeErAlleSvarMottatt() {
-        Mockito.`when`(feedDAO.finnFeedHendelserIMote(1L)).thenReturn(Arrays.asList(
+        Mockito.`when`(feedDAO.finnFeedHendelserIMote(1L)).thenReturn(listOf(
             PFeedHendelse()
                 .created(LocalDateTime.now().minusDays(7))
                 .type(FeedHendelseType.FLERE_TIDSPUNKT.name),

@@ -40,7 +40,7 @@ class SessionMock : Session {
     }
 
     @Throws(JMSException::class)
-    override fun createTextMessage(): TextMessage?? {
+    override fun createTextMessage(): TextMessage? {
         return null
     }
 
@@ -58,7 +58,7 @@ class SessionMock : Session {
             }
 
             @Throws(JMSException::class)
-            override fun getJMSMessageID(): String?? {
+            override fun getJMSMessageID(): String? {
                 return null
             }
 

@@ -111,7 +111,7 @@ class MoteBrukerServiceTest {
         val nyesteMote = mote
             .uuid(RIKTIG_UUID)
             .opprettetTidspunkt(femDagerSiden)
-        Mockito.`when`(moteService.findMoterByBrukerAktoerId(ArgumentMatchers.anyString())).thenReturn(Arrays.asList(eldsteMoteOpprettetEtterMottatDato, nyesteMote))
+        Mockito.`when`(moteService.findMoterByBrukerAktoerId(ArgumentMatchers.anyString())).thenReturn(listOf(eldsteMoteOpprettetEtterMottatDato, nyesteMote))
         val funnetBrukerMote = moteBrukerService.hentSisteBrukerMoteEtterDato(aktorId, brukerkontekst, mottattDatoTiDagerSiden).orElse(null)
         Assertions.assertThat(funnetBrukerMote).isNotNull
         Assertions.assertThat(funnetBrukerMote.moteUuid).isEqualToIgnoringCase(RIKTIG_UUID)
@@ -188,7 +188,7 @@ class MoteBrukerServiceTest {
             .status(MoteStatus.OPPRETTET)
             .uuid(RIKTIG_UUID)
             .opprettetTidspunkt(nyesteDatoEtterGrensedato)
-        Mockito.`when`(moteService.findMoterByBrukerAktoerId(ArgumentMatchers.anyString())).thenReturn(Arrays.asList(eldsteMoteOpprettetEtterMottatDato, nyesteMote))
+        Mockito.`when`(moteService.findMoterByBrukerAktoerId(ArgumentMatchers.anyString())).thenReturn(listOf(eldsteMoteOpprettetEtterMottatDato, nyesteMote))
         val harMoteplanleggerIBrukEtterDato = moteBrukerService.harMoteplanleggerIBruk(Fodselsnummer(ARBEIDSTAKER_FNR), brukerkontekst, mottattDatoTiDagerSiden)
         Assertions.assertThat(harMoteplanleggerIBrukEtterDato).isTrue
     }
