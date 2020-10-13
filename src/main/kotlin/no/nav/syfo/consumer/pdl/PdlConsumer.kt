@@ -5,7 +5,6 @@ import no.nav.syfo.consumer.sts.StsConsumer
 import no.nav.syfo.util.*
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.core.ParameterizedTypeReference
 import org.springframework.http.*
 import org.springframework.http.HttpHeaders.AUTHORIZATION
 import org.springframework.stereotype.Service
@@ -20,18 +19,22 @@ class PdlConsumer(
     private val restTemplate: RestTemplate
 ) {
     fun person(ident: String): PdlHentPerson? {
-        metric.countEvent("call_pdl")
-
-        val query = this::class.java.getResource("/pdl/hentPerson.graphql").readText().replace("[\n\r]", "")
-        val entity = createRequestEntity(PdlRequest(query, Variables(ident)))
+        val query = getPdlQuery("/pdl/hentPerson.graphql")
+        val request = PdlRequest(
+            query = query,
+            variables = Variables(ident)
+        )
+        val entity = HttpEntity(
+            request,
+            createRequestHeaders()
+        )
         try {
-            val pdlPerson = restTemplate.exchange<PdlPersonResponse>(
+            val pdlPerson = restTemplate.exchange(
                     pdlUrl,
                     HttpMethod.POST,
                     entity,
-                    object : ParameterizedTypeReference<PdlPersonResponse>() {}
+                    PdlPersonResponse::class.java
             )
-
             val pdlPersonReponse = pdlPerson.body!!
             return if (pdlPersonReponse.errors != null && pdlPersonReponse.errors.isNotEmpty()) {
                 metric.countEvent("call_pdl_fail")
@@ -50,6 +53,12 @@ class PdlConsumer(
         }
     }
 
+    private fun getPdlQuery(queryFilePath: String): String {
+        return this::class.java.getResource(queryFilePath)
+            .readText()
+            .replace("[\n\r]", "")
+    }
+
     fun fullName(ident: String): String {
         return person(ident)?.fullName() ?: throw PdlRequestFailedException()
     }
@@ -62,14 +71,14 @@ class PdlConsumer(
         return person(ident)?.isKode6Or7() ?: throw PdlRequestFailedException()
     }
 
-    private fun createRequestEntity(request: PdlRequest): HttpEntity<PdlRequest> {
+    private fun createRequestHeaders(): HttpHeaders {
         val stsToken: String = stsConsumer.token()
         val headers = HttpHeaders()
         headers.contentType = MediaType.APPLICATION_JSON
         headers.set(TEMA_HEADER, ALLE_TEMA_HEADERVERDI)
         headers.set(AUTHORIZATION, bearerCredentials(stsToken))
         headers.set(NAV_CONSUMER_TOKEN_HEADER, bearerCredentials(stsToken))
-        return HttpEntity(request, headers)
+        return headers
     }
 
     companion object {
