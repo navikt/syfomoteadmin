@@ -1,7 +1,7 @@
 package no.nav.syfo.service;
 
 import no.nav.syfo.consumer.aktorregister.AktorregisterConsumer;
-import no.nav.syfo.consumer.aktorregister.domain.AktorId;
+import no.nav.syfo.domain.AktorId;
 import no.nav.syfo.api.domain.RSHistorikk;
 import no.nav.syfo.domain.model.*;
 import no.nav.syfo.consumer.pdl.PdlConsumer;

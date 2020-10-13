@@ -2,7 +2,7 @@ package no.nav.syfo.api.ressurser;
 
 import no.nav.security.oidc.api.Protected;
 import no.nav.security.oidc.api.ProtectedWithClaims;
-import no.nav.syfo.consumer.aktorregister.domain.Fodselsnummer;
+import no.nav.syfo.domain.Fodselsnummer;
 import no.nav.syfo.service.MoteBrukerService;
 import no.nav.syfo.util.Brukerkontekst;
 import org.springframework.web.bind.annotation.*;

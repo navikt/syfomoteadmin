@@ -2,7 +2,7 @@ package no.nav.syfo.api.ressurser.azuread;
 
 import no.nav.security.oidc.api.ProtectedWithClaims;
 import no.nav.syfo.consumer.aktorregister.AktorregisterConsumer;
-import no.nav.syfo.consumer.aktorregister.domain.Fodselsnummer;
+import no.nav.syfo.domain.Fodselsnummer;
 import no.nav.syfo.api.domain.RSHistorikk;
 import no.nav.syfo.domain.model.Mote;
 import no.nav.syfo.service.*;

@@ -5,6 +5,8 @@ import no.nav.syfo.config.CacheConfig.CACHENAME_AKTOR_FNR
 import no.nav.syfo.config.CacheConfig.CACHENAME_AKTOR_ID
 import no.nav.syfo.metric.Metric
 import no.nav.syfo.consumer.sts.StsConsumer
+import no.nav.syfo.domain.AktorId
+import no.nav.syfo.domain.Fodselsnummer
 import no.nav.syfo.util.*
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value

@@ -2,7 +2,7 @@ package no.nav.syfo.controller.internad
 
 import no.nav.syfo.LocalApplication
 import no.nav.syfo.consumer.aktorregister.AktorregisterConsumer
-import no.nav.syfo.consumer.aktorregister.domain.AktorId
+import no.nav.syfo.domain.AktorId
 import no.nav.syfo.api.ressurser.azuread.AktorController
 import no.nav.syfo.testhelper.OidcTestHelper.loggInnVeilederAzure
 import no.nav.syfo.testhelper.OidcTestHelper.loggUtAlle

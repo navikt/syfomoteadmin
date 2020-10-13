@@ -2,8 +2,8 @@ package no.nav.syfo.controller.internad
 
 import no.nav.syfo.LocalApplication
 import no.nav.syfo.consumer.aktorregister.AktorregisterConsumer
-import no.nav.syfo.consumer.aktorregister.domain.AktorId
-import no.nav.syfo.consumer.aktorregister.domain.Fodselsnummer
+import no.nav.syfo.domain.AktorId
+import no.nav.syfo.domain.Fodselsnummer
 import no.nav.syfo.api.domain.nyttmoterequest.RSNyttMoteRequest
 import no.nav.syfo.api.ressurser.azuread.MoterInternController
 import no.nav.syfo.consumer.axsys.AxsysConsumer

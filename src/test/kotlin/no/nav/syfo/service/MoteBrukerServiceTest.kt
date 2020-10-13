@@ -2,7 +2,7 @@ package no.nav.syfo.service
 
 import no.nav.security.oidc.context.OIDCRequestContextHolder
 import no.nav.syfo.consumer.aktorregister.AktorregisterConsumer
-import no.nav.syfo.consumer.aktorregister.domain.Fodselsnummer
+import no.nav.syfo.domain.Fodselsnummer
 import no.nav.syfo.domain.model.*
 import no.nav.syfo.consumer.pdl.PdlConsumer
 import no.nav.syfo.testhelper.UserConstants.ARBEIDSTAKER_AKTORID
