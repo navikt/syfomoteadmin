@@ -1,11 +1,11 @@
 package no.nav.syfo.controller.internad
 
 import no.nav.syfo.LocalApplication
-import no.nav.syfo.consumer.aktorregister.AktorregisterConsumer
-import no.nav.syfo.domain.AktorId
 import no.nav.syfo.api.ressurser.azuread.PersonController
 import no.nav.syfo.consumer.dkif.DkifConsumer
 import no.nav.syfo.consumer.pdl.PdlConsumer
+import no.nav.syfo.domain.AktorId
+import no.nav.syfo.domain.Fodselsnummer
 import no.nav.syfo.testhelper.OidcTestHelper.loggInnVeilederAzure
 import no.nav.syfo.testhelper.OidcTestHelper.loggUtAlle
 import no.nav.syfo.testhelper.UserConstants.ARBEIDSTAKER_AKTORID
@@ -30,9 +30,6 @@ import javax.ws.rs.ForbiddenException
 @DirtiesContext
 class PersonControllerTest : AbstractRessursTilgangTest() {
     @MockBean
-    private lateinit var aktorregisterConsumer: AktorregisterConsumer
-
-    @MockBean
     private lateinit var dkifConsumer: DkifConsumer
 
     @MockBean
@@ -43,7 +40,7 @@ class PersonControllerTest : AbstractRessursTilgangTest() {
 
     @Before
     fun setup() {
-        Mockito.`when`(aktorregisterConsumer.getFnrForAktorId(AktorId(ARBEIDSTAKER_AKTORID))).thenReturn(ARBEIDSTAKER_FNR)
+        Mockito.`when`(pdlConsumer.fodselsnummer(AktorId(ARBEIDSTAKER_AKTORID))).thenReturn(Fodselsnummer(ARBEIDSTAKER_FNR))
         try {
             loggInnVeilederAzure(oidcRequestContextHolder, VEILEDER_ID)
         } catch (e: ParseException) {

@@ -1,8 +1,8 @@
 package no.nav.syfo.api.ressurser.azuread;
 
 import no.nav.security.oidc.api.ProtectedWithClaims;
-import no.nav.syfo.consumer.aktorregister.AktorregisterConsumer;
 import no.nav.syfo.api.domain.RSAktor;
+import no.nav.syfo.consumer.pdl.PdlConsumer;
 import no.nav.syfo.consumer.veiledertilgang.VeilederTilgangConsumer;
 import no.nav.syfo.domain.AktorId;
 import no.nav.syfo.domain.Fodselsnummer;
@@ -18,21 +18,21 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @ProtectedWithClaims(issuer = AZURE)
 public class AktorController {
 
-    private final AktorregisterConsumer aktorregisterConsumer;
+    private final PdlConsumer pdlConsumer;
     private final VeilederTilgangConsumer tilgangService;
 
     @Inject
     public AktorController(
-            AktorregisterConsumer aktorregisterConsumer,
+            PdlConsumer pdlConsumer,
             VeilederTilgangConsumer tilgangService
     ) {
-        this.aktorregisterConsumer = aktorregisterConsumer;
+        this.pdlConsumer = pdlConsumer;
         this.tilgangService = tilgangService;
     }
 
     @GetMapping(produces = APPLICATION_JSON_VALUE)
     public RSAktor get(@PathVariable("aktorId") String aktorId) {
-        final Fodselsnummer fnr = new Fodselsnummer(aktorregisterConsumer.getFnrForAktorId(new AktorId(aktorId)));
+        final Fodselsnummer fnr = pdlConsumer.fodselsnummer(new AktorId(aktorId));
 
         tilgangService.throwExceptionIfVeilederWithoutAccess(fnr);
 
