@@ -1,7 +1,6 @@
 package no.nav.syfo.service;
 
 import no.nav.security.oidc.context.OIDCRequestContextHolder;
-import no.nav.syfo.consumer.aktorregister.AktorregisterConsumer;
 import no.nav.syfo.domain.AktorId;
 import no.nav.syfo.domain.Fodselsnummer;
 import no.nav.syfo.api.domain.bruker.*;
@@ -31,8 +30,6 @@ public class MoteBrukerService {
 
     private OIDCRequestContextHolder contextHolder;
 
-    private AktorregisterConsumer aktorregisterConsumer;
-
     private final PdlConsumer pdlConsumer;
 
     private BrukertilgangService brukertilgangService;
@@ -46,7 +43,6 @@ public class MoteBrukerService {
     @Inject
     public MoteBrukerService(
             OIDCRequestContextHolder contextHolder,
-            AktorregisterConsumer aktorregisterConsumer,
             BrukertilgangService brukertilgangService,
             MoteService moteService,
             MotedeltakerService motedeltakerService,
@@ -54,7 +50,6 @@ public class MoteBrukerService {
             PdlConsumer pdlConsumer
     ) {
         this.contextHolder = contextHolder;
-        this.aktorregisterConsumer = aktorregisterConsumer;
         this.brukertilgangService = brukertilgangService;
         this.moteService = moteService;
         this.motedeltakerService = motedeltakerService;
@@ -79,9 +74,9 @@ public class MoteBrukerService {
     }
 
     public Boolean harMoteplanleggerIBruk(Fodselsnummer fnr, String brukerkontekst, LocalDateTime tidligsteOpprettetGrense) {
-        String aktorId = aktorregisterConsumer.getAktorIdForFodselsnummer(fnr);
+        AktorId aktorId = pdlConsumer.aktorId(fnr);
         LocalDateTime today = LocalDateTime.now();
-        return Optional.of(hentBrukerMoteListe(aktorId, brukerkontekst)
+        return Optional.of(hentBrukerMoteListe(aktorId.getValue(), brukerkontekst)
                 .stream()
                 .filter((mote) ->
                         mote.status.equals(OPPRETTET.name())
@@ -99,12 +94,12 @@ public class MoteBrukerService {
         return mapListe(moter, mote2BrukerMote)
                 .stream()
                 .map(brukerMote -> brukerMote
-                        .fnr(finnAktoersFnrFraMotet(brukerMote))
+                        .fnr(finnAktoersFnrFraMotet(brukerMote).getValue())
                         .deltakere(brukerMote.deltakere()
                                 .stream()
                                 .map(deltaker -> {
                                     if (Brukerkontekst.ARBEIDSTAKER.equals(deltaker.type)) {
-                                        return deltaker.navn(pdlConsumer.fullName(aktorregisterConsumer.getFnrForAktorId(new AktorId(deltaker.aktoerId))));
+                                        return deltaker.navn(pdlConsumer.fullName(pdlConsumer.fodselsnummer(new AktorId(deltaker.aktoerId)).getValue()));
                                     }
                                     return deltaker;
                                 })
@@ -117,12 +112,12 @@ public class MoteBrukerService {
         String brukerkontekst = Brukerkontekst.ARBEIDSTAKER.equals(brukerMoteSvar.deltakertype)
                 ? Brukerkontekst.ARBEIDSTAKER
                 : Brukerkontekst.ARBEIDSGIVER;
-        String innloggetAktorId = aktorregisterConsumer.getAktorIdForFodselsnummer(new Fodselsnummer(getSubjectEkstern(contextHolder)));
-        Mote mote = hentMoteByUuid(moteUuid, innloggetAktorId, brukerkontekst);
+        AktorId innloggetAktorId = pdlConsumer.aktorId(new Fodselsnummer(getSubjectEkstern(contextHolder)));
+        Mote mote = hentMoteByUuid(moteUuid, innloggetAktorId.getValue(), brukerkontekst);
         String arbeidstakerAktorId = motedeltakerService.finnArbeidstakerAktorIdForMoteId(mote.id);
-        String arbeidstakerFnr = aktorregisterConsumer.getFnrForAktorId(new AktorId(arbeidstakerAktorId));
+        Fodselsnummer arbeidstakerFnr = pdlConsumer.fodselsnummer(new AktorId(arbeidstakerAktorId));
 
-        brukertilgangService.kastExceptionHvisIkkeTilgang(arbeidstakerFnr);
+        brukertilgangService.kastExceptionHvisIkkeTilgang(arbeidstakerFnr.getValue());
 
         if (mote.status.equals(MoteStatus.AVBRUTT)) {
             throw new IllegalStateException("Prøver å svare på et alternativ som ikke har status OPPRETTET");
@@ -170,11 +165,11 @@ public class MoteBrukerService {
                 .noneMatch(alternativ -> motedeltaker.svartTidspunkt == null || alternativ.created.isAfter(motedeltaker.svartTidspunkt));
     }
 
-    private String finnAktoersFnrFraMotet(BrukerMote mote) {
+    private Fodselsnummer finnAktoersFnrFraMotet(BrukerMote mote) {
         String aktorId = mote.deltakere.stream()
                 .filter(motedeltaker -> "Bruker".equals(motedeltaker.type))
                 .findFirst().orElseThrow(() -> new NotFoundException("Fant ikke bruker!"))
                 .aktoerId;
-        return aktorregisterConsumer.getFnrForAktorId(new AktorId(aktorId));
+        return pdlConsumer.fodselsnummer(new AktorId(aktorId));
     }
 }

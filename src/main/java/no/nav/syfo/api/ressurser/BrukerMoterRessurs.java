@@ -2,7 +2,8 @@ package no.nav.syfo.api.ressurser;
 
 import no.nav.security.oidc.api.ProtectedWithClaims;
 import no.nav.security.oidc.context.OIDCRequestContextHolder;
-import no.nav.syfo.consumer.aktorregister.AktorregisterConsumer;
+import no.nav.syfo.consumer.pdl.PdlConsumer;
+import no.nav.syfo.domain.AktorId;
 import no.nav.syfo.domain.Fodselsnummer;
 import no.nav.syfo.api.domain.bruker.*;
 import no.nav.syfo.metric.Metric;
@@ -26,23 +27,23 @@ public class BrukerMoterRessurs {
 
     private final Metric metric;
 
-    private AktorregisterConsumer aktorregisterConsumer;
-
     private BrukertilgangService brukertilgangService;
 
     private MoteBrukerService moteBrukerService;
+
+    private final PdlConsumer pdlConsumer;
 
     @Inject
     public BrukerMoterRessurs(
             OIDCRequestContextHolder contextHolder,
             Metric metric,
-            AktorregisterConsumer aktorregisterConsumer,
             BrukertilgangService brukertilgangService,
-            MoteBrukerService moteBrukerService
+            MoteBrukerService moteBrukerService,
+            PdlConsumer pdlConsumer
     ) {
         this.contextHolder = contextHolder;
         this.metric = metric;
-        this.aktorregisterConsumer = aktorregisterConsumer;
+        this.pdlConsumer = pdlConsumer;
         this.brukertilgangService = brukertilgangService;
         this.moteBrukerService = moteBrukerService;
     }
@@ -51,24 +52,24 @@ public class BrukerMoterRessurs {
     @RequestMapping(value = "/arbeidsgiver/moter")
     public List<BrukerMote> hentMoter() {
         String innloggetIdent = getSubjectEkstern(contextHolder);
-        String innloggetAktorId = aktorregisterConsumer.getAktorIdForFodselsnummer(new Fodselsnummer(innloggetIdent));
+        AktorId innloggetAktorId = pdlConsumer.aktorId(new Fodselsnummer(innloggetIdent));
 
         metric.tellEndepunktKall("hent_mote_arbeidsgiver");
 
-        return moteBrukerService.hentBrukerMoteListe(innloggetAktorId, Brukerkontekst.ARBEIDSGIVER);
+        return moteBrukerService.hentBrukerMoteListe(innloggetAktorId.getValue(), Brukerkontekst.ARBEIDSGIVER);
     }
 
     @GetMapping(produces = APPLICATION_JSON_VALUE)
     @RequestMapping(value = "/arbeidstaker/moter/siste")
     public BrukerMote hentSisteMote() {
         String innloggetIdent = getSubjectEkstern(contextHolder);
-        String innloggetAktorId = aktorregisterConsumer.getAktorIdForFodselsnummer(new Fodselsnummer(innloggetIdent));
+        AktorId innloggetAktorId = pdlConsumer.aktorId(new Fodselsnummer(innloggetIdent));
 
         brukertilgangService.kastExceptionHvisIkkeTilgang(innloggetIdent);
 
         metric.tellEndepunktKall("hent_mote_arbeidstaker");
 
-        return moteBrukerService.hentSisteBrukerMote(innloggetAktorId, Brukerkontekst.ARBEIDSTAKER);
+        return moteBrukerService.hentSisteBrukerMote(innloggetAktorId.getValue(), Brukerkontekst.ARBEIDSTAKER);
     }
 
     @PostMapping(consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)

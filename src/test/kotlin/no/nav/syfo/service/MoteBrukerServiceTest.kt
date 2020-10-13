@@ -1,10 +1,10 @@
 package no.nav.syfo.service
 
 import no.nav.security.oidc.context.OIDCRequestContextHolder
-import no.nav.syfo.consumer.aktorregister.AktorregisterConsumer
 import no.nav.syfo.domain.Fodselsnummer
 import no.nav.syfo.domain.model.*
 import no.nav.syfo.consumer.pdl.PdlConsumer
+import no.nav.syfo.domain.AktorId
 import no.nav.syfo.testhelper.UserConstants.ARBEIDSTAKER_AKTORID
 import no.nav.syfo.testhelper.UserConstants.ARBEIDSTAKER_FNR
 import no.nav.syfo.util.Brukerkontekst
@@ -20,9 +20,6 @@ import java.time.LocalDateTime
 class MoteBrukerServiceTest {
     @Mock
     private lateinit var contextHolder: OIDCRequestContextHolder
-
-    @Mock
-    private lateinit var aktorregisterConsumer: AktorregisterConsumer
 
     @Mock
     private lateinit var brukertilgangService: BrukertilgangService
@@ -80,7 +77,8 @@ class MoteBrukerServiceTest {
 
     @Before
     fun setup() {
-        Mockito.`when`(aktorregisterConsumer.getAktorIdForFodselsnummer(Fodselsnummer(ARBEIDSTAKER_FNR))).thenReturn(ARBEIDSTAKER_AKTORID)
+        Mockito.`when`(pdlConsumer.aktorId(Fodselsnummer(ARBEIDSTAKER_FNR))).thenReturn(AktorId(ARBEIDSTAKER_AKTORID))
+        Mockito.`when`(pdlConsumer.fodselsnummer(AktorId(ARBEIDSTAKER_AKTORID))).thenReturn(Fodselsnummer(ARBEIDSTAKER_FNR))
     }
 
     @Test

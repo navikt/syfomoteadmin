@@ -2,8 +2,8 @@ package no.nav.syfo.api.ressurser.azuread;
 
 import no.nav.security.oidc.api.ProtectedWithClaims;
 import no.nav.security.oidc.context.OIDCRequestContextHolder;
-import no.nav.syfo.consumer.aktorregister.AktorregisterConsumer;
 import no.nav.syfo.api.domain.RSEpostInnhold;
+import no.nav.syfo.consumer.pdl.PdlConsumer;
 import no.nav.syfo.domain.AktorId;
 import no.nav.syfo.domain.Fodselsnummer;
 import no.nav.syfo.domain.model.*;
@@ -31,9 +31,9 @@ public class EmailContentController {
 
     private OIDCRequestContextHolder contextHolder;
 
-    private AktorregisterConsumer aktorregisterConsumer;
-
     private MoteService moteService;
+
+    private final PdlConsumer pdlConsumer;
 
     private VeilederTilgangConsumer tilgangService;
 
@@ -42,14 +42,14 @@ public class EmailContentController {
     @Inject
     public EmailContentController(
             OIDCRequestContextHolder contextHolder,
-            AktorregisterConsumer aktorregisterConsumer,
             MoteService moteService,
+            PdlConsumer pdlConsumer,
             VeilederTilgangConsumer tilgangService,
             ArbeidsgiverVarselService arbeidsgiverVarselService
     ) {
         this.contextHolder = contextHolder;
-        this.aktorregisterConsumer = aktorregisterConsumer;
         this.moteService = moteService;
+        this.pdlConsumer = pdlConsumer;
         this.tilgangService = tilgangService;
         this.arbeidsgiverVarselService = arbeidsgiverVarselService;
     }
@@ -61,7 +61,7 @@ public class EmailContentController {
             @RequestParam(value = "valgtAlternativId", required = false) String valgtAlternativId
     ) {
         Mote Mote = moteService.findMoteByMotedeltakerUuid(motedeltakeruuid);
-        Fodselsnummer sykmeldtFnr = new Fodselsnummer(aktorregisterConsumer.getFnrForAktorId(new AktorId(Mote.sykmeldt().aktorId)));
+        Fodselsnummer sykmeldtFnr = pdlConsumer.fodselsnummer(new AktorId(Mote.sykmeldt().aktorId));
 
         tilgangService.throwExceptionIfVeilederWithoutAccess(sykmeldtFnr);
 
