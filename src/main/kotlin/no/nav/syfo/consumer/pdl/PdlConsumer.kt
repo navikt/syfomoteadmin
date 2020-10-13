@@ -37,17 +37,17 @@ class PdlConsumer(
             )
             val pdlPersonReponse = pdlPerson.body!!
             return if (pdlPersonReponse.errors != null && pdlPersonReponse.errors.isNotEmpty()) {
-                metric.countEvent("call_pdl_fail")
+                metric.countEvent(CALL_PDL_PERSON_FAIL)
                 pdlPersonReponse.errors.forEach {
                     LOG.error("Error while requesting person from PersonDataLosningen: ${it.errorMessage()}")
                 }
                 null
             } else {
-                metric.countEvent("call_pdl_success")
+                metric.countEvent(CALL_PDL_PERSON_SUCCESS)
                 pdlPersonReponse.data
             }
         } catch (exception: RestClientResponseException) {
-            metric.countEvent("call_pdl_fail")
+            metric.countEvent(CALL_PDL_PERSON_FAIL)
             LOG.error("Error from PDL with request-url: $pdlUrl", exception)
             throw exception
         }
@@ -83,5 +83,9 @@ class PdlConsumer(
 
     companion object {
         private val LOG = LoggerFactory.getLogger(PdlConsumer::class.java)
+
+        private const val CALL_PDL_BASE = "call_pdl"
+        const val CALL_PDL_PERSON_FAIL = "${CALL_PDL_BASE}_person_fail"
+        const val CALL_PDL_PERSON_SUCCESS = "${CALL_PDL_BASE}_person_success"
     }
 }
