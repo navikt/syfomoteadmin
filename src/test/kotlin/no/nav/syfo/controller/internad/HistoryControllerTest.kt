@@ -1,8 +1,10 @@
 package no.nav.syfo.controller.internad
 
 import no.nav.syfo.LocalApplication
-import no.nav.syfo.consumer.aktorregister.AktorregisterConsumer
 import no.nav.syfo.api.ressurser.azuread.HistoryController
+import no.nav.syfo.consumer.pdl.PdlConsumer
+import no.nav.syfo.domain.AktorId
+import no.nav.syfo.domain.Fodselsnummer
 import no.nav.syfo.service.HistorikkService
 import no.nav.syfo.service.MoteService
 import no.nav.syfo.testhelper.OidcTestHelper.loggInnVeilederAzure
@@ -27,7 +29,7 @@ import javax.ws.rs.ForbiddenException
 @DirtiesContext
 class HistoryControllerTest : AbstractRessursTilgangTest() {
     @MockBean
-    private lateinit var aktorregisterConsumer: AktorregisterConsumer
+    private lateinit var pdlConsumer: PdlConsumer
 
     @MockBean
     private lateinit var historikkService: HistorikkService
@@ -51,6 +53,7 @@ class HistoryControllerTest : AbstractRessursTilgangTest() {
 
     @Test
     fun historyHasAccess() {
+        Mockito.`when`(pdlConsumer.aktorId(Fodselsnummer(ARBEIDSTAKER_FNR))).thenReturn(AktorId(ARBEIDSTAKER_AKTORID))
         Mockito.`when`(moteService.findMoterByBrukerAktoerId(ARBEIDSTAKER_AKTORID)).thenReturn(emptyList())
         Mockito.`when`(historikkService.opprettetHistorikk(emptyList())).thenReturn(emptyList())
         Mockito.`when`(historikkService.flereTidspunktHistorikk(emptyList())).thenReturn(emptyList())

@@ -1,7 +1,7 @@
 package no.nav.syfo.api.ressurser.azuread;
 
 import no.nav.security.oidc.api.ProtectedWithClaims;
-import no.nav.syfo.consumer.aktorregister.AktorregisterConsumer;
+import no.nav.syfo.consumer.pdl.PdlConsumer;
 import no.nav.syfo.domain.Fodselsnummer;
 import no.nav.syfo.api.domain.RSHistorikk;
 import no.nav.syfo.domain.model.Mote;
@@ -23,21 +23,21 @@ public class HistoryController {
 
     private VeilederTilgangConsumer tilgangService;
 
-    private AktorregisterConsumer aktorregisterConsumer;
-
     private MoteService moteService;
+
+    private PdlConsumer pdlConsumer;
 
     private HistorikkService historikkService;
 
     @Inject
     public HistoryController(
             VeilederTilgangConsumer tilgangService,
-            AktorregisterConsumer aktorregisterConsumer,
             MoteService moteService,
+            PdlConsumer pdlConsumer,
             HistorikkService historikkService
     ) {
         this.tilgangService = tilgangService;
-        this.aktorregisterConsumer = aktorregisterConsumer;
+        this.pdlConsumer = pdlConsumer;
         this.moteService = moteService;
         this.historikkService = historikkService;
     }
@@ -50,7 +50,7 @@ public class HistoryController {
 
         tilgangService.throwExceptionIfVeilederWithoutAccess(personFnr);
 
-        List<Mote> moter = moteService.findMoterByBrukerAktoerId(aktorregisterConsumer.getAktorIdForFodselsnummer(personFnr));
+        List<Mote> moter = moteService.findMoterByBrukerAktoerId(pdlConsumer.aktorId(personFnr).getValue());
         List<RSHistorikk> historikk = new ArrayList<>();
         historikk.addAll(historikkService.opprettetHistorikk(moter));
         historikk.addAll(historikkService.flereTidspunktHistorikk(moter));

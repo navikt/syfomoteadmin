@@ -1,7 +1,9 @@
 package no.nav.syfo.consumer.pdl
 
-import no.nav.syfo.metric.Metric
 import no.nav.syfo.consumer.sts.StsConsumer
+import no.nav.syfo.domain.AktorId
+import no.nav.syfo.domain.Fodselsnummer
+import no.nav.syfo.metric.Metric
 import no.nav.syfo.util.*
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
@@ -18,6 +20,57 @@ class PdlConsumer(
     private val stsConsumer: StsConsumer,
     private val restTemplate: RestTemplate
 ) {
+    fun aktorId(fodselsnummer: Fodselsnummer): AktorId {
+        return identer(fodselsnummer.value).aktorId()
+            ?: throw PdlRequestFailedException("Request to get Ident of Type ${IdentType.AKTORID.name} from PDL Failed")
+    }
+
+    fun fodselsnummer(aktorId: AktorId): Fodselsnummer {
+        return identer(aktorId.value).fodselsnummer()
+            ?: throw PdlRequestFailedException("Request to get Ident of Type ${IdentType.FOLKEREGISTERIDENT.name} from PDL Failed")
+    }
+
+    fun identer(ident: String): PdlHentIdenter? {
+        val request = PdlHentIdenterRequest(
+            query = getPdlQuery("/pdl/hentIdenter.graphql"),
+            variables = PdlHentIdenterRequestVariables(
+                ident = ident,
+                historikk = false,
+                grupper = listOf(
+                    IdentType.AKTORID.name,
+                    IdentType.FOLKEREGISTERIDENT.name
+                )
+            )
+        )
+        val entity = HttpEntity(
+            request,
+            createRequestHeaders()
+        )
+        try {
+            val pdlReponseEntity = restTemplate.exchange(
+                pdlUrl,
+                HttpMethod.POST,
+                entity,
+                PdlIdenterResponse::class.java
+            )
+            val pdlIdenterReponse = pdlReponseEntity.body!!
+            return if (pdlIdenterReponse.errors != null && pdlIdenterReponse.errors.isNotEmpty()) {
+                metric.countEvent(CALL_PDL_IDENTER_FAIL)
+                pdlIdenterReponse.errors.forEach {
+                    LOG.error("Error while requesting Identer from PersonDataLosningen: ${it.errorMessage()}")
+                }
+                null
+            } else {
+                metric.countEvent(CALL_PDL_IDENTER_SUCCESS)
+                pdlIdenterReponse.data
+            }
+        } catch (exception: RestClientResponseException) {
+            metric.countEvent(CALL_PDL_IDENTER_FAIL)
+            LOG.error("Error from PDL with request-url: $pdlUrl", exception)
+            throw exception
+        }
+    }
+
     fun person(ident: String): PdlHentPerson? {
         val query = getPdlQuery("/pdl/hentPerson.graphql")
         val request = PdlRequest(
@@ -30,10 +83,10 @@ class PdlConsumer(
         )
         try {
             val pdlPerson = restTemplate.exchange(
-                    pdlUrl,
-                    HttpMethod.POST,
-                    entity,
-                    PdlPersonResponse::class.java
+                pdlUrl,
+                HttpMethod.POST,
+                entity,
+                PdlPersonResponse::class.java
             )
             val pdlPersonReponse = pdlPerson.body!!
             return if (pdlPersonReponse.errors != null && pdlPersonReponse.errors.isNotEmpty()) {
@@ -87,5 +140,7 @@ class PdlConsumer(
         private const val CALL_PDL_BASE = "call_pdl"
         const val CALL_PDL_PERSON_FAIL = "${CALL_PDL_BASE}_person_fail"
         const val CALL_PDL_PERSON_SUCCESS = "${CALL_PDL_BASE}_person_success"
+        const val CALL_PDL_IDENTER_FAIL = "${CALL_PDL_BASE}_identer_fail"
+        const val CALL_PDL_IDENTER_SUCCESS = "${CALL_PDL_BASE}_identer_success"
     }
 }

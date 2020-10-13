@@ -124,7 +124,7 @@ public class MoterInternController {
             } else {
                 moterByFnr.addAll(
                         moteService.findMoterByBrukerAktoerId(
-                                aktorregisterConsumer.getAktorIdForFodselsnummer(new Fodselsnummer(fnr))
+                                pdlConsumer.aktorId(new Fodselsnummer(fnr)).getValue()
                         )
                 );
                 moter.addAll(moterByFnr);
@@ -206,7 +206,7 @@ public class MoterInternController {
         if (pdlConsumer.isKode6Or7(nyttMoteRequest.fnr) || !tilgangService.hasVeilederAccessToPerson(nyttMoteRequest.fnr)) {
             throw new ForbiddenException();
         } else {
-            String aktorId = aktorregisterConsumer.getAktorIdForFodselsnummer(new Fodselsnummer(nyttMoteRequest.fnr));
+            String aktorId = pdlConsumer.aktorId(new Fodselsnummer(nyttMoteRequest.fnr)).getValue();
             NarmesteLederRelasjon narmesteLederRelasjon = Optional.ofNullable(narmesteLederConsumer.narmesteLederRelasjonLeder(aktorId, nyttMoteRequest.orgnummer))
                     .orElseThrow(() -> new RuntimeException("Fant ikke nærmeste leder"));
             String lederNavn = pdlConsumer.fullName(

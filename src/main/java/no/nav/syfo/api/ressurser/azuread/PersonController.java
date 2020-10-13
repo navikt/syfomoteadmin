@@ -1,7 +1,6 @@
 package no.nav.syfo.api.ressurser.azuread;
 
 import no.nav.security.oidc.api.ProtectedWithClaims;
-import no.nav.syfo.consumer.aktorregister.AktorregisterConsumer;
 import no.nav.syfo.api.domain.RSBruker;
 import no.nav.syfo.consumer.dkif.DigitalKontaktinfo;
 import no.nav.syfo.consumer.dkif.DkifConsumer;
@@ -22,7 +21,6 @@ import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 @ProtectedWithClaims(issuer = AZURE)
 public class PersonController {
 
-    private AktorregisterConsumer aktorregisterConsumer;
     private DkifConsumer dkifConsumer;
     private PdlConsumer pdlConsumer;
     private VeilederTilgangConsumer tilgangService;
@@ -30,13 +28,11 @@ public class PersonController {
 
     @Inject
     public PersonController(
-            AktorregisterConsumer aktorregisterConsumer,
             DkifConsumer dkifConsumer,
             PdlConsumer pdlConsumer,
             VeilederTilgangConsumer tilgangService,
             Metric metric
     ) {
-        this.aktorregisterConsumer = aktorregisterConsumer;
         this.dkifConsumer = dkifConsumer;
         this.pdlConsumer = pdlConsumer;
         this.tilgangService = tilgangService;
@@ -81,7 +77,7 @@ public class PersonController {
         if (ident.matches("\\d{11}$")) {
             fnr = new Fodselsnummer(ident);
         } else {
-            fnr = new Fodselsnummer(aktorregisterConsumer.getFnrForAktorId(new AktorId(ident)));
+            fnr = pdlConsumer.fodselsnummer(new AktorId(ident));
         }
         return fnr;
     }
