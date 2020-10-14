@@ -103,8 +103,6 @@ spec:
       value: srvsyfomotebehov,srvsyfoservice
     - name: AD_ACCESSTOKEN_URL
       value: https://login.microsoftonline.com/navq.onmicrosoft.com/oauth2/token
-    - name: AKTORREGISTER_REST_URL
-      value: https://app-q1.adeo.no/aktoerregister/api/v1
     - name: EREG_BASEURL
       value: https://modapp-q1.adeo.no
     - name: PDL_URL

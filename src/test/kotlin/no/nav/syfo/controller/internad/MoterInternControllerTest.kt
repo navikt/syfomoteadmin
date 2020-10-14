@@ -1,7 +1,6 @@
 package no.nav.syfo.controller.internad
 
 import no.nav.syfo.LocalApplication
-import no.nav.syfo.consumer.aktorregister.AktorregisterConsumer
 import no.nav.syfo.domain.AktorId
 import no.nav.syfo.domain.Fodselsnummer
 import no.nav.syfo.api.domain.nyttmoterequest.RSNyttMoteRequest
@@ -67,9 +66,6 @@ class MoterInternControllerTest : AbstractRessursTilgangTest() {
     private lateinit var srvPassword: String
 
     @MockBean
-    private lateinit var aktorregisterConsumer: AktorregisterConsumer
-
-    @MockBean
     private lateinit var moteService: MoteService
 
     @MockBean
@@ -124,10 +120,10 @@ class MoterInternControllerTest : AbstractRessursTilgangTest() {
     fun setup() {
         mockRestServiceServer = MockRestServiceServer.bindTo(restTemplate).build()
         loggInnVeilederAzure(oidcRequestContextHolder, VEILEDER_ID)
-        Mockito.`when`(aktorregisterConsumer.getFnrForAktorId(AktorId(ARBEIDSTAKER_AKTORID))).thenReturn(ARBEIDSTAKER_FNR)
-        Mockito.`when`(aktorregisterConsumer.getFnrForAktorId(AktorId(AKTOER_ID_2))).thenReturn(FNR_2)
-        Mockito.`when`(aktorregisterConsumer.getFnrForAktorId(AktorId(LEDER_AKTORID))).thenReturn(LEDER_FNR)
         Mockito.`when`(pdlConsumer.aktorId(Fodselsnummer(ARBEIDSTAKER_FNR))).thenReturn(AktorId(ARBEIDSTAKER_AKTORID))
+        Mockito.`when`(pdlConsumer.fodselsnummer(AktorId(ARBEIDSTAKER_AKTORID))).thenReturn(Fodselsnummer(ARBEIDSTAKER_FNR))
+        Mockito.`when`(pdlConsumer.fodselsnummer(AktorId(AKTOER_ID_2))).thenReturn(Fodselsnummer(FNR_2))
+        Mockito.`when`(pdlConsumer.fodselsnummer(AktorId(LEDER_AKTORID))).thenReturn(Fodselsnummer(LEDER_FNR))
         Mockito.`when`(moteService.findMoterByBrukerNavEnhet(NAV_ENHET)).thenReturn(MoteList)
         Mockito.`when`(moteService.maxTwoMonthOldMoterEnhet(NAV_ENHET)).thenReturn(MoteList)
     }
@@ -170,7 +166,7 @@ class MoterInternControllerTest : AbstractRessursTilgangTest() {
         val moteList = moterController.hentMoter(null, ARBEIDSTAKER_FNR, false, null, false)
         Assert.assertEquals(ARBEIDSTAKER_AKTORID, moteList[0].aktorId)
         Assert.assertEquals(ARBEIDSTAKER_AKTORID, moteList[1].aktorId)
-        Mockito.verify(aktorregisterConsumer, Mockito.times(4)).getFnrForAktorId(AktorId(ARBEIDSTAKER_AKTORID))
+        Mockito.verify(pdlConsumer, Mockito.times(4)).fodselsnummer(AktorId(ARBEIDSTAKER_AKTORID))
         Mockito.verify(pdlConsumer, Mockito.times(1)).aktorId(Fodselsnummer(ARBEIDSTAKER_FNR))
         Mockito.verify(moteService).findMoterByBrukerAktoerId(ARBEIDSTAKER_AKTORID)
     }

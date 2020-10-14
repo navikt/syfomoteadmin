@@ -1,6 +1,5 @@
 package no.nav.syfo.service;
 
-import no.nav.syfo.consumer.aktorregister.AktorregisterConsumer;
 import no.nav.syfo.domain.AktorId;
 import no.nav.syfo.api.domain.RSHistorikk;
 import no.nav.syfo.domain.model.*;
@@ -17,17 +16,14 @@ import static java.util.stream.Collectors.toList;
 @Service
 public class HistorikkService {
 
-    private final AktorregisterConsumer aktorregisterConsumer;
     private final PdlConsumer pdlConsumer;
     private final HendelseDAO hendelseDAO;
 
     @Autowired
     public HistorikkService(
-            AktorregisterConsumer aktorregisterConsumer,
             PdlConsumer pdlConsumer,
             HendelseDAO hendelseDAO
     ) {
-        this.aktorregisterConsumer = aktorregisterConsumer;
         this.pdlConsumer = pdlConsumer;
         this.hendelseDAO = hendelseDAO;
     }
@@ -101,7 +97,7 @@ public class HistorikkService {
     private String hentNavn(Motedeltaker motedeltaker) {
         if (motedeltaker.motedeltakertype.equals("Bruker")) {
             MotedeltakerAktorId motedeltakerAktorId = (MotedeltakerAktorId) motedeltaker;
-            return pdlConsumer.fullName(aktorregisterConsumer.getFnrForAktorId(new AktorId(motedeltakerAktorId.aktorId)));
+            return pdlConsumer.fullName(pdlConsumer.fodselsnummer(new AktorId(motedeltakerAktorId.aktorId)).getValue());
         }
         return motedeltaker.navn;
     }

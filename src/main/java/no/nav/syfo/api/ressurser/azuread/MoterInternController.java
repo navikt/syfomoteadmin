@@ -2,7 +2,6 @@ package no.nav.syfo.api.ressurser.azuread;
 
 import no.nav.security.oidc.api.ProtectedWithClaims;
 import no.nav.security.oidc.context.OIDCRequestContextHolder;
-import no.nav.syfo.consumer.aktorregister.AktorregisterConsumer;
 import no.nav.syfo.api.domain.*;
 import no.nav.syfo.api.domain.nyttmoterequest.RSNyttMoteRequest;
 import no.nav.syfo.consumer.axsys.AxsysConsumer;
@@ -49,7 +48,6 @@ public class MoterInternController {
 
     private OIDCRequestContextHolder contextHolder;
     private Metric metric;
-    private final AktorregisterConsumer aktorregisterConsumer;
     private final BehandlendeEnhetConsumer behandlendeEnhetConsumer;
     private MoteService moteService;
     private TidOgStedDAO tidOgStedDAO;
@@ -67,7 +65,6 @@ public class MoterInternController {
     public MoterInternController(
             OIDCRequestContextHolder contextHolder,
             Metric metric,
-            AktorregisterConsumer aktorregisterConsumer,
             BehandlendeEnhetConsumer behandlendeEnhetConsumer,
             MoteService moteService,
             TidOgStedDAO tidOgStedDAO,
@@ -83,7 +80,6 @@ public class MoterInternController {
     ) {
         this.contextHolder = contextHolder;
         this.metric = metric;
-        this.aktorregisterConsumer = aktorregisterConsumer;
         this.behandlendeEnhetConsumer = behandlendeEnhetConsumer;
         this.moteService = moteService;
         this.tidOgStedDAO = tidOgStedDAO;
@@ -154,9 +150,9 @@ public class MoterInternController {
         }
 
         moter = moter.stream()
-                .filter(mote -> !pdlConsumer.isKode6Or7(aktorregisterConsumer.getFnrForAktorId(new AktorId(mote.sykmeldt().aktorId))))
+                .filter(mote -> !pdlConsumer.isKode6Or7(pdlConsumer.fodselsnummer(new AktorId(mote.sykmeldt().aktorId)).getValue()))
                 .filter(mote -> tilgangService.hasVeilederAccessToPerson(
-                        aktorregisterConsumer.getFnrForAktorId(new AktorId(mote.sykmeldt().aktorId)))
+                        pdlConsumer.fodselsnummer(new AktorId(mote.sykmeldt().aktorId)).getValue())
                 )
                 .collect(toList());
 
@@ -192,7 +188,7 @@ public class MoterInternController {
                         .map(motedeltaker -> {
                             if (motedeltaker instanceof MotedeltakerAktorId) {
                                 MotedeltakerAktorId sykmeldt = (MotedeltakerAktorId) motedeltaker;
-                                return sykmeldt.navn(pdlConsumer.fullName(aktorregisterConsumer.getFnrForAktorId(new AktorId(sykmeldt.aktorId))));
+                                return sykmeldt.navn(pdlConsumer.fullName(pdlConsumer.fodselsnummer(new AktorId(sykmeldt.aktorId)).getValue()));
                             }
                             return motedeltaker;
                         })
@@ -210,7 +206,7 @@ public class MoterInternController {
             NarmesteLederRelasjon narmesteLederRelasjon = Optional.ofNullable(narmesteLederConsumer.narmesteLederRelasjonLeder(aktorId, nyttMoteRequest.orgnummer))
                     .orElseThrow(() -> new RuntimeException("Fant ikke nærmeste leder"));
             String lederNavn = pdlConsumer.fullName(
-                    aktorregisterConsumer.getFnrForAktorId(new AktorId(narmesteLederRelasjon.getNarmesteLederAktorId()))
+                    pdlConsumer.fodselsnummer(new AktorId(narmesteLederRelasjon.getNarmesteLederAktorId())).getValue()
             );
             nyttMoteRequest.navn(lederNavn);
             nyttMoteRequest.epost(narmesteLederRelasjon.getNarmesteLederEpost());

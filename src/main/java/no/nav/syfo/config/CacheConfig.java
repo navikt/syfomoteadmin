@@ -12,8 +12,6 @@ import static java.util.Arrays.asList;
 @EnableCaching
 public class CacheConfig {
 
-    public static final String CACHENAME_AKTOR_ID = "aktoerid";
-    public static final String CACHENAME_AKTOR_FNR = "aktoerfnr";
     public static final String CACHENAME_BEHANDLENDEENHET_FNR = "behandlendeenhetfnr";
     public static final String CACHENAME_DKIF_IDENT = "dkifident";
     public static final String CACHENAME_EREG_VIRKSOMHETSNAVN = "virksomhetsnavn";
@@ -30,8 +28,6 @@ public class CacheConfig {
     public CacheManager cacheManager() {
         SimpleCacheManager cacheManager = new SimpleCacheManager();
         cacheManager.setCaches(asList(
-                new ConcurrentMapCache(CACHENAME_AKTOR_ID),
-                new ConcurrentMapCache(CACHENAME_AKTOR_FNR),
                 new ConcurrentMapCache(CACHENAME_AXSYS_ENHETER),
                 new ConcurrentMapCache(CACHENAME_BEHANDLENDEENHET_FNR),
                 new ConcurrentMapCache(CACHENAME_DKIF_IDENT),
