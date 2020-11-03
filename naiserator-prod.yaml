@@ -46,6 +46,8 @@ spec:
       - kvPath: "/kv/prod/fss/syfomoteadmin/default"
         mountPath: "/var/run/secrets/nais.io/vault"
   leaderElection: true
+  envFrom:
+    - configmap: loginservice-idporten
   env:
     - name: APP_NAME
       value: "syfomoteadmin"
@@ -93,10 +95,6 @@ spec:
       value: https://login.microsoftonline.com/navno.onmicrosoft.com/.well-known/openid-configuration
     - name: NO_NAV_SECURITY_OIDC_ISSUER_VEILEDER_ACCEPTEDAUDIENCE
       value: 9b4e07a3-4f4c-4bab-b866-87f62dff480d,97085f8d-2aa8-4a4e-ba8c-10bcc5691191
-    - name: NO_NAV_SECURITY_OIDC_ISSUER_SELVBETJENING_DISCOVERYURL
-      value: https://login.microsoftonline.com/navnob2c.onmicrosoft.com/v2.0/.well-known/openid-configuration?p=B2C_1A_idporten
-    - name: NO_NAV_SECURITY_OIDC_ISSUER_SELVBETJENING_ACCEPTEDAUDIENCE
-      value: 45104d6a-f5bc-4e8c-b352-4bbfc9381f25
     - name: NO_NAV_SECURITY_OIDC_ISSUER_STS_DISCOVERYURL
       value: http://security-token-service/rest/v1/sts/.well-known/openid-configuration
     - name: NO_NAV_SECURITY_OIDC_ISSUER_STS_ACCEPTEDAUDIENCE
