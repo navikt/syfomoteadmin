@@ -2,8 +2,8 @@ no.nav.security.oidc:
   issuers: selvbetjening,veileder,sts
   issuer:
     selvbetjening:
-      discoveryurl: <SETTES FRA MILJØCONFIG>
-      accepted_audience: <SETTES FRA MILJØCONFIG>
+      discoveryurl: ${LOGINSERVICE_IDPORTEN_DISCOVERY_URL}
+      accepted_audience: ${LOGINSERVICE_IDPORTEN_AUDIENCE}
       cookie_name: selvbetjening-idtoken
     veileder:
       discoveryurl: <SETTES FRA MILJØCONFIG>
