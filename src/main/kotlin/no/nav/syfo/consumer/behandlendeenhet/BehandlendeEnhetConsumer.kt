@@ -27,7 +27,7 @@ class BehandlendeEnhetConsumer(
 
         val httpEntity = entity(callId, bearer)
         try {
-            val response = template.exchange<BehandlendeEnhet>(
+            val response = template.exchange(
                     getBehandlendeEnhetUrl(fnr),
                     HttpMethod.GET,
                     httpEntity,
