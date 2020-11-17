@@ -40,6 +40,6 @@ public class OversikthendelseService {
                 .tidspunkt(now()
                 ).build();
 
-        oversikthendelseProducer.sendOversikthendelse(kOversikthendelse);
+        oversikthendelseProducer.sendOversikthendelse(mote.uuid, kOversikthendelse);
     }
 }

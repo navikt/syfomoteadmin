@@ -21,11 +21,11 @@ public class OversikthendelseProducer {
         this.kafkaTemplate = kafkaTemplate;
     }
 
-    public void sendOversikthendelse(KOversikthendelse kOversikthendelse) {
+    public void sendOversikthendelse(String key, KOversikthendelse kOversikthendelse) {
         try {
             kafkaTemplate.send(
                     OVERSIKTHENDELSE_TOPIC,
-                    randomUUID().toString(),
+                    key,
                     kOversikthendelse
             ).get();
             log.info("Legger oversikthendelse med id {} på kø for enhet {}", kOversikthendelse.getHendelseId(), kOversikthendelse.getEnhetId());
