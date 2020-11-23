@@ -41,6 +41,10 @@ spec:
     paths:
       - kvPath: "/azuread/data/dev/creds/syfomoteadmin"
         mountPath: "/secrets/azuread/syfomoteadmin"
+      - kvPath: "/oracle/data/dev/creds/moteadmin_q1-user"
+        mountPath: "/secrets/moteadmindb/credentials"
+      - kvPath: "/oracle/data/dev/config/moteadmin_q1"
+        mountPath: "/secrets/moteadmindb/config"
       - kvPath: "serviceuser/data/dev/srvssolinux"
         mountPath: "/secrets/ldap/ldap"
       - kvPath: "/kv/preprod/fss/syfomoteadmin/default"
