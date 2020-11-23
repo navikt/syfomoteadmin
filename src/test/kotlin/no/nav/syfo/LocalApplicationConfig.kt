@@ -11,8 +11,6 @@ import java.util.*
 class LocalApplicationConfig(environment: Environment) {
     init {
         System.setProperty("SECURITYTOKENSERVICE_URL", Objects.requireNonNull(environment.getProperty("securitytokenservice.url")))
-        System.setProperty("srv_username", Objects.requireNonNull(environment.getProperty("srv.username")))
-        System.setProperty("srv_password", Objects.requireNonNull(environment.getProperty("srv.password")))
         System.setProperty("LDAP_URL", Objects.requireNonNull(environment.getProperty("ldap.url")))
         System.setProperty("LDAP_USERNAME", Objects.requireNonNull(environment.getProperty("ldap.username")))
         System.setProperty("LDAP_PASSWORD", Objects.requireNonNull(environment.getProperty("ldap.password")))

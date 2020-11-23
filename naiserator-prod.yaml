@@ -45,6 +45,8 @@ spec:
         mountPath: "/secrets/moteadmindb/credentials"
       - kvPath: "/oracle/data/prod/config/moteadmin"
         mountPath: "/secrets/moteadmindb/config"
+      - kvPath: "/serviceuser/data/prod/srvsyfomoteadmin"
+        mountPath: "/secrets/serviceuser/syfomoteadmin"
       - kvPath: "serviceuser/data/prod/srvssolinux"
         mountPath: "/secrets/ldap/ldap"
       - kvPath: "/kv/prod/fss/syfomoteadmin/default"
