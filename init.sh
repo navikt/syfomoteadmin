@@ -1,6 +1,9 @@
 export CLIENT_ID=$(cat /secrets/azuread/syfomoteadmin/client_id)
 export CLIENT_SECRET=$(cat /secrets/azuread/syfomoteadmin/client_secret)
 
+export SRV_USERNAME=$(cat /secrets/serviceuser/syfomoteadmin/username)
+export SRV_PASSWORD=$(cat /secrets/serviceuser/syfomoteadmin/password)
+
 export LDAP_USERNAME=$(cat /secrets/ldap/ldap/username)
 export LDAP_PASSWORD=$(cat /secrets/ldap/ldap/password)
 
