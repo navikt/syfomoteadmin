@@ -22,7 +22,7 @@ class BrukertilgangConsumer(
     fun hasAccessToAnsatt(ansattFnr: String): Boolean {
         val httpEntity = entity()
         try {
-            val response = restTemplate.exchange<Boolean>(
+            val response = restTemplate.exchange(
                     arbeidstakerUrl(ansattFnr),
                     HttpMethod.GET,
                     entity(),
