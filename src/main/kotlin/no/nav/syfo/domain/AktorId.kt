@@ -1,7 +1,7 @@
 package no.nav.syfo.domain
 
 data class AktorId(val value: String) {
-    private val thirteenDigits = Regex("\\d{13}")
+    private val thirteenDigits = Regex("^\\d{13}\$")
 
     init {
         if (!thirteenDigits.matches(value)) {
