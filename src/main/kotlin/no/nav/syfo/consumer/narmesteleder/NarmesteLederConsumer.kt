@@ -27,7 +27,7 @@ class NarmesteLederConsumer @Autowired constructor(
     @Cacheable(value = [CACHENAME_NARMESTELEDER_LEDER], key = "#aktorId + #virksomhetsnummer", condition = "#aktorId != null && #virksomhetsnummer != null")
     fun narmesteLederRelasjonLeder(aktorId: String, virksomhetsnummer: String): NarmesteLederRelasjon? {
         try {
-            val response = restTemplate.exchange<NarmestelederResponse>(
+            val response = restTemplate.exchange(
                     getLederUrl(aktorId, virksomhetsnummer),
                     HttpMethod.GET,
                     entity(),
