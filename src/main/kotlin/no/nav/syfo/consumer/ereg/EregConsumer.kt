@@ -3,6 +3,7 @@ package no.nav.syfo.consumer.ereg
 import no.nav.syfo.config.CacheConfig
 import no.nav.syfo.metric.Metric
 import no.nav.syfo.consumer.sts.StsConsumer
+import no.nav.syfo.domain.Virksomhetsnummer
 import no.nav.syfo.util.*
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
@@ -20,7 +21,7 @@ class EregConsumer @Inject constructor(
     private val restTemplate: RestTemplate,
     private val stsConsumer: StsConsumer
 ) {
-    fun eregReponse(virksomhetsnummer: String): EregOrganisasjonResponse {
+    fun eregReponse(virksomhetsnummer: Virksomhetsnummer): EregOrganisasjonResponse {
         try {
             val response = restTemplate.exchange(
                     getEregUrl(virksomhetsnummer),
@@ -44,12 +45,12 @@ class EregConsumer @Inject constructor(
             key = "#virksomhetsnummer",
             condition = "#virksomhetsnummer != null"
     )
-    fun virksomhetsnavn(virksomhetsnummer: String): String {
+    fun virksomhetsnavn(virksomhetsnummer: Virksomhetsnummer): String {
         return eregReponse(virksomhetsnummer).navn()
     }
 
-    private fun getEregUrl(virksomhetsnummer: String): String {
-        return "$baseUrl/ereg/api/v1/organisasjon/$virksomhetsnummer"
+    private fun getEregUrl(virksomhetsnummer: Virksomhetsnummer): String {
+        return "$baseUrl/ereg/api/v1/organisasjon/${virksomhetsnummer.value}"
     }
 
     private fun entity(): HttpEntity<String> {
