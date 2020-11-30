@@ -46,7 +46,7 @@ class NarmesteLederConsumer @Autowired constructor(
     @Cacheable(value = [CACHENAME_NARMESTELEDER_ANSATTE], key = "#aktorId", condition = "#aktorId != null")
     fun narmestelederRelasjonerAnsatte(aktorId: String): List<NarmesteLederRelasjon> {
         try {
-            val response = restTemplate.exchange<List<NarmesteLederRelasjon>>(
+            val response = restTemplate.exchange(
                     getAnsatteUrl(aktorId),
                     HttpMethod.GET,
                     entity(),
@@ -65,7 +65,7 @@ class NarmesteLederConsumer @Autowired constructor(
     @Cacheable(value = [CACHENAME_NARMESTELEDER_LEDERE], key = "#aktorId", condition = "#aktorId != null")
     fun narmestelederRelasjonerLedere(aktorId: String): List<NarmesteLederRelasjon> {
         try {
-            val response = restTemplate.exchange<List<NarmesteLederRelasjon>>(
+            val response = restTemplate.exchange(
                     getLedereUrl(aktorId),
                     HttpMethod.GET,
                     entity(),
