@@ -2,6 +2,7 @@ package no.nav.syfo.controller.internad.virksomhet
 
 import no.nav.syfo.LocalApplication
 import no.nav.syfo.consumer.ereg.EregConsumer
+import no.nav.syfo.domain.Virksomhetsnummer
 import no.nav.syfo.testhelper.UserConstants
 import org.junit.*
 import org.junit.runner.RunWith
@@ -24,12 +25,12 @@ class VirksomhetControllerTest {
 
     @Before
     fun setup() {
-        `when`(eregConsumer.virksomhetsnavn(UserConstants.VIRKSOMHETSNUMMER)).thenReturn(UserConstants.VIRKSOMHET_NAME)
+        `when`(eregConsumer.virksomhetsnavn(Virksomhetsnummer(UserConstants.VIRKSOMHETSNUMMER))).thenReturn(UserConstants.VIRKSOMHET_NAME)
     }
 
     @Test
     fun userWithNameHasAccess() {
-        val virksomhet = virksomhetController.getVirksomhetsnavn(UserConstants.VIRKSOMHETSNUMMER)
+        val virksomhet = virksomhetController.getVirksomhetsnavn(Virksomhetsnummer(UserConstants.VIRKSOMHETSNUMMER))
         Assert.assertEquals(UserConstants.VIRKSOMHET_NAME, virksomhet.navn)
     }
 }
