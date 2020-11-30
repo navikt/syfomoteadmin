@@ -118,7 +118,7 @@ class NarmesteLederConsumer @Autowired constructor(
         private const val CALL_SYFONARMESTELEDER_LEDER_SUCCESS = "${CALL_SYFONARMESTELEDER_LEDER_BASE}_success"
 
         private const val CALL_SYFONARMESTELEDER_LEDERE_BASE = "call_syfonarmesteledere_leder"
-        private const val CALL_SYFONARMESTELEDER_LEDERE_FAIL = "${CALL_SYFONARMESTELEDER_LEDER_BASE}_fail"
-        private const val CALL_SYFONARMESTELEDER_LEDERE_SUCCESS = "${CALL_SYFONARMESTELEDER_LEDER_BASE}_success"
+        private const val CALL_SYFONARMESTELEDER_LEDERE_FAIL = "${CALL_SYFONARMESTELEDER_LEDERE_BASE}_fail"
+        private const val CALL_SYFONARMESTELEDER_LEDERE_SUCCESS = "${CALL_SYFONARMESTELEDER_LEDERE_BASE}_success"
     }
 }
