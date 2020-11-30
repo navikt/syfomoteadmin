@@ -22,7 +22,7 @@ class NarmesteLederConsumer @Autowired constructor(
     private val azureAdTokenConsumer: AzureAdTokenConsumer,
     private val metric: Metric,
     private val restTemplate: RestTemplate,
-    @param:Value("\${syfonarmesteleder.id}") private val syfonarmestelederId: String
+    @Value("\${syfonarmesteleder.id}") private val syfonarmestelederId: String
 ) {
     @Cacheable(value = [CACHENAME_NARMESTELEDER_LEDER], key = "#aktorId + #virksomhetsnummer", condition = "#aktorId != null && #virksomhetsnummer != null")
     fun narmesteLederRelasjonLeder(aktorId: String, virksomhetsnummer: String): NarmesteLederRelasjon? {
