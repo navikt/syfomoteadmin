@@ -8,7 +8,7 @@ import javax.inject.Inject;
 import java.util.*;
 
 import static java.util.Arrays.asList;
-import static no.nav.syfo.config.CacheConfig.CACHENAME_LDAP_VEILEDER_NAVN;
+import static no.nav.syfo.cache.CacheConfig.CACHENAME_LDAP_VEILEDER_NAVN;
 
 @Service
 public class VeilederService {

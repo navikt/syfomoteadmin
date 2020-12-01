@@ -1,6 +1,6 @@
 package no.nav.syfo.consumer.ereg
 
-import no.nav.syfo.config.CacheConfig
+import no.nav.syfo.cache.CacheConfig
 import no.nav.syfo.metric.Metric
 import no.nav.syfo.consumer.sts.StsConsumer
 import no.nav.syfo.domain.Virksomhetsnummer

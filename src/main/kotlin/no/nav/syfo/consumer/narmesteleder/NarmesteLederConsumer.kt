@@ -1,7 +1,9 @@
 package no.nav.syfo.consumer.narmesteleder
 
+import no.nav.syfo.cache.CacheConfig.Companion.CACHENAME_NARMESTELEDER_ANSATTE
+import no.nav.syfo.cache.CacheConfig.Companion.CACHENAME_NARMESTELEDER_LEDER
+import no.nav.syfo.cache.CacheConfig.Companion.CACHENAME_NARMESTELEDER_LEDERE
 import no.nav.syfo.consumer.azuread.AzureAdTokenConsumer
-import no.nav.syfo.config.CacheConfig.*
 import no.nav.syfo.metric.Metric
 import no.nav.syfo.util.*
 import org.slf4j.LoggerFactory
@@ -28,16 +30,16 @@ class NarmesteLederConsumer @Autowired constructor(
     fun narmesteLederRelasjonLeder(aktorId: String, virksomhetsnummer: String): NarmesteLederRelasjon? {
         try {
             val response = restTemplate.exchange(
-                    getLederUrl(aktorId, virksomhetsnummer),
-                    HttpMethod.GET,
-                    entity(),
-                    NarmestelederResponse::class.java
+                getLederUrl(aktorId, virksomhetsnummer),
+                HttpMethod.GET,
+                entity(),
+                NarmestelederResponse::class.java
             )
             metric.countEvent(CALL_SYFONARMESTELEDER_LEDER_SUCCESS)
 
             return response.body!!.narmesteLederRelasjon
         } catch (e: RestClientResponseException) {
-            LOG.error("Request to get Leder from Syfonarmesteleder failed with status ${e.rawStatusCode} and message: ${e.responseBodyAsString}" )
+            LOG.error("Request to get Leder from Syfonarmesteleder failed with status ${e.rawStatusCode} and message: ${e.responseBodyAsString}")
             metric.countEvent(CALL_SYFONARMESTELEDER_LEDER_FAIL)
             throw e
         }
@@ -47,16 +49,16 @@ class NarmesteLederConsumer @Autowired constructor(
     fun narmestelederRelasjonerAnsatte(aktorId: String): List<NarmesteLederRelasjon> {
         try {
             val response = restTemplate.exchange(
-                    getAnsatteUrl(aktorId),
-                    HttpMethod.GET,
-                    entity(),
-                    object : ParameterizedTypeReference<List<NarmesteLederRelasjon>>() {}
+                getAnsatteUrl(aktorId),
+                HttpMethod.GET,
+                entity(),
+                object : ParameterizedTypeReference<List<NarmesteLederRelasjon>>() {}
             )
             metric.countEvent(CALL_SYFONARMESTELEDER_ANSATTE_SUCCESS)
 
             return response.body!!
         } catch (e: RestClientResponseException) {
-            LOG.error("Request to get Ansatte from Syfonarmesteleder failed with status ${e.rawStatusCode} and message: ${e.responseBodyAsString}" )
+            LOG.error("Request to get Ansatte from Syfonarmesteleder failed with status ${e.rawStatusCode} and message: ${e.responseBodyAsString}")
             metric.countEvent(CALL_SYFONARMESTELEDER_ANSATTE_FAIL)
             throw e
         }
@@ -66,16 +68,16 @@ class NarmesteLederConsumer @Autowired constructor(
     fun narmestelederRelasjonerLedere(aktorId: String): List<NarmesteLederRelasjon> {
         try {
             val response = restTemplate.exchange(
-                    getLedereUrl(aktorId),
-                    HttpMethod.GET,
-                    entity(),
-                    object : ParameterizedTypeReference<List<NarmesteLederRelasjon>>() {}
+                getLedereUrl(aktorId),
+                HttpMethod.GET,
+                entity(),
+                object : ParameterizedTypeReference<List<NarmesteLederRelasjon>>() {}
             )
             metric.countEvent(CALL_SYFONARMESTELEDER_LEDERE_SUCCESS)
 
             return response.body!!
         } catch (e: RestClientResponseException) {
-            LOG.error("Request to get Ledere from Syfonarmesteleder failed with status ${e.rawStatusCode} and message: ${e.responseBodyAsString}" )
+            LOG.error("Request to get Ledere from Syfonarmesteleder failed with status ${e.rawStatusCode} and message: ${e.responseBodyAsString}")
             metric.countEvent(CALL_SYFONARMESTELEDER_LEDERE_FAIL)
             throw e
         }
@@ -96,9 +98,9 @@ class NarmesteLederConsumer @Autowired constructor(
 
     private fun getLederUrl(aktorId: String, virksomhetsnummer: String): String {
         return UriComponentsBuilder
-                .fromHttpUrl("$SYFONARMESTELEDER_BASEURL/sykmeldt/$aktorId")
-                .queryParam("orgnummer", virksomhetsnummer)
-                .toUriString()
+            .fromHttpUrl("$SYFONARMESTELEDER_BASEURL/sykmeldt/$aktorId")
+            .queryParam("orgnummer", virksomhetsnummer)
+            .toUriString()
     }
 
     private fun getLedereUrl(aktorId: String): String {

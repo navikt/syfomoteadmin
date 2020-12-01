@@ -11,7 +11,7 @@ import org.springframework.stereotype.Service;
 
 import javax.ws.rs.ForbiddenException;
 
-import static no.nav.syfo.config.CacheConfig.CACHENAME_TILGANG_IDENT;
+import static no.nav.syfo.cache.CacheConfig.CACHENAME_TILGANG_IDENT;
 import static no.nav.syfo.api.auth.OIDCUtil.getSubjectEkstern;
 
 @Service
