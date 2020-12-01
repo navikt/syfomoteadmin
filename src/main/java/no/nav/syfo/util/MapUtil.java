@@ -79,10 +79,6 @@ public class MapUtil {
         return of(fra).map(exp).orElseThrow(() -> new RuntimeException("Resultatet fra exp ble null"));
     }
 
-    public static <T, R> R mapNullableFilter(T fra, Predicate<T> p, Function<T, R> exp) {
-        return ofNullable(fra).filter(p).map(exp).orElse(null);
-    }
-
     public static <T, R> List<R> mapListe(List<T> fra, Predicate<T> filter, Function<T, R> exp) {
         return ofNullable(fra).map(f -> mapStream(f.stream().filter(filter), exp).collect(toList())).orElse(new ArrayList<>());
     }
@@ -93,9 +89,5 @@ public class MapUtil {
 
     public static <T, R> Stream<R> mapStream(Stream<T> fra, Function<T, R> exp) {
         return ofNullable(fra).map(f -> f.map(exp)).orElse(empty());
-    }
-
-    public static <T> List<T> filterListe(List<T> fra, Predicate<T> filter) {
-        return ofNullable(fra).map(f -> f.stream().filter(filter).collect(toList())).orElse(new ArrayList<>());
     }
 }
