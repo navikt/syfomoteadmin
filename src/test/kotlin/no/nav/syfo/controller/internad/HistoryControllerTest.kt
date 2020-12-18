@@ -1,11 +1,11 @@
 package no.nav.syfo.controller.internad
 
 import no.nav.syfo.LocalApplication
-import no.nav.syfo.api.ressurser.azuread.HistoryController
+import no.nav.syfo.history.controller.HistoryController
 import no.nav.syfo.consumer.pdl.PdlConsumer
 import no.nav.syfo.domain.AktorId
 import no.nav.syfo.domain.Fodselsnummer
-import no.nav.syfo.service.HistorikkService
+import no.nav.syfo.history.HistorikkService
 import no.nav.syfo.service.MoteService
 import no.nav.syfo.testhelper.OidcTestHelper.loggInnVeilederAzure
 import no.nav.syfo.testhelper.OidcTestHelper.loggUtAlle
