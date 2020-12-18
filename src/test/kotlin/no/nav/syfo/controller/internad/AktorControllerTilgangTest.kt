@@ -1,16 +1,18 @@
 package no.nav.syfo.controller.internad
 
 import no.nav.syfo.LocalApplication
-import no.nav.syfo.domain.AktorId
-import no.nav.syfo.api.ressurser.azuread.AktorController
 import no.nav.syfo.consumer.pdl.PdlConsumer
+import no.nav.syfo.controller.internad.aktor.AktorController
+import no.nav.syfo.domain.AktorId
 import no.nav.syfo.domain.Fodselsnummer
 import no.nav.syfo.testhelper.OidcTestHelper.loggInnVeilederAzure
 import no.nav.syfo.testhelper.OidcTestHelper.loggUtAlle
 import no.nav.syfo.testhelper.UserConstants.ARBEIDSTAKER_AKTORID
 import no.nav.syfo.testhelper.UserConstants.ARBEIDSTAKER_FNR
 import no.nav.syfo.testhelper.UserConstants.VEILEDER_ID
-import org.junit.*
+import org.junit.Assert
+import org.junit.Before
+import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito
 import org.springframework.boot.test.context.SpringBootTest
@@ -45,20 +47,20 @@ class AktorControllerTilgangTest : AbstractRessursTilgangTest() {
     @Test
     fun hasAccess() {
         mockSvarFraTilgangTilBrukerViaAzure(ARBEIDSTAKER_FNR, HttpStatus.OK)
-        val aktor = aktorController[ARBEIDSTAKER_AKTORID]
+        val aktor = aktorController.get(ARBEIDSTAKER_AKTORID)
         Assert.assertEquals(ARBEIDSTAKER_FNR, aktor.fnr)
     }
 
     @Test(expected = ForbiddenException::class)
     fun noAccess() {
         mockSvarFraTilgangTilBrukerViaAzure(ARBEIDSTAKER_FNR, HttpStatus.FORBIDDEN)
-        aktorController[ARBEIDSTAKER_AKTORID]
+        aktorController.get(ARBEIDSTAKER_AKTORID)
     }
 
     @Test(expected = RuntimeException::class)
     fun invalidUserContext() {
         loggUtAlle(oidcRequestContextHolder)
         mockSvarFraTilgangTilBrukerViaAzure(ARBEIDSTAKER_FNR, HttpStatus.FORBIDDEN)
-        aktorController[ARBEIDSTAKER_AKTORID]
+        aktorController.get(ARBEIDSTAKER_AKTORID)
     }
 }
