@@ -17,22 +17,6 @@ public class DateUtil {
         return dato.format(DateTimeFormatter.ofPattern("dd.MM.yyyy"));
     }
 
-    public static String tilKortDatoMedTid(LocalDateTime dato) {
-        return dato.format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm"));
-    }
-
-    public static LocalDateTime fraKortDatoMedTid(String dato) {
-        return LocalDateTime.parse(dato, DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm"));
-    }
-
-    public static String tilKortDatoMedKlokkeslettPostfix(LocalDateTime dato) {
-        return dato.format(DateTimeFormatter.ofPattern("dd.MM")) + " kl. " + dato.format(DateTimeFormatter.ofPattern("HH:mm"));
-    }
-
-    public static String tilLangDatoMedKlokkeslettPostfix(LocalDateTime dato) {
-        return dato.format(DateTimeFormatter.ofPattern("dd.MM.yyyy")) + " kl. " + dato.format(DateTimeFormatter.ofPattern("HH:mm"));
-    }
-
     public static String tilLangDatoMedKlokkeslettPostfixDagPrefix(LocalDateTime dato) {
         return dag(dato.getDayOfWeek()) + " " + dato.format(DateTimeFormatter.ofPattern("dd.MM.yyyy")) + " kl. " + dato.format(DateTimeFormatter.ofPattern("HH:mm"));
     }
