@@ -4,7 +4,7 @@ import no.nav.security.oidc.api.Protected;
 import no.nav.security.oidc.api.ProtectedWithClaims;
 import no.nav.syfo.domain.Fodselsnummer;
 import no.nav.syfo.service.MoteBrukerService;
-import no.nav.syfo.util.Brukerkontekst;
+import no.nav.syfo.domain.Brukerkontekst;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;

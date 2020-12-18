@@ -7,7 +7,7 @@ import no.nav.syfo.consumer.pdl.PdlConsumer
 import no.nav.syfo.domain.AktorId
 import no.nav.syfo.testhelper.UserConstants.ARBEIDSTAKER_AKTORID
 import no.nav.syfo.testhelper.UserConstants.ARBEIDSTAKER_FNR
-import no.nav.syfo.util.Brukerkontekst
+import no.nav.syfo.domain.Brukerkontekst
 import org.assertj.core.api.Assertions
 import org.junit.Before
 import org.junit.Test

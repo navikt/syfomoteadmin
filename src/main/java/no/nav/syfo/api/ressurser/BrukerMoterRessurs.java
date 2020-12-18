@@ -8,7 +8,7 @@ import no.nav.syfo.domain.Fodselsnummer;
 import no.nav.syfo.api.domain.bruker.*;
 import no.nav.syfo.metric.Metric;
 import no.nav.syfo.service.*;
-import no.nav.syfo.util.Brukerkontekst;
+import no.nav.syfo.domain.Brukerkontekst;
 import org.springframework.web.bind.annotation.*;
 
 import javax.inject.Inject;

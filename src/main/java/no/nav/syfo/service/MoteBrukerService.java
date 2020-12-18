@@ -7,7 +7,7 @@ import no.nav.syfo.api.domain.bruker.*;
 import no.nav.syfo.domain.model.*;
 import no.nav.syfo.api.exception.ConflictException;
 import no.nav.syfo.consumer.pdl.PdlConsumer;
-import no.nav.syfo.util.Brukerkontekst;
+import no.nav.syfo.domain.Brukerkontekst;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
