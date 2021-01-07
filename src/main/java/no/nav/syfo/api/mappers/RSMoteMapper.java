@@ -1,34 +1,17 @@
 package no.nav.syfo.api.mappers;
 
+import no.nav.syfo.api.domain.*;
 import no.nav.syfo.domain.model.*;
-import no.nav.syfo.api.domain.RSMote;
-import no.nav.syfo.api.domain.RSMotedeltaker;
-import no.nav.syfo.api.domain.RSTidOgSted;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.function.Function;
 
-import static no.nav.syfo.api.domain.RSReservasjon.KontaktInfoFeilAarsak.*;
 import static no.nav.syfo.util.MapUtil.mapListe;
 import static no.nav.syfo.util.MapUtil.mapNullable;
 import static no.nav.syfo.util.MoterUtil.finnAktoerFraMote;
 
 public class RSMoteMapper {
-
-    public static Function<HendelseVarselMotedeltaker.Resultat, String> resultat2rs = f -> {
-        if (f.equals(HendelseVarselMotedeltaker.Resultat.KRR_INGEN_KONTAKTINFORMASJON)) {
-            return INGEN_KONTAKTINFORMASJON.name();
-        } else if (f.equals(HendelseVarselMotedeltaker.Resultat.KRR_SIKKERHETSBEGRENSNING)) {
-            return KODE6.name();
-        } else if (f.equals(HendelseVarselMotedeltaker.Resultat.KRR_RESERVERT)) {
-            return RESERVERT.name();
-        } else if (f.equals(HendelseVarselMotedeltaker.Resultat.KRR_UTGAATT)) {
-            return UTGAATT.name();
-        } else {
-            return "OK";
-        }
-    };
 
     public static Function<TidOgSted, RSTidOgSted> tidOgSted2rs = tidOgSted ->
             new RSTidOgSted()

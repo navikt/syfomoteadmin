@@ -1,9 +1,9 @@
 package no.nav.syfo.controller.internad
 
 import no.nav.syfo.LocalApplication
-import no.nav.syfo.api.ressurser.azuread.PersonController
 import no.nav.syfo.consumer.dkif.DkifConsumer
 import no.nav.syfo.consumer.pdl.PdlConsumer
+import no.nav.syfo.controller.internad.person.PersonController
 import no.nav.syfo.domain.AktorId
 import no.nav.syfo.domain.Fodselsnummer
 import no.nav.syfo.testhelper.OidcTestHelper.loggInnVeilederAzure
@@ -13,7 +13,9 @@ import no.nav.syfo.testhelper.UserConstants.ARBEIDSTAKER_FNR
 import no.nav.syfo.testhelper.UserConstants.PERSON_NAVN
 import no.nav.syfo.testhelper.UserConstants.VEILEDER_ID
 import no.nav.syfo.testhelper.generateDigitalKontaktinfo
-import org.junit.*
+import org.junit.Assert
+import org.junit.Before
+import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito
 import org.springframework.boot.test.context.SpringBootTest
@@ -76,9 +78,9 @@ class PersonControllerTest : AbstractRessursTilgangTest() {
         Mockito.`when`(pdlConsumer.fullName(ARBEIDSTAKER_FNR)).thenReturn(PERSON_NAVN)
         mockSvarFraTilgangTilBrukerViaAzure(ARBEIDSTAKER_FNR, HttpStatus.OK)
         val user = personController.bruker(ARBEIDSTAKER_AKTORID)
-        Assert.assertEquals(digitalKontaktinfo.epostadresse, user.kontaktinfo.epost)
-        Assert.assertEquals(digitalKontaktinfo.mobiltelefonnummer, user.kontaktinfo.tlf)
-        Assert.assertEquals(digitalKontaktinfo.kanVarsles, user.kontaktinfo.reservasjon.skalHaVarsel)
+        Assert.assertEquals(digitalKontaktinfo.epostadresse, user.kontaktinfo?.epost)
+        Assert.assertEquals(digitalKontaktinfo.mobiltelefonnummer, user.kontaktinfo?.tlf)
+        Assert.assertEquals(digitalKontaktinfo.kanVarsles, user.kontaktinfo?.reservasjon?.skalHaVarsel)
         Assert.assertEquals(PERSON_NAVN, user.navn)
     }
 
