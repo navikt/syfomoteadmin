@@ -1,6 +1,8 @@
 package no.nav.syfo.kafka.producer
 
-import no.nav.syfo.kafka.producer.model.KOversikthendelse
+import no.nav.syfo.oversikthendelse.KOversikthendelse
+import no.nav.syfo.oversikthendelse.OversikthendelseProducer
+import no.nav.syfo.oversikthendelse.OversikthendelseType
 import no.nav.syfo.testhelper.UserConstants.ARBEIDSTAKER_FNR
 import no.nav.syfo.testhelper.UserConstants.NAV_ENHET
 import org.junit.Test
