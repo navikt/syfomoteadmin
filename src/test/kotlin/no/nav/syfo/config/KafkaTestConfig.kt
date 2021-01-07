@@ -1,6 +1,6 @@
 package no.nav.syfo.config
 
-import no.nav.syfo.kafka.producer.OversikthendelseProducer
+import no.nav.syfo.oversikthendelse.OversikthendelseProducer
 import org.junit.ClassRule
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
