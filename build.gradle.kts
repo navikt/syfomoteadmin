@@ -14,6 +14,7 @@ val mqVersion = "9.0.4.0"
 val tjenesteSpesifikasjonerVersion = "1.2019.09.25-00.21-49b69f0625e0"
 val tjenesteSpesifikasjonerGithubVersion = "1.2020.06.11-19.53-1cad83414166"
 
+val apacheHttpClientVersion = "4.5.13"
 val prometheusVersion = "1.0.6"
 val logstashLogbackEncoderVersion = "4.10"
 val slf4jVersion = "1.7.25"
@@ -64,7 +65,7 @@ dependencies {
     implementation(kotlin("reflect"))
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:$kotlinJacksonVersion")
 
-    implementation("org.apache.httpcomponents:httpclient:4.5.6")
+    implementation("org.apache.httpcomponents:httpclient:$apacheHttpClientVersion")
 
     implementation("org.springframework.boot:spring-boot-starter-web")
     implementation("org.springframework.boot:spring-boot-starter-actuator")
