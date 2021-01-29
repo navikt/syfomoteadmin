@@ -36,6 +36,7 @@ spec:
   ingresses:
     - "https://syfomoteadmin.nais.adeo.no"
     - "https://app.adeo.no/syfomoteadmin"
+    - "https://syfomoteadmin.prod-fss-pub.nais.io"
   vault:
     enabled: true
     paths:
