@@ -65,16 +65,26 @@ class MoteActionsControllerTest {
         val uuid = UUID.randomUUID()
         val alternativId = 1L
 
-        moteActionsController.bekreft(uuid.toString(), alternativId)
+        moteActionsController.bekreft(uuid.toString(), alternativId, null)
 
-        verify(moteService).bekreftMote(uuid.toString(), alternativId, VEILEDER_ID)
+        verify(moteService).bekreftMote(uuid.toString(), alternativId, true, VEILEDER_ID)
+    }
+
+    @Test
+    fun bekreftDialogmoteVarsleFalseHasAccess() {
+        val uuid = UUID.randomUUID()
+        val alternativId = 1L
+
+        moteActionsController.bekreft(uuid.toString(), alternativId, false)
+
+        verify(moteService).bekreftMote(uuid.toString(), alternativId, false, VEILEDER_ID)
     }
 
     @Test(expected = RuntimeException::class)
     fun bekreftDialogmoteServerError() {
         loggUtAlle(oidcRequestContextHolder)
 
-        moteActionsController.bekreft(UUID.randomUUID().toString(), 1L)
+        moteActionsController.bekreft(UUID.randomUUID().toString(), 1L, null)
     }
 
     @Test

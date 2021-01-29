@@ -42,12 +42,14 @@ constructor(
     @PostMapping(consumes = [APPLICATION_JSON_VALUE], produces = [APPLICATION_JSON_VALUE])
     @RequestMapping(value = ["/bekreft"])
     fun bekreft(
-            @PathVariable("moteUuid") moteUuid: String,
-            @RequestParam(value = "valgtAlternativId") tidOgStedId: Long
+        @PathVariable("moteUuid") moteUuid: String,
+        @RequestParam(value = "valgtAlternativId") tidOgStedId: Long,
+        @RequestParam(value = "varsle") varsle: Boolean?
     ) {
         moteService.bekreftMote(
                 moteUuid,
                 tidOgStedId,
+                varsle ?: true,
                 getSubjectInternAzure(contextHolder)
         )
 
