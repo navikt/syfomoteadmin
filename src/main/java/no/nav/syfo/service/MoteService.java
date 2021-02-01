@@ -116,7 +116,12 @@ public class MoteService {
     }
 
     @Transactional
-    public void bekreftMote(String moteUuid, Long tidOgStedId, String veilederIdent) {
+    public void bekreftMote(
+            String moteUuid,
+            Long tidOgStedId,
+            Boolean varsle,
+            String veilederIdent
+        ) {
         Mote mote = moteDAO.findMoteByUUID(moteUuid);
 
         metric.reportAntallDagerSiden(mote.opprettetTidspunkt, "antallDagerForSvar");
@@ -128,8 +133,11 @@ public class MoteService {
         hendelseService.moteStatusEndret(mote.status(BEKREFTET), veilederIdent);
 
         mqStoppRevarslingService.stoppReVarsel(finnAktoerIMote(mote).uuid);
-        arbeidsgiverVarselService.sendVarsel(Varseltype.BEKREFTET, mote, false, veilederIdent);
-        sykmeldtVarselService.sendVarsel(Varseltype.BEKREFTET, mote);
+
+        if (varsle) {
+            arbeidsgiverVarselService.sendVarsel(Varseltype.BEKREFTET, mote, false, veilederIdent);
+            sykmeldtVarselService.sendVarsel(Varseltype.BEKREFTET, mote);
+        }
         if (feedService.skalOppretteFeedHendelse(mote, PFeedHendelse.FeedHendelseType.BEKREFTET)) {
             opprettFeedHendelseAvTypen(PFeedHendelse.FeedHendelseType.BEKREFTET, mote, veilederIdent);
         }
