@@ -35,9 +35,8 @@ import static no.nav.syfo.api.mappers.RSNyttMoteMapper.opprett2TidOgSted;
 import static no.nav.syfo.domain.model.MotedeltakerStatus.SENDT;
 import static no.nav.syfo.domain.model.Varseltype.OPPRETTET;
 import static no.nav.syfo.api.auth.OIDCIssuer.AZURE;
-import static no.nav.syfo.util.MapUtil.map;
-import static no.nav.syfo.util.MapUtil.mapListe;
 import static no.nav.syfo.api.auth.OIDCUtil.getSubjectInternAzure;
+import static no.nav.syfo.util.MapUtil.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 import static org.springframework.util.StringUtils.isEmpty;
 
@@ -92,6 +91,30 @@ public class MoterInternController {
         this.narmesteLederConsumer = narmesteLederConsumer;
         this.sykmeldtVarselService = sykmeldtVarselService;
         this.tilgangService = tilgangService;
+    }
+    @GetMapping(value = "/{moteUuid}", produces = APPLICATION_JSON_VALUE)
+    public RSMote getMote(
+        @PathVariable("moteUuid") final String moteUuid
+    ) {
+        metric.tellEndepunktKall("hent_mote");
+
+        UUID uuid = UUID.fromString(moteUuid);
+
+        Optional<Mote> maybeMote = Optional.ofNullable(moteService.findMoteByUUID(uuid));
+        if (maybeMote.isPresent()) {
+            RSMote rsMote = map(maybeMote.get(), mote2rs);
+            String arbeidstakerPersonIdent = pdlConsumer.fodselsnummer(new AktorId(rsMote.aktorId)).getValue();
+            rsMote.fnr(arbeidstakerPersonIdent);
+            boolean hasAdressebeskyttelse = pdlConsumer.isKode6Or7(arbeidstakerPersonIdent);
+            boolean hasAccessToPerson = tilgangService.hasVeilederAccessToPerson(arbeidstakerPersonIdent);
+            if (hasAccessToPerson && !hasAdressebeskyttelse) {
+                return rsMote;
+            } else {
+                throw new ForbiddenException("Access to Person is denied");
+            }
+        } else {
+            throw new RuntimeException("Mote for moteUuid was not found");
+        }
     }
 
     @GetMapping(produces = APPLICATION_JSON_VALUE)
