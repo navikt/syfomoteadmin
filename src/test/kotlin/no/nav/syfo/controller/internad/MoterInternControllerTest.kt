@@ -149,6 +149,63 @@ class MoterInternControllerTest : AbstractRessursTilgangTest() {
     )
 
     @Test
+    fun `get Mote for UUID vellykket`() {
+        val uuid = UUID.randomUUID()
+        val mote = Mote()
+            .uuid(uuid.toString())
+            .id(1337L)
+            .status(MoteStatus.OPPRETTET)
+            .opprettetTidspunkt(LocalDateTime.now().minusMonths(1L))
+            .motedeltakere(listOf(MotedeltakerAktorId().aktorId(ARBEIDSTAKER_AKTORID)))
+
+        Mockito.`when`(moteService.findMoteByUUID(uuid)).thenReturn(mote)
+        Mockito.`when`(pdlConsumer.isKode6Or7(ARBEIDSTAKER_FNR)).thenReturn(false)
+        Mockito.`when`(tilgangService.hasVeilederAccessToPerson(ARBEIDSTAKER_FNR)).thenReturn(true)
+
+        val returnedMote = moterController.getMote(uuid.toString())
+
+        Assert.assertEquals(ARBEIDSTAKER_AKTORID, returnedMote.aktorId)
+        Assert.assertEquals(ARBEIDSTAKER_FNR, returnedMote.fnr)
+        Mockito.verify(pdlConsumer, Mockito.times(1)).fodselsnummer(AktorId(ARBEIDSTAKER_AKTORID))
+        Mockito.verify(pdlConsumer, Mockito.times(1)).isKode6Or7(ARBEIDSTAKER_FNR)
+        Mockito.verify(moteService).findMoteByUUID(uuid)
+    }
+
+    @Test(expected = ForbiddenException::class)
+    fun `get Mote for moteUUID forbudt fordi veileder ikke har tilgang til bruker`() {
+        val uuid = UUID.randomUUID()
+        val mote = Mote()
+            .uuid(uuid.toString())
+            .id(1337L)
+            .status(MoteStatus.OPPRETTET)
+            .opprettetTidspunkt(LocalDateTime.now().minusMonths(1L))
+            .motedeltakere(listOf(MotedeltakerAktorId().aktorId(ARBEIDSTAKER_AKTORID)))
+
+        Mockito.`when`(moteService.findMoteByUUID(uuid)).thenReturn(mote)
+        Mockito.`when`(pdlConsumer.isKode6Or7(ARBEIDSTAKER_FNR)).thenReturn(false)
+        Mockito.`when`(tilgangService.hasVeilederAccessToPerson(ARBEIDSTAKER_FNR)).thenReturn(false)
+
+        moterController.getMote(uuid.toString())
+    }
+
+    @Test(expected = ForbiddenException::class)
+    fun `get Mote for moteUUID forbudt for person med adressebeskyttelse`() {
+        val uuid = UUID.randomUUID()
+        val mote = Mote()
+            .uuid(uuid.toString())
+            .id(1337L)
+            .status(MoteStatus.OPPRETTET)
+            .opprettetTidspunkt(LocalDateTime.now().minusMonths(1L))
+            .motedeltakere(listOf(MotedeltakerAktorId().aktorId(ARBEIDSTAKER_AKTORID)))
+
+        Mockito.`when`(moteService.findMoteByUUID(uuid)).thenReturn(mote)
+        Mockito.`when`(pdlConsumer.isKode6Or7(ARBEIDSTAKER_FNR)).thenReturn(true)
+        Mockito.`when`(tilgangService.hasVeilederAccessToPerson(ARBEIDSTAKER_FNR)).thenReturn(false)
+
+        moterController.getMote(uuid.toString())
+    }
+
+    @Test
     fun hentMoter_fnr_veileder_har_tilgang() {
         val Mote1 = Mote()
             .id(1337L)

@@ -258,8 +258,8 @@ public class MoteService {
         }
     }
 
-    public Mote findMoteByUUID(String moteUuid) {
-        return moteDAO.findMoteByUUID(moteUuid);
+    public Mote findMoteByUUID(UUID moteUuid) {
+        return moteDAO.findMoteByUUID(moteUuid.toString());
     }
 
     public List<Mote> findMoterByBrukerNavAnsatt(String navansatt) {
