@@ -7,7 +7,7 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.kafka.annotation.EnableKafka
 import org.springframework.kafka.core.DefaultKafkaProducerFactory
 import org.springframework.kafka.core.ProducerFactory
-import org.springframework.kafka.test.EmbeddedKafkaBroker
+import org.springframework.kafka.test.rule.KafkaEmbedded
 import org.springframework.kafka.test.utils.KafkaTestUtils
 
 @Configuration
@@ -20,6 +20,6 @@ class KafkaTestConfig {
 
     companion object {
         @ClassRule
-        var embeddedKafka = EmbeddedKafkaBroker(1, true, OversikthendelseProducer.OVERSIKTHENDELSE_TOPIC)
+        var embeddedKafka = KafkaEmbedded(1, true, OversikthendelseProducer.OVERSIKTHENDELSE_TOPIC)
     }
 }

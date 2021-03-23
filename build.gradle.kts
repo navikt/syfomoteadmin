@@ -8,20 +8,19 @@ version = "1.0.0"
 
 val nimbusSDKVersion = "7.0.3"
 val oidcSupportVersion = "0.2.18"
-val kotlinVersion = "1.4.10"
-val kotlinJacksonVersion = "2.12.0"
+val kotlinJacksonVersion = "2.11.2"
 
-val mqVersion = "9.1.0.3"
+val mqVersion = "9.0.4.0"
 val tjenesteSpesifikasjonerVersion = "1.2019.09.25-00.21-49b69f0625e0"
 val tjenesteSpesifikasjonerGithubVersion = "1.2020.06.11-19.53-1cad83414166"
 
 val apacheHttpClientVersion = "4.5.13"
 val prometheusVersion = "1.0.6"
-val logstashLogbackEncoderVersion = "6.4"
+val logstashLogbackEncoderVersion = "4.10"
 val slf4jVersion = "1.7.25"
 val javaxWsRsVersion = "2.0.1"
 val javaxInjectVersion = "1"
-val jose4jVersion = "0.5.5"
+val jose4jVersion = "0.5.0"
 val aspectjweaverVersion = "1.8.8"
 val apacheCommonsVersion = "3.5"
 val javaxActivationVersion = "1.2.0"
@@ -37,8 +36,8 @@ plugins {
     id("org.jetbrains.kotlin.plugin.allopen") version "1.4.10"
     id("java")
     id("com.github.johnrengelman.shadow") version "6.0.0"
-    id("org.springframework.boot") version "2.4.4"
-    id("io.spring.dependency-management") version "1.0.11.RELEASE"
+    id("org.springframework.boot") version "2.1.18.RELEASE"
+    id("io.spring.dependency-management") version "1.0.10.RELEASE"
 }
 
 allOpen {
@@ -64,8 +63,6 @@ repositories {
 dependencies {
     implementation(kotlin("stdlib"))
     implementation(kotlin("reflect"))
-    testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlinVersion")
-
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:$kotlinJacksonVersion")
 
     implementation("org.apache.httpcomponents:httpclient:$apacheHttpClientVersion")
