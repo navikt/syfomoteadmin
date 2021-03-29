@@ -13,6 +13,7 @@ fun generateNarmesteLederRelasjon(): NarmesteLederRelasjon {
             narmesteLederTelefonnummer = null,
             narmesteLederEpost = null,
             aktivFom = LocalDate.of(2017, 3, 2),
+            aktivTom = LocalDate.of(2018, 3, 2),
             arbeidsgiverForskutterer = false,
             skrivetilgang = false,
             tilganger = emptyList()
@@ -25,6 +26,7 @@ fun generateNarmesteLederRelasjon(aktorId: String = "aktoerId1",
                                   narmesteLederTelefonnummer: String? = null,
                                   narmesteLederEpost: String? = null,
                                   aktivFom: LocalDate = LocalDate.of(2017, 3, 2),
+                                  aktivTom: LocalDate = LocalDate.of(2018, 3, 2),
                                   arbeidsgiverForskutterer: Boolean? = false,
                                   skrivetilgang: Boolean = false,
                                   tilganger: List<Tilgang> = emptyList()): NarmesteLederRelasjon {
@@ -36,6 +38,7 @@ fun generateNarmesteLederRelasjon(aktorId: String = "aktoerId1",
             narmesteLederTelefonnummer,
             narmesteLederEpost,
             aktivFom,
+            aktivTom,
             arbeidsgiverForskutterer,
             skrivetilgang,
             tilganger
