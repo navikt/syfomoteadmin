@@ -35,7 +35,7 @@ class NarmesteLederConsumer @Autowired constructor(
             )
             metric.countEvent(CALL_SYFONARMESTELEDER_LEDER_SUCCESS)
 
-            return response.body?.narmesteLederRelasjon
+            return response.body.narmesteLederRelasjon
         } catch (e: RestClientResponseException) {
             LOG.error("Request to get Leder from Syfonarmesteleder failed with status ${e.rawStatusCode} and message: ${e.responseBodyAsString}")
             metric.countEvent(CALL_SYFONARMESTELEDER_LEDER_FAIL)

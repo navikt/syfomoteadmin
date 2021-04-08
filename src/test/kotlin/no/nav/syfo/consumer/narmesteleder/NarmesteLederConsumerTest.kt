@@ -30,7 +30,7 @@ internal class NarmesteLederConsumerTest {
     fun setUp() = MockKAnnotations.init(this, relaxed = true)
 
     @Test
-    fun shouldReturnEmptyListWhenResponseBodyIsNull() {
+    fun `should return empty list when response body is null`() {
         val consumer = NarmesteLederConsumer(azureAdTokenConsumer, metric, restTemplate, "123")
 
         every {
@@ -48,7 +48,7 @@ internal class NarmesteLederConsumerTest {
     }
 
     @Test
-    fun shouldReturnListOfRelasjonIfBodyIsNotNull() {
+    fun `should return list of relasjon when response body is not null`() {
         val consumer = NarmesteLederConsumer(azureAdTokenConsumer, metric, restTemplate, "123")
 
         every {
