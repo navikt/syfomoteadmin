@@ -11,9 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.core.ParameterizedTypeReference
-import org.springframework.http.HttpEntity
-import org.springframework.http.HttpHeaders
-import org.springframework.http.HttpMethod
+import org.springframework.http.*
 import org.springframework.stereotype.Component
 import org.springframework.web.client.RestClientResponseException
 import org.springframework.web.client.RestTemplate
@@ -37,7 +35,7 @@ class NarmesteLederConsumer @Autowired constructor(
             )
             metric.countEvent(CALL_SYFONARMESTELEDER_LEDER_SUCCESS)
 
-            return response.body!!.narmesteLederRelasjon
+            return response.body.narmesteLederRelasjon
         } catch (e: RestClientResponseException) {
             LOG.error("Request to get Leder from Syfonarmesteleder failed with status ${e.rawStatusCode} and message: ${e.responseBodyAsString}")
             metric.countEvent(CALL_SYFONARMESTELEDER_LEDER_FAIL)
@@ -48,15 +46,21 @@ class NarmesteLederConsumer @Autowired constructor(
     @Cacheable(value = [CACHENAME_NARMESTELEDER_ANSATTE], key = "#aktorId", condition = "#aktorId != null")
     fun narmestelederRelasjonerAnsatte(aktorId: String): List<NarmesteLederRelasjon> {
         try {
-            val response = restTemplate.exchange(
+            val response: ResponseEntity<List<NarmesteLederRelasjon>> = restTemplate.exchange(
                 getAnsatteUrl(aktorId),
                 HttpMethod.GET,
                 entity(),
                 object : ParameterizedTypeReference<List<NarmesteLederRelasjon>>() {}
             )
+
+            if (response.body == null) {
+                LOG.error("Request to get Ansatte from Syfonarmesteleder was null. Response: $response")
+                return emptyList()
+            }
+
             metric.countEvent(CALL_SYFONARMESTELEDER_ANSATTE_SUCCESS)
 
-            return response.body!!
+            return response.body
         } catch (e: RestClientResponseException) {
             LOG.error("Request to get Ansatte from Syfonarmesteleder failed with status ${e.rawStatusCode} and message: ${e.responseBodyAsString}")
             metric.countEvent(CALL_SYFONARMESTELEDER_ANSATTE_FAIL)
@@ -73,9 +77,15 @@ class NarmesteLederConsumer @Autowired constructor(
                 entity(),
                 object : ParameterizedTypeReference<List<NarmesteLederRelasjon>>() {}
             )
+
+            if (response.body == null) {
+                LOG.error("Request to get Ledere from Syfonarmesteleder was null. Response: $response")
+                return emptyList()
+            }
+
             metric.countEvent(CALL_SYFONARMESTELEDER_LEDERE_SUCCESS)
 
-            return response.body!!
+            return response.body
         } catch (e: RestClientResponseException) {
             LOG.error("Request to get Ledere from Syfonarmesteleder failed with status ${e.rawStatusCode} and message: ${e.responseBodyAsString}")
             metric.countEvent(CALL_SYFONARMESTELEDER_LEDERE_FAIL)

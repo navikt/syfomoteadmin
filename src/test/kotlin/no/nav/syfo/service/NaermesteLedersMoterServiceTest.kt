@@ -40,6 +40,7 @@ class NaermesteLedersMoterServiceTest {
                         null,
                         null,
                         LocalDate.of(2017, 3, 2),
+                        LocalDate.of(2018, 3, 2),
                         false,
                         false,
                         emptyList()
@@ -93,6 +94,7 @@ class NaermesteLedersMoterServiceTest {
                         null,
                         null,
                         LocalDate.of(2017, 3, 3),
+                        LocalDate.of(2018, 3, 3),
                         false,
                         false,
                         emptyList()
@@ -152,6 +154,7 @@ class NaermesteLedersMoterServiceTest {
                         null,
                         null,
                         LocalDate.of(2017, 3, 3),
+                        LocalDate.of(2018, 3, 3),
                         false,
                         false,
                         emptyList()
