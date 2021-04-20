@@ -26,18 +26,19 @@ class NarmesteLederConsumer @Autowired constructor(
 ) {
     @Cacheable(value = [CACHENAME_NARMESTELEDER_LEDER], key = "#aktorId + #virksomhetsnummer", condition = "#aktorId != null && #virksomhetsnummer != null")
     fun narmesteLederRelasjonLeder(aktorId: String, virksomhetsnummer: String): NarmesteLederRelasjon? {
+        val callId = createCallId()
         try {
             val response = restTemplate.exchange(
                 getLederUrl(aktorId, virksomhetsnummer),
                 HttpMethod.GET,
-                entity(),
+                entity(callId),
                 NarmestelederResponse::class.java
             )
             metric.countEvent(CALL_SYFONARMESTELEDER_LEDER_SUCCESS)
 
             return response.body.narmesteLederRelasjon
         } catch (e: RestClientResponseException) {
-            LOG.error("Request to get Leder from Syfonarmesteleder failed with status ${e.rawStatusCode} and message: ${e.responseBodyAsString}")
+            LOG.error("Request to get Leder from Syfonarmesteleder failed with status ${e.rawStatusCode}, CallId=$callId, and message ${e.responseBodyAsString}")
             metric.countEvent(CALL_SYFONARMESTELEDER_LEDER_FAIL)
             throw e
         }
@@ -45,16 +46,17 @@ class NarmesteLederConsumer @Autowired constructor(
 
     @Cacheable(value = [CACHENAME_NARMESTELEDER_ANSATTE], key = "#aktorId", condition = "#aktorId != null")
     fun narmestelederRelasjonerAnsatte(aktorId: String): List<NarmesteLederRelasjon> {
+        val callId = createCallId()
         try {
             val response: ResponseEntity<List<NarmesteLederRelasjon>> = restTemplate.exchange(
                 getAnsatteUrl(aktorId),
                 HttpMethod.GET,
-                entity(),
+                entity(callId),
                 object : ParameterizedTypeReference<List<NarmesteLederRelasjon>>() {}
             )
 
             if (response.body == null) {
-                LOG.error("Request to get Ansatte from Syfonarmesteleder was null. Response: $response")
+                LOG.error("Request to get Ansatte from Syfonarmesteleder was null, CallId=$callId, Response: $response")
                 return emptyList()
             }
 
@@ -62,7 +64,7 @@ class NarmesteLederConsumer @Autowired constructor(
 
             return response.body
         } catch (e: RestClientResponseException) {
-            LOG.error("Request to get Ansatte from Syfonarmesteleder failed with status ${e.rawStatusCode} and message: ${e.responseBodyAsString}")
+            LOG.error("Request to get Ansatte from Syfonarmesteleder failed with status ${e.rawStatusCode}, CallId=$callId, message ${e.responseBodyAsString}")
             metric.countEvent(CALL_SYFONARMESTELEDER_ANSATTE_FAIL)
             throw e
         }
@@ -70,16 +72,17 @@ class NarmesteLederConsumer @Autowired constructor(
 
     @Cacheable(value = [CACHENAME_NARMESTELEDER_LEDERE], key = "#aktorId", condition = "#aktorId != null")
     fun narmestelederRelasjonerLedere(aktorId: String): List<NarmesteLederRelasjon> {
+        val callId = createCallId()
         try {
             val response = restTemplate.exchange(
                 getLedereUrl(aktorId),
                 HttpMethod.GET,
-                entity(),
+                entity(callId),
                 object : ParameterizedTypeReference<List<NarmesteLederRelasjon>>() {}
             )
 
             if (response.body == null) {
-                LOG.error("Request to get Ledere from Syfonarmesteleder was null. Response: $response")
+                LOG.error("Request to get Ledere from Syfonarmesteleder was null, CallId=$callId, Response=$response")
                 return emptyList()
             }
 
@@ -87,17 +90,18 @@ class NarmesteLederConsumer @Autowired constructor(
 
             return response.body
         } catch (e: RestClientResponseException) {
-            LOG.error("Request to get Ledere from Syfonarmesteleder failed with status ${e.rawStatusCode} and message: ${e.responseBodyAsString}")
+            LOG.error("Request to get Ledere from Syfonarmesteleder failed with status ${e.rawStatusCode}, CallId=$callId, message ${e.responseBodyAsString}")
             metric.countEvent(CALL_SYFONARMESTELEDER_LEDERE_FAIL)
             throw e
         }
     }
 
-    private fun entity(): HttpEntity<*> {
+    private fun entity(callId: String): HttpEntity<*> {
         val token = azureAdTokenConsumer.accessToken(syfonarmestelederId)
         val headers = HttpHeaders()
         headers[HttpHeaders.AUTHORIZATION] = bearerCredentials(token)
         headers[NAV_CALL_ID_HEADER] = createCallId()
+        headers[SYFONARMESTELEDER_CALL_ID_HEADER] = createCallId()
         headers[NAV_CONSUMER_ID_HEADER] = APP_CONSUMER_ID
         return HttpEntity<Any>(headers)
     }
@@ -132,5 +136,7 @@ class NarmesteLederConsumer @Autowired constructor(
         private const val CALL_SYFONARMESTELEDER_LEDERE_BASE = "call_syfonarmesteledere_leder"
         private const val CALL_SYFONARMESTELEDER_LEDERE_FAIL = "${CALL_SYFONARMESTELEDER_LEDERE_BASE}_fail"
         private const val CALL_SYFONARMESTELEDER_LEDERE_SUCCESS = "${CALL_SYFONARMESTELEDER_LEDERE_BASE}_success"
+
+        private const val SYFONARMESTELEDER_CALL_ID_HEADER = "Nav-Callid"
     }
 }
