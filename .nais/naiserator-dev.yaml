@@ -34,6 +34,7 @@ spec:
     enabled: true
     path: /syfomoteadmin/internal/prometheus
   ingresses:
+    - "https://syfomoteadmin.dev.intern.nav.no"
     - "https://syfomoteadmin.nais.preprod.local"
     - "https://app-q1.adeo.no/syfomoteadmin"
     - "https://syfomoteadmin.dev-fss-pub.nais.io"
