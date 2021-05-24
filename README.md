@@ -39,7 +39,7 @@ githubPassword=<token>
 
 Where `<token>` is a personal access token with scope `read:packages`(and SSO enabled).
 
-The variables can alternatively be configured as environment variables or used in the command lines:
+The variables can alternatively be configured as environment variables or used in the command line:
 
 * `ORG_GRADLE_PROJECT_githubUser`
 * `ORG_GRADLE_PROJECT_githubPassword`
