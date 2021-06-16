@@ -19,11 +19,18 @@ import org.springframework.web.util.UriComponentsBuilder
 
 @Component
 class NarmesteLederConsumer @Autowired constructor(
+    @Value("\${syfonarmesteleder.url}") private val syfonarmestelederUrl: String,
     private val azureAdTokenConsumer: AzureAdTokenConsumer,
     private val metric: Metric,
     private val restTemplate: RestTemplate,
     @Value("\${syfonarmesteleder.id}") private val syfonarmestelederId: String
 ) {
+    private val syfonarmestelederBaseUrl: String
+
+    init {
+        this.syfonarmestelederBaseUrl = "$syfonarmestelederUrl/syfonarmesteleder"
+    }
+
     @Cacheable(value = [CACHENAME_NARMESTELEDER_LEDER], key = "#aktorId + #virksomhetsnummer", condition = "#aktorId != null && #virksomhetsnummer != null")
     fun narmesteLederRelasjonLeder(aktorId: String, virksomhetsnummer: String): NarmesteLederRelasjon? {
         val callId = createCallId()
@@ -107,23 +114,22 @@ class NarmesteLederConsumer @Autowired constructor(
     }
 
     private fun getAnsatteUrl(aktorId: String): String {
-        return "$SYFONARMESTELEDER_BASEURL/narmesteLeder/$aktorId"
+        return "$syfonarmestelederBaseUrl/narmesteLeder/$aktorId"
     }
 
     private fun getLederUrl(aktorId: String, virksomhetsnummer: String): String {
         return UriComponentsBuilder
-            .fromHttpUrl("$SYFONARMESTELEDER_BASEURL/sykmeldt/$aktorId")
+            .fromHttpUrl("$syfonarmestelederBaseUrl/sykmeldt/$aktorId")
             .queryParam("orgnummer", virksomhetsnummer)
             .toUriString()
     }
 
     private fun getLedereUrl(aktorId: String): String {
-        return "$SYFONARMESTELEDER_BASEURL/sykmeldt/$aktorId/narmesteledere"
+        return "$syfonarmestelederBaseUrl/sykmeldt/$aktorId/narmesteledere"
     }
 
     companion object {
         private val LOG = LoggerFactory.getLogger(NarmesteLederConsumer::class.java)
-        private const val SYFONARMESTELEDER_BASEURL = "http://syfonarmesteleder/syfonarmesteleder"
 
         private const val CALL_SYFONARMESTELEDER_ANSATTE_BASE = "call_syfonarmesteleder_ansatte"
         private const val CALL_SYFONARMESTELEDER_ANSATTE_FAIL = "${CALL_SYFONARMESTELEDER_ANSATTE_BASE}_fail"

@@ -17,6 +17,8 @@ import java.time.LocalDate
 
 internal class NarmesteLederConsumerTest {
 
+    private val syfonarmestelederUrl = "https://syfonarmesteleder.nav.no"
+
     @MockK
     private lateinit var azureAdTokenConsumer: AzureAdTokenConsumer
 
@@ -31,11 +33,11 @@ internal class NarmesteLederConsumerTest {
 
     @Test
     fun `should return empty list when response body is null`() {
-        val consumer = NarmesteLederConsumer(azureAdTokenConsumer, metric, restTemplate, "123")
+        val consumer = NarmesteLederConsumer(syfonarmestelederUrl, azureAdTokenConsumer, metric, restTemplate, "123")
 
         every {
             restTemplate.exchange(
-                "http://syfonarmesteleder/syfonarmesteleder/sykmeldt/123/narmesteledere",
+                "$syfonarmestelederUrl/syfonarmesteleder/sykmeldt/123/narmesteledere",
                 HttpMethod.GET,
                 any(),
                 object : ParameterizedTypeReference<List<NarmesteLederRelasjon>>() {}
@@ -49,11 +51,11 @@ internal class NarmesteLederConsumerTest {
 
     @Test
     fun `should return list of relasjon when response body is not null`() {
-        val consumer = NarmesteLederConsumer(azureAdTokenConsumer, metric, restTemplate, "123")
+        val consumer = NarmesteLederConsumer(syfonarmestelederUrl, azureAdTokenConsumer, metric, restTemplate, "123")
 
         every {
             restTemplate.exchange(
-                "http://syfonarmesteleder/syfonarmesteleder/sykmeldt/123/narmesteledere",
+                "$syfonarmestelederUrl/syfonarmesteleder/sykmeldt/123/narmesteledere",
                 HttpMethod.GET,
                 any(),
                 object : ParameterizedTypeReference<List<NarmesteLederRelasjon>>() {}

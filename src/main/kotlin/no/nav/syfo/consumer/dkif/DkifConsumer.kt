@@ -5,8 +5,8 @@ import no.nav.syfo.metric.Metric
 import no.nav.syfo.consumer.sts.StsConsumer
 import no.nav.syfo.util.*
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.cache.annotation.Cacheable
-import org.springframework.core.ParameterizedTypeReference
 import org.springframework.http.*
 import org.springframework.stereotype.Service
 import org.springframework.web.client.RestClientResponseException
@@ -14,20 +14,27 @@ import org.springframework.web.client.RestTemplate
 
 @Service
 class DkifConsumer(
+    @Value("\${dkif.url}") private val dkifUrl: String,
     private val metric: Metric,
     private val stsConsumer: StsConsumer,
     private val template: RestTemplate
 ) {
+    private val dkifKontaktinfoUrl: String
+
+    init {
+        this.dkifKontaktinfoUrl = "$dkifUrl$DKIF_KONTAKTINFO_PATH"
+    }
+
     @Cacheable(cacheNames = [CacheConfig.CACHENAME_DKIF_IDENT], key = "#ident", condition = "#ident != null")
     fun kontaktinformasjon(ident: String): DigitalKontaktinfo {
         val bearer = stsConsumer.token()
 
         try {
-            val response = template.exchange<DigitalKontaktinfoBolk>(
-                    DKIF_URL,
-                    HttpMethod.GET,
-                    entity(ident, bearer),
-                    object : ParameterizedTypeReference<DigitalKontaktinfoBolk>() {}
+            val response = template.exchange(
+                dkifKontaktinfoUrl,
+                HttpMethod.GET,
+                entity(ident, bearer),
+                DigitalKontaktinfoBolk::class.java
             )
             val responseBody = response.body
 
@@ -42,8 +49,8 @@ class DkifConsumer(
                     feil != null -> {
                         if (feil.melding == "Ingen kontaktinformasjon er registrert på personen") {
                             return DigitalKontaktinfo(
-                                    kanVarsles = false,
-                                    personident = ident
+                                kanVarsles = false,
+                                personident = ident
                             )
                         } else {
                             throw DKIFRequestFailedException(feil.melding)
@@ -70,7 +77,7 @@ class DkifConsumer(
         private val LOG = LoggerFactory.getLogger(DkifConsumer::class.java)
 
         const val METRIC_CALL_DKIF = "call_dkif"
-        const val DKIF_URL = "http://dkif/api/v1/personer/kontaktinformasjon"
+        const val DKIF_KONTAKTINFO_PATH = "/api/v1/personer/kontaktinformasjon"
     }
 
     private fun entity(ident: String, token: String): HttpEntity<String> {

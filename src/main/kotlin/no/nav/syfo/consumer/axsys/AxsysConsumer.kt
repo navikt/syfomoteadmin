@@ -4,6 +4,7 @@ import no.nav.syfo.cache.CacheConfig
 import no.nav.syfo.metric.Metric
 import no.nav.syfo.util.*
 import org.slf4j.LoggerFactory
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.cache.annotation.Cacheable
 import org.springframework.http.*
 import org.springframework.stereotype.Service
@@ -13,9 +14,16 @@ import javax.inject.Inject
 
 @Service
 class AxsysConsumer @Inject constructor(
+    @Value("\${axsys.url}") private val axsysUrl: String,
     private val metric: Metric,
     private val restTemplate: RestTemplate
 ) {
+    private val axsysTilgangerUrl: String
+
+    init {
+        this.axsysTilgangerUrl = "$axsysUrl${AXSYS_TILGANGER_PATH}"
+    }
+
     fun axsysTilgangerResponse(navIdent: String): AxsysTilgangerResponse {
         try {
             val response = restTemplate.exchange(
@@ -41,7 +49,7 @@ class AxsysConsumer @Inject constructor(
     }
 
     private fun getAxsysTilgangUrl(navIdent: String): String {
-        return "http://axsys/api/v1/tilgang/$navIdent"
+        return "$axsysTilgangerUrl/$navIdent"
     }
 
     private fun entity(): HttpEntity<String> {
@@ -57,5 +65,6 @@ class AxsysConsumer @Inject constructor(
 
         private const val METRIC_CALL_AXSYS_SUCCESS = "call_axsys_success"
         private const val METRIC_CALL_AXSYS_FAIL = "call_axsys_fail"
+        private const val AXSYS_TILGANGER_PATH = "/api/v1/tilgang"
     }
 }

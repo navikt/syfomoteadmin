@@ -58,8 +58,11 @@ fasit.environment.name: 'local'
 
 dev: true
 
+axsys.url: "https://axsys.nais.no"
+dkif.url: "https://dkif.nais.no"
 syfobehandlendeenhet.url: "https://syfobehandlendeenhet"
 security.token.service.rest.url: "https://security-token-service"
+syfonarmesteleder.url: "https://syfonarmesteleder.nav.no"
 tilgangskontrollapi.url: "https://www.ikke.no"
 
 ## DATABASE ##
