@@ -54,6 +54,16 @@ syfonarmesteleder.id: "syfonarmestelederID"
 ad.accesstoken.url: 'http://aadaccesstoken'
 syfobrukertilgang.url: "http://syfobrukertilgang"
 
+azure:
+  app:
+    client:
+      id: "1345678"
+      secret: "secret"
+  openid:
+    config:
+      token:
+        endpoint: "https://login.microsoftonline.com/id/oauth2/v2.0/token"
+
 fasit.environment.name: 'local'
 
 dev: true
@@ -63,6 +73,7 @@ dkif.url: "https://dkif.nais.no"
 syfobehandlendeenhet.url: "https://syfobehandlendeenhet"
 security.token.service.rest.url: "https://security-token-service"
 syfonarmesteleder.url: "https://syfonarmesteleder.nav.no"
+syfotilgangskontroll.client.id: "syfotilgangskontrollId"
 tilgangskontrollapi.url: "https://www.ikke.no"
 
 ## DATABASE ##

@@ -60,4 +60,18 @@ abstract class AbstractRessursTilgangTest {
             .andExpect(MockRestRequestMatchers.header(HttpHeaders.AUTHORIZATION, "Bearer $idToken"))
             .andRespond(MockRestResponseCreators.withStatus(status))
     }
+
+    val oboToken = "token"
+
+    fun mockSvarFraTilgangTilBrukerViaAzureV2(fnr: String, status: HttpStatus) {
+        val uriString = UriComponentsBuilder.fromHttpUrl(tilgangskontrollUrl)
+            .path(VeilederTilgangConsumer.ACCESS_TO_USER_WITH_AZURE_V2_PATH)
+            .path("/")
+            .path(fnr)
+            .toUriString()
+        mockRestServiceServer.expect(ExpectedCount.manyTimes(), MockRestRequestMatchers.requestTo(uriString))
+            .andExpect(MockRestRequestMatchers.method(HttpMethod.GET))
+            .andExpect(MockRestRequestMatchers.header(HttpHeaders.AUTHORIZATION, "Bearer $oboToken"))
+            .andRespond(MockRestResponseCreators.withStatus(status))
+    }
 }

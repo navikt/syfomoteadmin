@@ -10,6 +10,17 @@ import java.text.ParseException
 object OidcTestHelper {
     @JvmStatic
     @Throws(ParseException::class)
+    fun loggInnVeilederAzureV2(
+        oidcRequestContextHolder: OIDCRequestContextHolder,
+        veilederIdent: String
+    ) {
+        val claimsSet = JWTClaimsSet.parse("{\"NAVident\":\"$veilederIdent\"}")
+        val jwt = JwtTokenGenerator.createSignedJWT(claimsSet)
+        settOIDCValidationContext(oidcRequestContextHolder, jwt, OIDCIssuer.VEILEDER_AZURE_V2)
+    }
+
+    @JvmStatic
+    @Throws(ParseException::class)
     fun loggInnVeilederAzure(oidcRequestContextHolder: OIDCRequestContextHolder, veilederIdent: String) {
         val claimsSet = JWTClaimsSet.parse("{\"NAVident\":\"$veilederIdent\"}")
         val jwt = JwtTokenGenerator.createSignedJWT(claimsSet)

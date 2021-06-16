@@ -38,6 +38,21 @@ spec:
     - "https://syfomoteadmin.nais.adeo.no"
     - "https://app.adeo.no/syfomoteadmin"
     - "https://syfomoteadmin.prod-fss-pub.nais.io"
+  accessPolicy:
+    inbound:
+      rules:
+        - application: syfomoteoversikt
+          namespace: teamsykefravr
+          cluster: prod-fss
+  azure:
+    application:
+      enabled: true
+      tenant: nav.no
+      replyURLs:
+        - "https://syfomoteadmin.intern.nav.no/oauth2/callback"
+      claims:
+        extra:
+          - "NAVident"
   vault:
     enabled: true
     paths:
@@ -117,6 +132,8 @@ spec:
       value: https://modapp.adeo.no
     - name: PDL_URL
       value: https://pdl-api.nais.adeo.no/graphql
+    - name: SYFOTILGANGSKONTROLL_CLIENT_ID
+      value: "dfaa2699-7390-4459-9cfc-2e8de64dfaf9"
     - name: TILGANGSKONTROLLAPI_URL
       value: https://syfo-tilgangskontroll.nais.adeo.no/syfo-tilgangskontroll/api/tilgang
     - name: SECURITY_TOKEN_SERVICE_REST_URL

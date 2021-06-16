@@ -9,6 +9,10 @@ no.nav.security.oidc:
       discoveryurl: <SETTES FRA MILJØCONFIG>
       accepted_audience: <SETTES FRA MILJØCONFIG>
       cookie_name: isso-idtoken
+    veilederaad:
+      discoveryurl: ${azure.app.well.known.url}
+      accepted_audience: ${azure.app.client.id}
+      cookiename: ID_token
     sts:
       discoveryurl: <SETTES FRA MILJØCONFIG>
       accepted_audience: <SETTES FRA MILJØCONFIG>
