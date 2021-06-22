@@ -35,13 +35,12 @@ class VeilederTilgangConsumer(
     }
 
     fun hasVeilederAccessToPersonWithAzureOBO(fnr: Fodselsnummer): Boolean {
+        val token = OIDCUtil.tokenFraOIDC(contextHolder, OIDCIssuer.VEILEDER_AZURE_V2)
+        val oboToken = azureAdV2TokenConsumer.getOnBehalfOfToken(
+            scopeClientId = syfotilgangskontrollClientId,
+            token = token
+        )
         try {
-            val token = OIDCUtil.tokenFraOIDC(contextHolder, OIDCIssuer.VEILEDER_AZURE_V2)
-            val oboToken = azureAdV2TokenConsumer.getOnBehalfOfToken(
-                scopeClientId = syfotilgangskontrollClientId,
-                token = token
-            )
-
             val response = template.exchange(
                 accessToUserV2Url(fnr),
                 HttpMethod.GET,
