@@ -95,13 +95,11 @@ spec:
     - name: SMTPSERVER_PORT
       value: '25'
     - name: MQGATEWAY03_HOSTNAME
-      value: b27apvl173.preprod.local
+      value: b27apvl221.preprod.local
     - name: MQGATEWAY03_PORT
       value: '1413'
     - name: MQGATEWAY03_NAME
-      value: MQ1LSC03
-    - name: SYFOMOTEADMIN_CHANNEL_QUEUEMANAGER
-      value: mq://b27apvl173.preprod.local:1413/MQ1LSC03
+      value: MQLS03
     - name: SYFOMOTEADMIN_CHANNEL_NAME
       value: Q1_SYFOMOTEADMIN
     - name: SERVICEVARSEL_QUEUENAME

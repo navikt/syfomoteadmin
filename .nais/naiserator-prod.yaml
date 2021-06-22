@@ -95,13 +95,11 @@ spec:
     - name: SMTPSERVER_PORT
       value: '25'
     - name: MQGATEWAY03_HOSTNAME
-      value: a01apvl062.adeo.no
+      value: a01apvl270.adeo.no
     - name: MQGATEWAY03_PORT
       value: '1414'
     - name: MQGATEWAY03_NAME
-      value: MPLSC03
-    - name: SYFOMOTEADMIN_CHANNEL_QUEUEMANAGER
-      value: mq://a01apvl062.adeo.no:1414/MPLSC03
+      value: MPLS03
     - name: SYFOMOTEADMIN_CHANNEL_NAME
       value: P_SYFOMOTEADMIN
     - name: SERVICEVARSEL_QUEUENAME

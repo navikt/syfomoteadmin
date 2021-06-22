@@ -10,7 +10,7 @@ val nimbusSDKVersion = "7.0.3"
 val oidcSupportVersion = "0.2.18"
 val kotlinJacksonVersion = "2.11.2"
 
-val mqVersion = "9.0.4.0"
+val mqVersion = "9.2.2.0"
 val tjenesteSpesifikasjonerVersion = "1.2019.09.25-00.21-49b69f0625e0"
 val tjenesteSpesifikasjonerGithubVersion = "1.2020.06.11-19.53-1cad83414166"
 
