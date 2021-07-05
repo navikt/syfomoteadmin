@@ -1,6 +1,7 @@
 package no.nav.syfo.controller.internad.v2
 
 import no.nav.syfo.LocalApplication
+import no.nav.syfo.api.domain.nyttmoterequest.RSNyttMoteRequest
 import no.nav.syfo.api.ressurser.azuread.v2.MoterInternControllerV2
 import no.nav.syfo.consumer.axsys.AxsysConsumer
 import no.nav.syfo.consumer.axsys.AxsysEnhet
@@ -304,6 +305,27 @@ class MoterInternControllerV2Test : AbstractRessursTilgangTest() {
         moterController.hentMoter(null, null, false, NAV_ENHET, false)
         Mockito.verify(pdlConsumer).isKode6Or7(ARBEIDSTAKER_FNR)
         Mockito.verify(pdlConsumer).isKode6Or7(FNR_2)
+    }
+
+    @Test(expected = ForbiddenException::class)
+    fun opprettMoter_ikke_tilgang_pga_skjermet_bruker() {
+        Mockito.`when`(tilgangService.hasVeilederAccessToPersonWithAzureOBO(Fodselsnummer(ARBEIDSTAKER_FNR))).thenReturn(true)
+        Mockito.`when`(pdlConsumer.isKode6Or7(ARBEIDSTAKER_FNR)).thenReturn(true)
+        moterController.opprett(RSNyttMoteRequest().fnr(ARBEIDSTAKER_FNR))
+    }
+
+    @Test(expected = ForbiddenException::class)
+    fun opprettMoter_ikke_tilgang_pga_rolle() {
+        Mockito.`when`(tilgangService.hasVeilederAccessToPersonWithAzureOBO(Fodselsnummer(ARBEIDSTAKER_FNR))).thenReturn(false)
+        Mockito.`when`(pdlConsumer.isKode6Or7(ARBEIDSTAKER_FNR)).thenReturn(false)
+        moterController.opprett(RSNyttMoteRequest().fnr(ARBEIDSTAKER_FNR))
+    }
+
+    @Test(expected = RuntimeException::class)
+    fun opprettMoter_annen_tilgangsfeil() {
+        Mockito.doThrow(RuntimeException()).`when`(tilgangService).hasVeilederAccessToPersonWithAzureOBO(Fodselsnummer(ARBEIDSTAKER_FNR))
+        Mockito.`when`(pdlConsumer.isKode6Or7(ARBEIDSTAKER_FNR)).thenReturn(false)
+        moterController.opprett(RSNyttMoteRequest().fnr(ARBEIDSTAKER_FNR))
     }
 
     private fun mockSTS() {
