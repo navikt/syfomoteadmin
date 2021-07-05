@@ -5,9 +5,12 @@ import no.nav.syfo.LocalApplication
 import no.nav.syfo.api.auth.OIDCIssuer
 import no.nav.syfo.consumer.veiledertilgang.VeilederTilgangConsumer
 import no.nav.syfo.testhelper.OidcTestHelper.loggUtAlle
+import no.nav.syfo.testhelper.generateAzureAdV2TokenResponse
+import no.nav.syfo.testhelper.mockAndExpectAzureADV2
 import org.junit.After
 import org.junit.Before
 import org.junit.runner.RunWith
+import org.springframework.beans.factory.annotation.Qualifier
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.*
@@ -25,6 +28,10 @@ import javax.inject.Inject
 @SpringBootTest(classes = [LocalApplication::class])
 @DirtiesContext
 abstract class AbstractRessursTilgangTest {
+
+    @Value("\${azure.openid.config.token.endpoint}")
+    private lateinit var azureTokenEndpoint: String
+
     @Value("\${tilgangskontrollapi.url}")
     private lateinit var tilgangskontrollUrl: String
 
@@ -38,15 +45,23 @@ abstract class AbstractRessursTilgangTest {
     private lateinit var restTemplate: RestTemplate
     private lateinit var mockRestServiceServer: MockRestServiceServer
 
+    @Inject
+    @Qualifier("restTemplateWithProxy")
+    private lateinit var restTemplateWithProxy: RestTemplate
+    private lateinit var mockRestServiceWithProxyServer: MockRestServiceServer
+
     @Before
     fun setUp() {
         mockRestServiceServer = MockRestServiceServer.bindTo(restTemplate).build()
+        mockRestServiceWithProxyServer = MockRestServiceServer.bindTo(restTemplateWithProxy).build()
     }
 
     @After
     open fun tearDown() {
         mockRestServiceServer.verify()
         loggUtAlle(oidcRequestContextHolder)
+        mockRestServiceServer.reset()
+        mockRestServiceWithProxyServer.reset()
     }
 
     fun mockSvarFraTilgangTilBrukerViaAzure(fnr: String?, status: HttpStatus?) {
@@ -61,9 +76,11 @@ abstract class AbstractRessursTilgangTest {
             .andRespond(MockRestResponseCreators.withStatus(status))
     }
 
-    val oboToken = "token"
+    val oboToken = generateAzureAdV2TokenResponse().access_token
 
     fun mockSvarFraTilgangTilBrukerViaAzureV2(fnr: String, status: HttpStatus) {
+        mockAndExpectAzureADV2(mockRestServiceWithProxyServer, azureTokenEndpoint, generateAzureAdV2TokenResponse())
+
         val uriString = UriComponentsBuilder.fromHttpUrl(tilgangskontrollUrl)
             .path(VeilederTilgangConsumer.ACCESS_TO_USER_WITH_AZURE_V2_PATH)
             .path("/")
