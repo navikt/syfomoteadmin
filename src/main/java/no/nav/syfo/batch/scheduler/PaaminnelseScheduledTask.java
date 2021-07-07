@@ -1,6 +1,7 @@
 package no.nav.syfo.batch.scheduler;
 
 import no.nav.syfo.batch.leaderelection.LeaderElectionService;
+import no.nav.syfo.domain.model.Mote;
 import no.nav.syfo.service.*;
 import no.nav.syfo.service.varselinnhold.ArbeidsgiverVarselService;
 import no.nav.syfo.util.*;
@@ -11,6 +12,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.inject.Inject;
 import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static no.nav.syfo.domain.model.Varseltype.PAAMINNELSE;
 import static no.nav.syfo.util.time.HelgedagUtil.erHelgedag;
@@ -52,7 +55,6 @@ public class PaaminnelseScheduledTask {
         this.leaderElectionService = leaderElectionService;
     }
 
-    @Transactional
     @Scheduled(cron = "0 0 8 * * *")
     public void run() {
         if (toggle.toggleBatchPaaminelse() && leaderElectionService.isLeader()) {
@@ -71,11 +73,24 @@ public class PaaminnelseScheduledTask {
                 dato = dato.minusDays(1);
             }
 
-            log.info("Sender påminnelser");
-            motedeltakerService.findMotedeltakereSomIkkeHarSvartSisteDognet(antallDagerBakoverEkstra)
+            List<Mote> moter = motedeltakerService.findMotedeltakereSomIkkeHarSvartSisteDognet(antallDagerBakoverEkstra)
                     .stream()
                     .map(motedeltaker -> moteService.findMoteByMotedeltakerUuid(motedeltaker.uuid))
-                    .forEach(mote -> varselService.sendVarsel(PAAMINNELSE, mote, true, SRV_BRUKER));
+                    .collect(Collectors.toList());
+
+            log.info ("Sender påminnelser: fant " + moter.size() + " møter");
+            int batchSize = 100;
+            while (!moter.isEmpty()) {
+                List<Mote> batch = (moter.size() > batchSize) ? moter.subList(0, batchSize) : moter;
+                handleBatch(batch);
+                batch.clear();
+            }
         }
+    }
+
+    @Transactional
+    void handleBatch(List<Mote> batch) {
+        log.info("Sender påminnelser: for en batch med " + batch.size() + " møter");
+        batch.forEach(mote -> varselService.sendVarsel(PAAMINNELSE, mote, true, SRV_BRUKER));
     }
 }
