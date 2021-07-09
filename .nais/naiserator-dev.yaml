@@ -136,7 +136,7 @@ spec:
     - name: SYFOTILGANGSKONTROLL_CLIENT_ID
       value: "32e36aa5-1d12-452a-9b1e-9f3f557cbb4d"
     - name: TILGANGSKONTROLLAPI_URL
-      value: "https://syfo-tilgangskontroll.dev.intern.nav.no/syfo-tilgangskontroll/api/tilgang"
+      value: https://syfo-tilgangskontroll.nais.preprod.local/syfo-tilgangskontroll/api/tilgang
     - name: SECURITY_TOKEN_SERVICE_REST_URL
       value: https://security-token-service.nais.preprod.local
     - name: SYFOBEHANDLENDEENHET_URL
