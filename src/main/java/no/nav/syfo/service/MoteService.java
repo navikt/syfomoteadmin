@@ -183,7 +183,7 @@ public class MoteService {
         moteDAO.oppdaterMoteEier(moteUuid, mottakerUserId);
     }
 
-    private boolean harDeltakerSvartTidligereEnnNyesteOpprettet(Motedeltaker motedeltaker, LocalDateTime nyesteAlternativOpprettetTidspunkt) {
+    private boolean harDeltakerIkkeSvartEllerSvartTidligereEnnNyesteOpprettet(Motedeltaker motedeltaker, LocalDateTime nyesteAlternativOpprettetTidspunkt) {
         return Optional.ofNullable(motedeltaker.svartTidspunkt)
                 .map(svartTidspunkt -> svartTidspunkt.isBefore(nyesteAlternativOpprettetTidspunkt))
                 .orElse(true);
@@ -196,16 +196,7 @@ public class MoteService {
 
         return Mote.motedeltakere.stream()
                 .filter(erIkkeReservertSykmeldt(skalSykmeldtHaVarsler))
-                .noneMatch(deltaker -> harDeltakerSvartTidligereEnnNyesteOpprettet(deltaker, nyesteAlternativOpprettetTidspunkt) ||
-                        sisteSvarErIkkeReservertBruk(Mote, skalSykmeldtHaVarsler));
-    }
-
-    private boolean sisteSvarErIkkeReservertBruk(Mote Mote, boolean skalSykmeldtHaVarsler) {
-        return !skalSykmeldtHaVarsler &&
-                Mote.motedeltakere.stream()
-                        .filter(motedeltaker -> motedeltaker.svartTidspunkt != null)
-                        .sorted((o1, o2) -> o2.svartTidspunkt.compareTo(o1.svartTidspunkt))
-                        .findFirst().get().motedeltakertype.equals("Bruker");
+                .noneMatch(deltaker -> harDeltakerIkkeSvartEllerSvartTidligereEnnNyesteOpprettet(deltaker, nyesteAlternativOpprettetTidspunkt));
     }
 
     private Predicate<Motedeltaker> erIkkeReservertSykmeldt(boolean skalSykmeldtHaVarsler) {
