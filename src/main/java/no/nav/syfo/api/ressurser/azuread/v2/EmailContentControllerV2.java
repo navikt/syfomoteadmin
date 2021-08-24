@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.inject.Inject;
 
 import static no.nav.syfo.api.auth.OIDCIssuer.VEILEDER_AZURE_V2;
-import static no.nav.syfo.api.auth.OIDCUtil.getSubjectInternAzure;
+import static no.nav.syfo.api.auth.OIDCUtil.getSubjectInternAzureV2;
 import static no.nav.syfo.util.ServiceVarselInnholdUtil.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
 
@@ -96,7 +96,7 @@ public class EmailContentControllerV2 {
         if (type.equals(Varseltype.AVBRUTT) && Mote.status.equals(MoteStatus.BEKREFTET)) {
             type = Varseltype.AVBRUTT_BEKREFTET;
         }
-        PEpost epost = arbeidsgiverVarselService.varselinnhold(type, Mote, getSubjectInternAzure(contextHolder));
+        PEpost epost = arbeidsgiverVarselService.varselinnhold(type, Mote, getSubjectInternAzureV2(contextHolder));
         return new RSEpostInnhold().emne(epost.emne).innhold(finnInnholdIHTMLTag(epost.innhold));
     }
 
