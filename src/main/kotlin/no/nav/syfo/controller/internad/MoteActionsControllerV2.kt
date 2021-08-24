@@ -2,7 +2,7 @@ package no.nav.syfo.controller.internad
 
 import no.nav.security.oidc.api.ProtectedWithClaims
 import no.nav.security.oidc.context.OIDCRequestContextHolder
-import no.nav.syfo.api.auth.OIDCIssuer.AZURE
+import no.nav.syfo.api.auth.OIDCIssuer.VEILEDER_AZURE_V2
 import no.nav.syfo.api.auth.OIDCUtil.getSubjectInternAzureV2
 import no.nav.syfo.api.domain.nyttmoterequest.RSNyttAlternativ
 import no.nav.syfo.api.mappers.RSNyttMoteMapper.opprett2TidOgSted
@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*
 import javax.inject.Inject
 
 @RestController
-@ProtectedWithClaims(issuer = AZURE)
+@ProtectedWithClaims(issuer = VEILEDER_AZURE_V2)
 @RequestMapping(value = ["/api/internad/v2/moter/{moteUuid}"])
 class MoteActionsControllerV2 @Inject
 constructor(
