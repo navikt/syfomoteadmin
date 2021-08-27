@@ -115,10 +115,6 @@ spec:
       value: QA.Q1_HENVENDELSE_OPPGAVE.HENVENDELSE
     - name: TREDJEPARTSVARSEL_QUEUENAME
       value: QA.Q1_VARSELPRODUKSJON.BEST_SRVMLD_M_KONTAKT
-    - name: NO_NAV_SECURITY_OIDC_ISSUER_VEILEDER_DISCOVERYURL
-      value: https://login.microsoftonline.com/966ac572-f5b7-4bbe-aa88-c76419c0f851/.well-known/openid-configuration
-    - name: NO_NAV_SECURITY_OIDC_ISSUER_VEILEDER_ACCEPTEDAUDIENCE
-      value: 38e07d31-659d-4595-939a-f18dce3446c5,595e0237-37db-4d5e-8dde-4fb3d0bf8839,33ad42cc-b88c-45c9-b640-8c8a4c93d3a1
     - name: NO_NAV_SECURITY_OIDC_ISSUER_STS_DISCOVERYURL
       value: https://security-token-service.nais.preprod.local/rest/v1/sts/.well-known/openid-configuration
     - name: NO_NAV_SECURITY_OIDC_ISSUER_STS_ACCEPTEDAUDIENCE

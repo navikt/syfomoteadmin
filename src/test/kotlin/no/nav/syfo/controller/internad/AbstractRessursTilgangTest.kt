@@ -2,7 +2,6 @@ package no.nav.syfo.controller.internad
 
 import no.nav.security.oidc.context.OIDCRequestContextHolder
 import no.nav.syfo.LocalApplication
-import no.nav.syfo.api.auth.OIDCIssuer
 import no.nav.syfo.consumer.veiledertilgang.VeilederTilgangConsumer
 import no.nav.syfo.testhelper.OidcTestHelper.loggUtAlle
 import no.nav.syfo.testhelper.generateAzureAdV2TokenResponse
@@ -62,18 +61,6 @@ abstract class AbstractRessursTilgangTest {
         loggUtAlle(oidcRequestContextHolder)
         mockRestServiceServer.reset()
         mockRestServiceWithProxyServer.reset()
-    }
-
-    fun mockSvarFraTilgangTilBrukerViaAzure(fnr: String?, status: HttpStatus?) {
-        val uriString = UriComponentsBuilder.fromHttpUrl(tilgangskontrollUrl)
-            .path(VeilederTilgangConsumer.TILGANG_TIL_BRUKER_VIA_AZURE_PATH)
-            .queryParam(VeilederTilgangConsumer.FNR, fnr)
-            .toUriString()
-        val idToken = oidcRequestContextHolder.oidcValidationContext.getToken(OIDCIssuer.AZURE).idToken
-        mockRestServiceServer.expect(ExpectedCount.manyTimes(), MockRestRequestMatchers.requestTo(uriString))
-            .andExpect(MockRestRequestMatchers.method(HttpMethod.GET))
-            .andExpect(MockRestRequestMatchers.header(HttpHeaders.AUTHORIZATION, "Bearer $idToken"))
-            .andRespond(MockRestResponseCreators.withStatus(status))
     }
 
     val oboToken = generateAzureAdV2TokenResponse().access_token
