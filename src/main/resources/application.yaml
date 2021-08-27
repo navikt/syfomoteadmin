@@ -5,10 +5,6 @@ no.nav.security.oidc:
       discoveryurl: ${LOGINSERVICE_IDPORTEN_DISCOVERY_URL}
       accepted_audience: ${LOGINSERVICE_IDPORTEN_AUDIENCE}
       cookie_name: selvbetjening-idtoken
-    veileder:
-      discoveryurl: <SETTES FRA MILJØCONFIG>
-      accepted_audience: <SETTES FRA MILJØCONFIG>
-      cookie_name: isso-idtoken
     veilederaad:
       discoveryurl: ${azure.app.well.known.url}
       accepted_audience: ${azure.app.client.id}

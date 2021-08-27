@@ -39,14 +39,6 @@ srv:
 nais.app.name: 'syfomoteadmin'
 kafka.env.name: 'local'
 
-#no.nav.security.oidc:
-#  issuers: selvbetjening
-#  issuer:
-#    selvbetjening:
-#      discoveryurl: http://metadata
-#      accepted_audience: aud-localhost
-#      cookie_name: localhost-idtoken
-
 client.id: "clientId"
 client.secret: "clientSecret"
 syfonarmesteleder.id: "syfonarmestelederID"

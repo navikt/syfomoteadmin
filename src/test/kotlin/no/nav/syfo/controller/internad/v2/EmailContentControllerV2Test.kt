@@ -1,7 +1,6 @@
 package no.nav.syfo.controller.internad.v2
 
 import no.nav.syfo.LocalApplication
-import no.nav.syfo.api.ressurser.azuread.EmailContentController
 import no.nav.syfo.api.ressurser.azuread.v2.EmailContentControllerV2
 import no.nav.syfo.consumer.pdl.PdlConsumer
 import no.nav.syfo.controller.internad.AbstractRessursTilgangTest
@@ -10,7 +9,6 @@ import no.nav.syfo.domain.Fodselsnummer
 import no.nav.syfo.service.MoteService
 import no.nav.syfo.testhelper.MoteGenerator
 import no.nav.syfo.testhelper.OidcTestHelper
-import no.nav.syfo.testhelper.OidcTestHelper.loggUtAlle
 import no.nav.syfo.testhelper.UserConstants.ARBEIDSTAKER_AKTORID
 import no.nav.syfo.testhelper.UserConstants.ARBEIDSTAKER_FNR
 import no.nav.syfo.testhelper.UserConstants.VEILEDER_ID
@@ -59,7 +57,7 @@ class EmailContentControllerV2Test : AbstractRessursTilgangTest() {
     @Test
     fun emailContentHasAccess() {
         mockSvarFraTilgangTilBrukerViaAzureV2(ARBEIDSTAKER_FNR, HttpStatus.OK)
-        val emailContent = emailContentController.getEmailContent(EmailContentController.BEKREFTET, uuid.toString(), "1")
+        val emailContent = emailContentController.getEmailContent(EmailContentControllerV2.BEKREFTET, uuid.toString(), "1")
         Assert.assertNotNull(emailContent.emne)
         Assert.assertNotNull(emailContent.innhold)
     }
@@ -67,12 +65,12 @@ class EmailContentControllerV2Test : AbstractRessursTilgangTest() {
     @Test(expected = ForbiddenException::class)
     fun emailContentNoAccess() {
         mockSvarFraTilgangTilBrukerViaAzureV2(ARBEIDSTAKER_FNR, HttpStatus.FORBIDDEN)
-        emailContentController.getEmailContent(EmailContentController.BEKREFTET, uuid.toString(), null)
+        emailContentController.getEmailContent(EmailContentControllerV2.BEKREFTET, uuid.toString(), null)
     }
 
     @Test(expected = RuntimeException::class)
     fun emailContentServerError() {
         mockSvarFraTilgangTilBrukerViaAzureV2(ARBEIDSTAKER_FNR, HttpStatus.INTERNAL_SERVER_ERROR)
-        emailContentController.getEmailContent(EmailContentController.BEKREFTET, uuid.toString(), null)
+        emailContentController.getEmailContent(EmailContentControllerV2.BEKREFTET, uuid.toString(), null)
     }
 }

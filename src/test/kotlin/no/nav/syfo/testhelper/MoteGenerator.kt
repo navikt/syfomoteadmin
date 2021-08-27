@@ -1,6 +1,6 @@
 package no.nav.syfo.testhelper
 
-import no.nav.syfo.api.ressurser.azuread.EmailContentController
+import no.nav.syfo.api.ressurser.azuread.v2.EmailContentControllerV2
 import no.nav.syfo.domain.model.*
 import no.nav.syfo.testhelper.UserConstants.ARBEIDSTAKER_AKTORID
 import java.time.LocalDateTime
@@ -15,7 +15,7 @@ class MoteGenerator {
     private val moteDeltaker: Motedeltaker = MotedeltakerAktorId()
         .uuid(UUID.randomUUID().toString())
         .aktorId(ARBEIDSTAKER_AKTORID)
-        .motedeltakertype(EmailContentController.BRUKER)
+        .motedeltakertype(EmailContentControllerV2.BRUKER)
         .tidOgStedAlternativer(listOf(tidOgSted))
 
     private val mote = Mote()
