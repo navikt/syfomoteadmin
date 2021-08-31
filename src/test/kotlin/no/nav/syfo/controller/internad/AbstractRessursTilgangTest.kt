@@ -6,6 +6,7 @@ import no.nav.syfo.consumer.veiledertilgang.VeilederTilgangConsumer
 import no.nav.syfo.testhelper.OidcTestHelper.loggUtAlle
 import no.nav.syfo.testhelper.generateAzureAdV2TokenResponse
 import no.nav.syfo.testhelper.mockAndExpectAzureADV2
+import no.nav.syfo.util.NAV_PERSONIDENT_HEADER
 import org.junit.After
 import org.junit.Before
 import org.junit.runner.RunWith
@@ -69,13 +70,12 @@ abstract class AbstractRessursTilgangTest {
         mockAndExpectAzureADV2(mockRestServiceWithProxyServer, azureTokenEndpoint, generateAzureAdV2TokenResponse())
 
         val uriString = UriComponentsBuilder.fromHttpUrl(tilgangskontrollUrl)
-            .path(VeilederTilgangConsumer.ACCESS_TO_USER_WITH_AZURE_V2_PATH)
-            .path("/")
-            .path(fnr)
+            .path(VeilederTilgangConsumer.TILGANGSKONTROLL_PERSON_PATH)
             .toUriString()
         mockRestServiceServer.expect(ExpectedCount.manyTimes(), MockRestRequestMatchers.requestTo(uriString))
             .andExpect(MockRestRequestMatchers.method(HttpMethod.GET))
             .andExpect(MockRestRequestMatchers.header(HttpHeaders.AUTHORIZATION, "Bearer $oboToken"))
+            .andExpect(MockRestRequestMatchers.header(NAV_PERSONIDENT_HEADER, fnr))
             .andRespond(MockRestResponseCreators.withStatus(status))
     }
 }
