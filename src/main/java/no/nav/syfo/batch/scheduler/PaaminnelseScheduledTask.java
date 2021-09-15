@@ -91,6 +91,14 @@ public class PaaminnelseScheduledTask {
     @Transactional
     void handleBatch(List<Mote> batch) {
         log.info("Sender påminnelser: for en batch med " + batch.size() + " møter");
-        batch.forEach(mote -> varselService.sendVarsel(PAAMINNELSE, mote, true, SRV_BRUKER));
+        batch.forEach(this::sendMoteVarsel);
+    }
+
+    private void sendMoteVarsel(Mote mote) {
+        try {
+            varselService.sendVarsel(PAAMINNELSE, mote, true, SRV_BRUKER);
+        } catch (RuntimeException e) {
+            log.warn("Klarte ikke sende varsel for møte med uuid:" + mote.uuid, e.getMessage(), e);
+        }
     }
 }
