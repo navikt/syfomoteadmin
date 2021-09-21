@@ -63,7 +63,7 @@ class NarmesteLederConsumer @Autowired constructor(
             )
 
             if (response.body == null) {
-                LOG.error("Request to get Ansatte from Syfonarmesteleder was null, CallId=$callId, Response: $response")
+                LOG.warn("Request to get Ansatte from Syfonarmesteleder was null, CallId=$callId, Response: $response")
                 return emptyList()
             }
 
@@ -89,7 +89,7 @@ class NarmesteLederConsumer @Autowired constructor(
             )
 
             if (response.body == null) {
-                LOG.error("Request to get Ledere from Syfonarmesteleder was null, CallId=$callId, Response=$response")
+                LOG.warn("Request to get Ledere from Syfonarmesteleder was null, CallId=$callId, Response=$response")
                 return emptyList()
             }
 
