@@ -46,7 +46,12 @@ class PersonControllerV2Test : AbstractRessursTilgangTest() {
 
     @Before
     fun setup() {
-        Mockito.`when`(azureAdV2TokenConsumer.getOnBehalfOfToken(ArgumentMatchers.anyString(), ArgumentMatchers.anyString())).thenReturn(oboToken)
+        Mockito.`when`(azureAdV2TokenConsumer.getOnBehalfOfToken(
+            scopeClientId = ArgumentMatchers.anyString(),
+            token = ArgumentMatchers.anyString(),
+            veilederId = ArgumentMatchers.anyString(),
+            azp = ArgumentMatchers.anyString(),
+        )).thenReturn(oboToken)
         Mockito.`when`(pdlConsumer.fodselsnummer(AktorId(ARBEIDSTAKER_AKTORID))).thenReturn(Fodselsnummer(ARBEIDSTAKER_FNR))
         try {
             loggInnVeilederAzureV2(oidcRequestContextHolder, VEILEDER_ID)

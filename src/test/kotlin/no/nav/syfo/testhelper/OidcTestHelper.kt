@@ -14,7 +14,7 @@ object OidcTestHelper {
         oidcRequestContextHolder: OIDCRequestContextHolder,
         veilederIdent: String
     ) {
-        val claimsSet = JWTClaimsSet.parse("{\"NAVident\":\"$veilederIdent\"}")
+        val claimsSet = JWTClaimsSet.parse("{\"NAVident\":\"$veilederIdent\", \"azp\":\"clientid\"}")
         val jwt = JwtTokenGenerator.createSignedJWT(claimsSet)
         settOIDCValidationContext(oidcRequestContextHolder, jwt, OIDCIssuer.VEILEDER_AZURE_V2)
     }
