@@ -39,7 +39,12 @@ class AktorControllerV2TilgangTest : AbstractRessursTilgangTest() {
 
     @Before
     fun setup() {
-        Mockito.`when`(azureAdV2TokenConsumer.getOnBehalfOfToken(anyString(), anyString())).thenReturn(oboToken)
+        Mockito.`when`(azureAdV2TokenConsumer.getOnBehalfOfToken(
+            scopeClientId = anyString(),
+            token = anyString(),
+            veilederId = anyString(),
+            azp = anyString(),
+        )).thenReturn(oboToken)
         Mockito.`when`(pdlConsumer.fodselsnummer(AktorId(ARBEIDSTAKER_AKTORID))).thenReturn(Fodselsnummer(ARBEIDSTAKER_FNR))
         try {
             loggInnVeilederAzureV2(oidcRequestContextHolder, VEILEDER_ID)
