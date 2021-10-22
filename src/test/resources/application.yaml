@@ -62,6 +62,7 @@ dev: true
 
 axsys.url: "https://axsys.nais.no"
 dkif.url: "https://dkif.nais.no"
+syfobehandlendeenhet.client.id: "dev-fss:teamsykefravr:syfobehandlendeenhet"
 syfobehandlendeenhet.url: "https://syfobehandlendeenhet"
 security.token.service.rest.url: "https://security-token-service"
 syfonarmesteleder.url: "https://syfonarmesteleder.nav.no"

@@ -213,7 +213,7 @@ public class MoterInternControllerV2 {
             );
             nyttMoteRequest.navn(lederNavn);
             nyttMoteRequest.epost(narmesteLederRelasjon.getNarmesteLederEpost());
-            nyttMoteRequest.navEnhet(behandlendeEnhetConsumer.getBehandlendeEnhet(nyttMoteRequest.fnr, null).getEnhetId());
+            nyttMoteRequest.navEnhet(behandlendeEnhetConsumer.getBehandlendeEnhet(null, nyttMoteRequest.fnr).getEnhetId());
 
             Mote nyttMote = map(nyttMoteRequest, opprett2Mote);
             String innloggetIdent = getSubjectInternAzureV2(contextHolder);

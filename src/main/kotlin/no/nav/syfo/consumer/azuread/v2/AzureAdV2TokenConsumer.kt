@@ -29,17 +29,14 @@ class AzureAdV2TokenConsumer @Autowired constructor(
         val cachedToken = tokenCache[cacheKey]
         return if (cachedToken == null || cachedToken.isExpired()) {
             try {
-                val response = restTemplateWithProxy.exchange(
-                    azureTokenEndpoint,
-                    HttpMethod.POST,
-                    requestEntity(scopeClientId, token),
-                    AzureAdV2TokenResponse::class.java
+                val requestEntity = onBehalfOfRequestEntity(
+                    scopeClientId = scopeClientId,
+                    token = token,
                 )
-                val tokenResponse = response.body!!
-                val azureToken = tokenResponse.toAzureAdV2Token()
-                tokenCache[cacheKey] = azureToken
+                val azureAdToken = getToken(requestEntity = requestEntity)
+                tokenCache[cacheKey] = azureAdToken
                 metric.countEvent(CALL_AZUREAD_CACHE_MISS)
-                azureToken.accessToken
+                azureAdToken.accessToken
             } catch (e: RestClientResponseException) {
                 log.error(
                     "Call to get AzureADV2Token from AzureAD for scope: $scopeClientId with status: ${e.rawStatusCode} and message: ${e.responseBodyAsString}",
@@ -54,7 +51,45 @@ class AzureAdV2TokenConsumer @Autowired constructor(
 
     }
 
-    private fun requestEntity(
+    fun getSystemToken(
+        scopeClientId: String,
+    ): String {
+        val cachedToken = systemTokenCache[scopeClientId]
+        return if (cachedToken == null || cachedToken.isExpired()) {
+            try {
+                val requestEntity = systemTokenRequestEntity(
+                    scopeClientId = scopeClientId,
+                )
+                val azureAdToken = getToken(requestEntity = requestEntity)
+                systemTokenCache[scopeClientId] = azureAdToken
+                azureAdToken.accessToken
+            } catch (e: RestClientResponseException) {
+                log.error(
+                    "Call to get AzureADV2Token from AzureAD as system for scope: $scopeClientId with status: ${e.rawStatusCode} and message: ${e.responseBodyAsString}",
+                    e
+                )
+                throw e
+            }
+        } else {
+            cachedToken.accessToken
+        }
+    }
+
+    private fun getToken(
+        requestEntity: HttpEntity<MultiValueMap<String, String>>,
+    ): AzureAdV2Token {
+        val response = restTemplateWithProxy.exchange(
+            azureTokenEndpoint,
+            HttpMethod.POST,
+            requestEntity,
+            AzureAdV2TokenResponse::class.java
+        )
+        val tokenResponse = response.body!!
+
+        return tokenResponse.toAzureAdV2Token()
+    }
+
+    private fun onBehalfOfRequestEntity(
         scopeClientId: String,
         token: String
     ): HttpEntity<MultiValueMap<String, String>> {
@@ -71,8 +106,23 @@ class AzureAdV2TokenConsumer @Autowired constructor(
         return HttpEntity<MultiValueMap<String, String>>(body, headers)
     }
 
+    fun systemTokenRequestEntity(
+        scopeClientId: String,
+    ): HttpEntity<MultiValueMap<String, String>> {
+        val headers = HttpHeaders()
+        headers.contentType = MediaType.MULTIPART_FORM_DATA
+        val body: MultiValueMap<String, String> = LinkedMultiValueMap()
+        body.add("client_id", azureAppClientId)
+        body.add("scope", "api://$scopeClientId/.default")
+        body.add("grant_type", "client_credentials")
+        body.add("client_secret", azureAppClientSecret)
+
+        return HttpEntity<MultiValueMap<String, String>>(body, headers)
+    }
+
     companion object {
         private val tokenCache = ConcurrentHashMap<String, AzureAdV2Token>()
+        private val systemTokenCache = ConcurrentHashMap<String, AzureAdV2Token>()
         private val log = LoggerFactory.getLogger(AzureAdV2TokenConsumer::class.java)
         private val CALL_AZUREAD_BASE = "call_azuread"
         private val CALL_AZUREAD_CACHE_HIT = "${CALL_AZUREAD_BASE}_cache_hit"

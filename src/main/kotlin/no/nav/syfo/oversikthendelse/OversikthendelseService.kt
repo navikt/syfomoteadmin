@@ -16,7 +16,10 @@ class OversikthendelseService(
 ) {
     fun sendOversikthendelse(mote: Mote, type: OversikthendelseType) {
         val fnr = pdlConsumer.fodselsnummer(AktorId(mote.sykmeldt().aktorId))
-        val behandlendeEnhet = behandlendeEnhetConsumer.getBehandlendeEnhet(fnr.value, null).enhetId
+        val behandlendeEnhet = behandlendeEnhetConsumer.getBehandlendeEnhet(
+            callId = null,
+            personIdentNumber = fnr.value,
+        ).enhetId
 
         val kOversikthendelse = map2KOversikthendelse(fnr, behandlendeEnhet, type)
         oversikthendelseProducer.sendOversikthendelse(mote.uuid, kOversikthendelse)

@@ -1,8 +1,8 @@
 package no.nav.syfo.consumer.behandlendeenhet
 
 import no.nav.syfo.cache.CacheConfig
+import no.nav.syfo.consumer.azuread.v2.AzureAdV2TokenConsumer
 import no.nav.syfo.metric.Metric
-import no.nav.syfo.consumer.sts.StsConsumer
 import no.nav.syfo.util.*
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Value
@@ -14,21 +14,29 @@ import org.springframework.web.client.RestTemplate
 
 @Service
 class BehandlendeEnhetConsumer(
-    private val metric: Metric,
+    private val azureAdTokenConsumer: AzureAdV2TokenConsumer,
     @Value("\${syfobehandlendeenhet.url}") private val baseUrl: String,
-    private val stsConsumer: StsConsumer,
+    @Value("\${syfobehandlendeenhet.client.id}") private val syfotilgangskontrollClientId: String,
+    private val metric: Metric,
     private val template: RestTemplate
 ) {
-
-    @Cacheable(cacheNames = [CacheConfig.CACHENAME_BEHANDLENDEENHET_FNR], key = "#fnr", condition = "#fnr != null")
-    fun getBehandlendeEnhet(fnr: String, callId: String?): BehandlendeEnhet {
-        metric.tellEndepunktKall(METRIC_CALL_BEHANDLENDEENHET)
-        val bearer = stsConsumer.token()
-
-        val httpEntity = entity(callId, bearer)
+    @Cacheable(cacheNames = [CacheConfig.CACHENAME_BEHANDLENDEENHET_FNR], key = "#personIdentNumber", condition = "#personIdentNumber != null")
+    fun getBehandlendeEnhet(
+        callId: String?,
+        personIdentNumber: String,
+    ): BehandlendeEnhet {
+        val oboToken = azureAdTokenConsumer.getSystemToken(
+            scopeClientId = syfotilgangskontrollClientId,
+        )
+        val httpEntity = entity(
+            callId = callId,
+            personIdentNumber = personIdentNumber,
+            token = oboToken,
+        )
         try {
+            val url = "$baseUrl/api/system/v2/personident"
             val response = template.exchange(
-                    getBehandlendeEnhetUrl(fnr),
+                    url,
                     HttpMethod.GET,
                     httpEntity,
                     BehandlendeEnhet::class.java
@@ -43,16 +51,17 @@ class BehandlendeEnhetConsumer(
         }
     }
 
-    private fun getBehandlendeEnhetUrl(bruker: String): String {
-        return "$baseUrl/api/$bruker"
-    }
-
-    private fun entity(callId: String?, token: String): HttpEntity<String> {
+    private fun entity(
+        callId: String?,
+        personIdentNumber: String,
+        token: String,
+    ): HttpEntity<String> {
         val credentials = bearerCredentials(token)
         val headers = HttpHeaders()
         headers[HttpHeaders.AUTHORIZATION] = credentials
         headers[NAV_CALL_ID_HEADER] = getOrCreateCallId(callId)
         headers[NAV_CONSUMER_ID_HEADER] = APP_CONSUMER_ID
+        headers[NAV_PERSONIDENT_HEADER] = personIdentNumber
         return HttpEntity(headers)
     }
 
