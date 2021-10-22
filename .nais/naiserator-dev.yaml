@@ -8,7 +8,6 @@ metadata:
 spec:
   image: {{ image }}
   port: 8080
-  team: teamsykefravr
   liveness:
     path: /syfomoteadmin/internal/isAlive
     initialDelay: 20
