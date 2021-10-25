@@ -16,7 +16,7 @@ import org.springframework.web.client.RestTemplate
 class BehandlendeEnhetConsumer(
     private val azureAdTokenConsumer: AzureAdV2TokenConsumer,
     @Value("\${syfobehandlendeenhet.url}") private val baseUrl: String,
-    @Value("\${syfobehandlendeenhet.client.id}") private val syfotilgangskontrollClientId: String,
+    @Value("\${syfobehandlendeenhet.client.id}") private val syfobehandlendeenhetClientId: String,
     private val metric: Metric,
     private val template: RestTemplate
 ) {
@@ -26,7 +26,7 @@ class BehandlendeEnhetConsumer(
         personIdentNumber: String,
     ): BehandlendeEnhet {
         val oboToken = azureAdTokenConsumer.getSystemToken(
-            scopeClientId = syfotilgangskontrollClientId,
+            scopeClientId = syfobehandlendeenhetClientId,
         )
         val httpEntity = entity(
             callId = callId,
