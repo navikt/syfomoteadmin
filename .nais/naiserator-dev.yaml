@@ -135,9 +135,9 @@ spec:
     - name: SECURITY_TOKEN_SERVICE_REST_URL
       value: https://security-token-service.nais.preprod.local
     - name: SYFOBEHANDLENDEENHET_CLIENT_ID
-      value: "dev-fss.teamsykefravr.syfobehandlendeenhet"
+      value: "dev-gcp.teamsykefravr.syfobehandlendeenhet"
     - name: SYFOBEHANDLENDEENHET_URL
-      value: https://syfobehandlendeenhet.nais.preprod.local
+      value: "https://syfobehandlendeenhet.dev.intern.nav.no"
     - name: SYFOBRUKERTILGANG_URL
       value: https://syfobrukertilgang.nais.preprod.local
     - name: SYFONARMESTELEDER_URL
