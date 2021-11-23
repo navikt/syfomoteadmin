@@ -8,7 +8,7 @@ import no.nav.syfo.api.domain.nyttmoterequest.RSNyttMoteRequest;
 import no.nav.syfo.consumer.axsys.AxsysConsumer;
 import no.nav.syfo.consumer.behandlendeenhet.BehandlendeEnhetConsumer;
 import no.nav.syfo.consumer.narmesteleder.NarmesteLederConsumer;
-import no.nav.syfo.consumer.narmesteleder.NarmesteLederRelasjon;
+import no.nav.syfo.consumer.narmesteleder.NarmesteLederRelasjonDTO;
 import no.nav.syfo.consumer.pdl.PdlConsumer;
 import no.nav.syfo.consumer.veiledertilgang.VeilederTilgangConsumer;
 import no.nav.syfo.domain.AktorId;
@@ -23,6 +23,8 @@ import no.nav.syfo.service.HendelseService;
 import no.nav.syfo.service.MoteService;
 import no.nav.syfo.service.varselinnhold.ArbeidsgiverVarselService;
 import no.nav.syfo.service.varselinnhold.SykmeldtVarselService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -205,14 +207,14 @@ public class MoterInternControllerV2 {
         if (pdlConsumer.isKode6Or7(nyttMoteRequest.fnr) || !tilgangService.hasVeilederAccessToPersonWithAzureOBO(new Fodselsnummer(nyttMoteRequest.fnr))) {
             throw new ForbiddenException();
         } else {
-            String aktorId = pdlConsumer.aktorId(new Fodselsnummer(nyttMoteRequest.fnr)).getValue();
-            NarmesteLederRelasjon narmesteLederRelasjon = Optional.ofNullable(narmesteLederConsumer.narmesteLederRelasjonLeder(aktorId, nyttMoteRequest.orgnummer))
+            NarmesteLederRelasjonDTO currentLeder = Optional.ofNullable(narmesteLederConsumer.narmesteLeder(nyttMoteRequest.fnr, nyttMoteRequest.orgnummer))
                     .orElseThrow(() -> new RuntimeException("Fant ikke nærmeste leder"));
-            String lederNavn = pdlConsumer.fullName(
-                    pdlConsumer.fodselsnummer(new AktorId(narmesteLederRelasjon.getNarmesteLederAktorId())).getValue()
-            );
+
+            String aktorId = pdlConsumer.aktorId(new Fodselsnummer(nyttMoteRequest.fnr)).getValue();
+            String lederNavn = pdlConsumer.fullName(currentLeder.getNarmesteLederPersonIdentNumber());
+
             nyttMoteRequest.navn(lederNavn);
-            nyttMoteRequest.epost(narmesteLederRelasjon.getNarmesteLederEpost());
+            nyttMoteRequest.epost(currentLeder.getNarmesteLederEpost());
             nyttMoteRequest.navEnhet(behandlendeEnhetConsumer.getBehandlendeEnhet(null, nyttMoteRequest.fnr).getEnhetId());
 
             Mote nyttMote = map(nyttMoteRequest, opprett2Mote);
@@ -228,8 +230,8 @@ public class MoterInternControllerV2 {
                             .status(SENDT.name()),
                     new PMotedeltakerArbeidsgiver()
                             .navn(lederNavn)
-                            .orgnummer(narmesteLederRelasjon.getOrgnummer())
-                            .epost(narmesteLederRelasjon.getNarmesteLederEpost())
+                            .orgnummer(currentLeder.getVirksomhetsnummer())
+                            .epost(currentLeder.getNarmesteLederEpost())
                             .motedeltakertype("arbeidsgiver")
                             .status(SENDT.name())
             );
