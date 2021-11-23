@@ -9,9 +9,12 @@ import no.nav.syfo.api.domain.bruker.*;
 import no.nav.syfo.metric.Metric;
 import no.nav.syfo.service.*;
 import no.nav.syfo.domain.Brukerkontekst;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import javax.inject.Inject;
+import javax.ws.rs.NotFoundException;
 import java.util.List;
 
 import static no.nav.syfo.api.auth.OIDCIssuer.EKSTERN;
@@ -69,7 +72,11 @@ public class BrukerMoterRessurs {
 
         metric.tellEndepunktKall("hent_mote_arbeidstaker");
 
-        return moteBrukerService.hentSisteBrukerMote(innloggetAktorId.getValue(), Brukerkontekst.ARBEIDSTAKER);
+        try {
+            return moteBrukerService.hentSisteBrukerMote(innloggetAktorId.getValue(), Brukerkontekst.ARBEIDSTAKER);
+        } catch (NotFoundException exc) {
+            throw new ResponseStatusException(HttpStatus.NO_CONTENT, exc.getMessage());
+        }
     }
 
     @PostMapping(consumes = APPLICATION_JSON_VALUE, produces = APPLICATION_JSON_VALUE)
