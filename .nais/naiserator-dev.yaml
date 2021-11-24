@@ -144,6 +144,10 @@ spec:
       value: "https://syfonarmesteleder.nais.preprod.local"
     - name: SYFONARMESTELEDER_ID
       value: a7e7ad0e-4e17-4f19-8aa6-39d73e62fff8
+    - name: ISNARMESTELEDER_HOST
+      value: "https://isnarmesteleder.dev.intern.nav.no"
+    - name: ISNARMESTELEDER_ID
+      value: "dev-gcp.teamsykefravr.isnarmesteleder"
     - name: LDAP_URL
       value: ldaps://ldapgw.preprod.local
     - name: LDAP_BASEDN

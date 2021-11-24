@@ -42,6 +42,7 @@ kafka.env.name: 'local'
 client.id: "clientId"
 client.secret: "clientSecret"
 syfonarmesteleder.id: "syfonarmestelederID"
+isnarmesteleder.id: "isnarmestelederID"
 
 ad.accesstoken.url: 'http://aadaccesstoken'
 syfobrukertilgang.url: "http://syfobrukertilgang"
@@ -66,6 +67,7 @@ syfobehandlendeenhet.client.id: "dev-fss:teamsykefravr:syfobehandlendeenhet"
 syfobehandlendeenhet.url: "https://syfobehandlendeenhet"
 security.token.service.rest.url: "https://security-token-service"
 syfonarmesteleder.url: "https://syfonarmesteleder.nav.no"
+isnarmesteleder.host: "https://isnarmesteleder.nav.no"
 syfotilgangskontroll.client.id: "syfotilgangskontrollId"
 tilgangskontrollapi.url: "https://www.ikke.no"
 
