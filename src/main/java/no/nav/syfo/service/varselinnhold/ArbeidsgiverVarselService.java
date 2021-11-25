@@ -1,18 +1,25 @@
 package no.nav.syfo.service.varselinnhold;
 
 import no.nav.melding.virksomhet.servicemeldingmedkontaktinformasjon.v1.servicemeldingmedkontaktinformasjon.WSParameter;
+import no.nav.syfo.consumer.narmesteleder.NarmesteLederConsumer;
+import no.nav.syfo.consumer.narmesteleder.NarmesteLederRelasjonDTO;
+import no.nav.syfo.consumer.pdl.PdlConsumer;
+import no.nav.syfo.domain.AktorId;
+import no.nav.syfo.domain.Fodselsnummer;
 import no.nav.syfo.domain.model.*;
-import no.nav.syfo.consumer.narmesteleder.*;
 import no.nav.syfo.repository.model.PEpost;
-import no.nav.syfo.service.*;
-import org.slf4j.*;
-import org.springframework.beans.factory.annotation.*;
+import no.nav.syfo.service.HendelseService;
+import no.nav.syfo.service.VeilederService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 import static java.util.Arrays.asList;
-import static java.util.Comparator.comparing;
 import static java.util.Optional.ofNullable;
 import static no.nav.syfo.domain.model.TredjepartsVarselType.*;
 import static no.nav.syfo.domain.model.Varseltype.*;
@@ -36,6 +43,8 @@ public class ArbeidsgiverVarselService {
 
     private NarmesteLederConsumer narmesteLederConsumer;
 
+    private PdlConsumer pdlConsumer;
+
     private TredjepartsvarselService tredjepartsvarselService;
 
     @Autowired
@@ -43,11 +52,13 @@ public class ArbeidsgiverVarselService {
             VeilederService veilederService,
             HendelseService hendelseService,
             NarmesteLederConsumer narmesteLederConsumer,
+            PdlConsumer pdlConsumer,
             TredjepartsvarselService tredjepartsvarselService
     ) {
         this.veilederService = veilederService;
         this.hendelseService = hendelseService;
         this.narmesteLederConsumer = narmesteLederConsumer;
+        this.pdlConsumer = pdlConsumer;
         this.tredjepartsvarselService = tredjepartsvarselService;
     }
 
@@ -90,8 +101,18 @@ public class ArbeidsgiverVarselService {
         }
 
         if (ofNullable(varselNokkel).isPresent()) {
-            List<NarmesteLederRelasjon> narmesteLedere = narmesteLederConsumer.narmestelederRelasjonerLedere(mote.sykmeldt().aktorId);
-            NarmesteLederRelasjon narmesteLederRelasjon = narmesteLederForMeeting(narmesteLedere, mote);
+            Fodselsnummer innbyggerFnr = pdlConsumer.fodselsnummer(new AktorId(mote.sykmeldt().aktorId));
+
+            List<NarmesteLederRelasjonDTO> narmesteLedere;
+
+            if (erSystemKall) {
+                narmesteLedere = narmesteLederConsumer.ledereForInnbyggerSystem(innbyggerFnr.getValue());
+            } else {
+                narmesteLedere = narmesteLederConsumer.ledereForInnbygger(innbyggerFnr.getValue());
+            }
+
+            NarmesteLederRelasjonDTO narmesteLederRelasjon = narmesteLederForMeeting(narmesteLedere, mote);
+
             tredjepartsvarselService.sendVarselTilNaermesteLeder(varselNokkel, narmesteLederRelasjon, parameterListe);
         } else {
             log.error("Fant ikke varselnøkkel for varseltype {}", varseltype);
