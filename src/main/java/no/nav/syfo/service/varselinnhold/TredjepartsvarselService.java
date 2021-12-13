@@ -1,9 +1,12 @@
 package no.nav.syfo.service.varselinnhold;
 
 import no.nav.melding.virksomhet.servicemeldingmedkontaktinformasjon.v1.servicemeldingmedkontaktinformasjon.*;
+import no.nav.syfo.consumer.narmesteleder.NarmesteLederRelasjonDTO;
+import no.nav.syfo.consumer.pdl.PdlConsumer;
+import no.nav.syfo.domain.AktorId;
+import no.nav.syfo.domain.Fodselsnummer;
 import no.nav.syfo.domain.model.TredjepartsVarselType;
 import no.nav.syfo.metric.Metric;
-import no.nav.syfo.consumer.narmesteleder.NarmesteLederRelasjon;
 import org.springframework.beans.factory.annotation.*;
 import org.springframework.jms.core.JmsTemplate;
 import org.springframework.stereotype.Service;
@@ -25,18 +28,21 @@ public class TredjepartsvarselService {
 
     private JmsTemplate tredjepartsvarselqueue;
     private Metric metric;
+    private PdlConsumer pdlConsumer;
 
     @Autowired
     public TredjepartsvarselService(
             @Qualifier("tredjepartsvarselqueue") JmsTemplate tredjepartsvarselqueue,
-            Metric metric
+            Metric metric,
+            PdlConsumer pdlConsumer
 
     ) {
         this.tredjepartsvarselqueue = tredjepartsvarselqueue;
         this.metric = metric;
+        this.pdlConsumer = pdlConsumer;
     }
 
-    public void sendVarselTilNaermesteLeder(TredjepartsVarselType type, NarmesteLederRelasjon narmesteLederRelasjon, List<WSParameter> parametere) {
+    public void sendVarselTilNaermesteLeder(TredjepartsVarselType type, NarmesteLederRelasjonDTO narmesteLederRelasjon, List<WSParameter> parametere) {
         WSServicemeldingMedKontaktinformasjon melding = new WSServicemeldingMedKontaktinformasjon();
         populerServiceMelding(melding, kontaktinformasjon(narmesteLederRelasjon), narmesteLederRelasjon, type, parametere);
 
@@ -47,7 +53,7 @@ public class TredjepartsvarselService {
         metric.tellTredjepartVarselSendt(type.name());
     }
 
-    private List<WSKontaktinformasjon> kontaktinformasjon(NarmesteLederRelasjon narmesteLederRelasjon) {
+    private List<WSKontaktinformasjon> kontaktinformasjon(NarmesteLederRelasjonDTO narmesteLederRelasjon) {
         return asList(
                 opprettKontaktinformasjon(narmesteLederRelasjon.getNarmesteLederEpost(), "EPOST"),
                 opprettKontaktinformasjon(narmesteLederRelasjon.getNarmesteLederTelefonnummer(), "SMS")
@@ -56,11 +62,13 @@ public class TredjepartsvarselService {
 
     private void populerServiceMelding(WSServicemeldingMedKontaktinformasjon servicemeldingMedKontaktinformasjon,
                                        List<WSKontaktinformasjon> kontaktinformasjon,
-                                       NarmesteLederRelasjon narmesteLederRelasjon,
+                                       NarmesteLederRelasjonDTO narmesteLederRelasjon,
                                        TredjepartsVarselType varseltype,
                                        List<WSParameter> parametere) {
-        servicemeldingMedKontaktinformasjon.setMottaker(aktoer(narmesteLederRelasjon.getNarmesteLederAktorId()));
-        servicemeldingMedKontaktinformasjon.setTilhoerendeOrganisasjon(organisasjon(narmesteLederRelasjon.getOrgnummer()));
+        AktorId arbeidsgiverAktorId = pdlConsumer.aktorId(new Fodselsnummer(narmesteLederRelasjon.getNarmesteLederPersonIdentNumber()));
+
+        servicemeldingMedKontaktinformasjon.setMottaker(aktoer(arbeidsgiverAktorId.getValue()));
+        servicemeldingMedKontaktinformasjon.setTilhoerendeOrganisasjon(organisasjon(narmesteLederRelasjon.getVirksomhetsnummer()));
         servicemeldingMedKontaktinformasjon.setVarseltypeId(varseltype.getId());
         servicemeldingMedKontaktinformasjon.getParameterListe().addAll(parametere);
         servicemeldingMedKontaktinformasjon.getKontaktinformasjonListe().addAll(kontaktinformasjon);

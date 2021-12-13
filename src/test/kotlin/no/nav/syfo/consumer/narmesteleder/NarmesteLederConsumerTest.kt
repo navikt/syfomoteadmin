@@ -155,5 +155,54 @@ internal class NarmesteLederConsumerTest {
 
         consumer.narmesteLeder(innbyggerIdent, activeVirksomhetsnummer)
     }
+
+    @Test
+    fun `return current leder for given virksomhetsnummer from isnarmesteleder with system token`() {
+        mockOIDCUtils(contextHolder)
+        every {
+            restTemplateWithProxy.exchange(
+                "$isnarmestelederHost/api/system/v1/narmestelederrelasjoner",
+                HttpMethod.GET,
+                any(),
+                object : ParameterizedTypeReference<List<NarmesteLederRelasjonDTO>>() {}
+            )
+        } returns ResponseEntity(lederListWithActiveLeder, null, HttpStatus.OK)
+
+        val actualLederList: List<NarmesteLederRelasjonDTO> = consumer.ledereForInnbyggerSystem(innbyggerIdent)
+
+        assertThat(actualLederList).usingRecursiveComparison().isEqualTo(lederListWithActiveLeder)
+    }
+
+    @Test
+    fun `return empty list when no ledere for given inbyggerident with system token`() {
+        mockOIDCUtils(contextHolder)
+        every {
+            restTemplateWithProxy.exchange(
+                "$isnarmestelederHost/api/system/v1/narmestelederrelasjoner",
+                HttpMethod.GET,
+                any(),
+                object : ParameterizedTypeReference<List<NarmesteLederRelasjonDTO>>() {}
+            )
+        } returns ResponseEntity(emptyList(), null, HttpStatus.OK)
+
+        val actualLederList: List<NarmesteLederRelasjonDTO> = consumer.ledereForInnbyggerSystem(innbyggerIdent)
+
+        assertThat(actualLederList).isEmpty()
+    }
+
+    @Test(expected = RuntimeException::class)
+    fun `throw RuntimeException if response body from isnarmesteleder is null with system token`() {
+        mockOIDCUtils(contextHolder)
+        every {
+            restTemplateWithProxy.exchange(
+                "$isnarmestelederHost/api/system/v1/narmestelederrelasjoner",
+                HttpMethod.GET,
+                any(),
+                object : ParameterizedTypeReference<List<NarmesteLederRelasjonDTO>>() {}
+            )
+        } returns ResponseEntity(null, null, HttpStatus.OK)
+
+        consumer.ledereForInnbyggerSystem(innbyggerIdent)
+    }
 }
 

@@ -32,11 +32,13 @@ class NarmesteLederConsumer @Autowired constructor(
     @Qualifier("restTemplateWithProxy") private val restTemplateWithProxy: RestTemplate,
     private val contextHolder: OIDCRequestContextHolder
 ) {
-    private val isnarmestelederBaseUrl: String
+    private val isnarmestelederUrl: String
+    private val isnarmestelederSystemUrl: String
     private val syfonarmestelederBaseUrl: String
 
     init {
-        this.isnarmestelederBaseUrl = "$isnarmestelederHost/api/v1/narmestelederrelasjon"
+        this.isnarmestelederUrl = "$isnarmestelederHost/api/v1/narmestelederrelasjon"
+        this.isnarmestelederSystemUrl = "$isnarmestelederHost/api/system/v1/narmestelederrelasjoner"
         this.syfonarmestelederBaseUrl = "$syfonarmestelederUrl/syfonarmesteleder"
     }
 
@@ -46,12 +48,16 @@ class NarmesteLederConsumer @Autowired constructor(
         return ledere.find { it.virksomhetsnummer == virksomhetsnummer && it.status == "INNMELDT_AKTIV" }
     }
 
-    @Cacheable(value = [CACHENAME_ISNARMESTELEDER_LEDERE], key = "#innbyggerIdent ", condition = "#innbyggerIdent != null")
+    @Cacheable(
+        value = [CACHENAME_ISNARMESTELEDER_LEDERE],
+        key = "#innbyggerIdent ",
+        condition = "#innbyggerIdent != null"
+    )
     fun ledereForInnbygger(innbyggerIdent: String): List<NarmesteLederRelasjonDTO> {
         val callId = createCallId()
         try {
             val response = restTemplateWithProxy.exchange(
-                "$isnarmestelederBaseUrl/personident",
+                "$isnarmestelederUrl/personident",
                 HttpMethod.GET,
                 entityWithOboToken(innbyggerIdent, callId),
                 object : ParameterizedTypeReference<List<NarmesteLederRelasjonDTO>>() {}
@@ -59,7 +65,34 @@ class NarmesteLederConsumer @Autowired constructor(
 
             metric.countEvent(CALL_ISNARMESTELEDER_LEDERE_SUCCESS)
 
-            return response.body ?: throw RuntimeException("Vellykket kall til isnarmesteleder, men med tom body, det skal ikke skje! callId=$callId")
+            return response.body
+                ?: throw RuntimeException("Vellykket kall til isnarmesteleder, men med tom body, det skal ikke skje! callId=$callId")
+        } catch (e: RestClientResponseException) {
+            LOG.error("Request to get Ledere from isnarmesteleder failed with status ${e.rawStatusCode}, CallId=$callId, and message ${e.responseBodyAsString}")
+            metric.countEvent(CALL_ISNARMESTELEDER_LEDERE_FAIL)
+            throw e
+        }
+    }
+
+    @Cacheable(
+        value = [CACHENAME_ISNARMESTELEDER_LEDERE],
+        key = "#innbyggerIdent ",
+        condition = "#innbyggerIdent != null"
+    )
+    fun ledereForInnbyggerSystem(innbyggerIdent: String): List<NarmesteLederRelasjonDTO> {
+        val callId = createCallId()
+        try {
+            val response = restTemplateWithProxy.exchange(
+                isnarmestelederSystemUrl,
+                HttpMethod.GET,
+                entityAzureadV2SystemToken(innbyggerIdent, callId),
+                object : ParameterizedTypeReference<List<NarmesteLederRelasjonDTO>>() {}
+            )
+
+            metric.countEvent(CALL_ISNARMESTELEDER_LEDERE_SUCCESS)
+
+            return response.body
+                ?: throw RuntimeException("Vellykket kall til isnarmesteleder med systemtoken, men med tom body, det skal ikke skje! callId=$callId")
         } catch (e: RestClientResponseException) {
             LOG.error("Request to get Ledere from isnarmesteleder failed with status ${e.rawStatusCode}, CallId=$callId, and message ${e.responseBodyAsString}")
             metric.countEvent(CALL_ISNARMESTELEDER_LEDERE_FAIL)
@@ -141,6 +174,17 @@ class NarmesteLederConsumer @Autowired constructor(
         )
         val headers = HttpHeaders()
         headers[HttpHeaders.AUTHORIZATION] = bearerCredentials(oboToken)
+        headers[NAV_CALL_ID_HEADER] = callId
+        headers[SYFONARMESTELEDER_CALL_ID_HEADER] = callId
+        headers[NAV_PERSONIDENT_HEADER] = innbyggerIdent
+        headers[NAV_CONSUMER_ID_HEADER] = APP_CONSUMER_ID
+        return HttpEntity<Any>(headers)
+    }
+
+    private fun entityAzureadV2SystemToken(innbyggerIdent: String, callId: String): HttpEntity<*> {
+        val token = azureAdV2TokenConsumer.getSystemToken(isnarmestelederId)
+        val headers = HttpHeaders()
+        headers[HttpHeaders.AUTHORIZATION] = bearerCredentials(token)
         headers[NAV_CALL_ID_HEADER] = callId
         headers[SYFONARMESTELEDER_CALL_ID_HEADER] = callId
         headers[NAV_PERSONIDENT_HEADER] = innbyggerIdent
