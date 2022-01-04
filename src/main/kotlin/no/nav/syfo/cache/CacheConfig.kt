@@ -23,6 +23,7 @@ class CacheConfig {
             ConcurrentMapCache(CACHENAME_NARMESTELEDER_ANSATTE),
             ConcurrentMapCache(CACHENAME_NARMESTELEDER_LEDER),
             ConcurrentMapCache(CACHENAME_ISNARMESTELEDER_LEDERE),
+            ConcurrentMapCache(CACHENAME_ISNARMESTELEDER_LEDERRELASJONER),
             ConcurrentMapCache(CACHENAME_NARMESTELEDER_LEDERE),
             ConcurrentMapCache(CACHENAME_NORG_ENHETER),
             ConcurrentMapCache(CACHENAME_TILGANG_IDENT)
@@ -39,6 +40,7 @@ class CacheConfig {
         const val CACHENAME_NARMESTELEDER_ANSATTE = "ansatte"
         const val CACHENAME_NARMESTELEDER_LEDER = "leder"
         const val CACHENAME_ISNARMESTELEDER_LEDERE = "isnarmesteleder_ledere"
+        const val CACHENAME_ISNARMESTELEDER_LEDERRELASJONER = "isnarmesteleder_lederrelasjoner"
         const val CACHENAME_NARMESTELEDER_LEDERE = "ledere"
         const val CACHENAME_NORG_ENHETER = "norgenheter"
         const val CACHENAME_TILGANG_IDENT = "tilgangtilident"

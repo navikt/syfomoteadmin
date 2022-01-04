@@ -174,6 +174,23 @@ internal class NarmesteLederConsumerTest {
     }
 
     @Test
+    fun `return only leder for given virksomhetsnummer from isnarmesteleder with system token when innbygger has both lederrelasjon and ansattrelasjon`() {
+        mockOIDCUtils(contextHolder)
+        every {
+            restTemplateWithProxy.exchange(
+                "$isnarmestelederHost/api/system/v1/narmestelederrelasjoner",
+                HttpMethod.GET,
+                any(),
+                object : ParameterizedTypeReference<List<NarmesteLederRelasjonDTO>>() {}
+            )
+        } returns ResponseEntity(listWithIdentAsBothLederAndAnsatt, null, HttpStatus.OK)
+
+        val actualLederList: List<NarmesteLederRelasjonDTO> = consumer.ledereForInnbyggerSystem(innbyggerIdent)
+
+        assertThat(actualLederList).usingRecursiveComparison().isEqualTo(lederListWithActiveLeder)
+    }
+
+    @Test
     fun `return empty list when no ledere for given inbyggerident with system token`() {
         mockOIDCUtils(contextHolder)
         every {
@@ -205,4 +222,3 @@ internal class NarmesteLederConsumerTest {
         consumer.ledereForInnbyggerSystem(innbyggerIdent)
     }
 }
-

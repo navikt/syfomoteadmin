@@ -4,6 +4,7 @@ import no.nav.security.oidc.context.OIDCRequestContextHolder
 import no.nav.syfo.api.auth.OIDCIssuer
 import no.nav.syfo.api.auth.OIDCUtil
 import no.nav.syfo.cache.CacheConfig.Companion.CACHENAME_ISNARMESTELEDER_LEDERE
+import no.nav.syfo.cache.CacheConfig.Companion.CACHENAME_ISNARMESTELEDER_LEDERRELASJONER
 import no.nav.syfo.cache.CacheConfig.Companion.CACHENAME_NARMESTELEDER_ANSATTE
 import no.nav.syfo.cache.CacheConfig.Companion.CACHENAME_NARMESTELEDER_LEDERE
 import no.nav.syfo.consumer.azuread.AzureAdTokenConsumer
@@ -50,7 +51,7 @@ class NarmesteLederConsumer @Autowired constructor(
 
     @Cacheable(
         value = [CACHENAME_ISNARMESTELEDER_LEDERE],
-        key = "#innbyggerIdent ",
+        key = "#innbyggerIdent",
         condition = "#innbyggerIdent != null"
     )
     fun ledereForInnbygger(innbyggerIdent: String): List<NarmesteLederRelasjonDTO> {
@@ -74,18 +75,24 @@ class NarmesteLederConsumer @Autowired constructor(
         }
     }
 
-    @Cacheable(
-        value = [CACHENAME_ISNARMESTELEDER_LEDERE],
-        key = "#innbyggerIdent ",
-        condition = "#innbyggerIdent != null"
-    )
     fun ledereForInnbyggerSystem(innbyggerIdent: String): List<NarmesteLederRelasjonDTO> {
+        val lederRelasjoner = lederRelasjonerSystem(innbyggerIdent)
+
+        return lederRelasjoner.relasjonerWhereIdentIsInnbygger(innbyggerIdent)
+    }
+
+    @Cacheable(
+        value = [CACHENAME_ISNARMESTELEDER_LEDERRELASJONER],
+        key = "#ident",
+        condition = "#ident != null"
+    )
+    fun lederRelasjonerSystem(ident: String): List<NarmesteLederRelasjonDTO> {
         val callId = createCallId()
         try {
             val response = restTemplateWithProxy.exchange(
                 isnarmestelederSystemUrl,
                 HttpMethod.GET,
-                entityAzureadV2SystemToken(innbyggerIdent, callId),
+                entityAzureadV2SystemToken(ident, callId),
                 object : ParameterizedTypeReference<List<NarmesteLederRelasjonDTO>>() {}
             )
 
@@ -93,8 +100,9 @@ class NarmesteLederConsumer @Autowired constructor(
 
             return response.body
                 ?: throw RuntimeException("Vellykket kall til isnarmesteleder med systemtoken, men med tom body, det skal ikke skje! callId=$callId")
+
         } catch (e: RestClientResponseException) {
-            LOG.error("Request to get Ledere from isnarmesteleder failed with status ${e.rawStatusCode}, CallId=$callId, and message ${e.responseBodyAsString}")
+            LOG.error("Request to get lederRelasjoner from isnarmesteleder failed with status ${e.rawStatusCode}, CallId=$callId, and message ${e.responseBodyAsString}")
             metric.countEvent(CALL_ISNARMESTELEDER_LEDERE_FAIL)
             throw e
         }
