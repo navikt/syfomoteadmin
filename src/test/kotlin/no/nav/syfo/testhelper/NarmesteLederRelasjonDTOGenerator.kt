@@ -27,6 +27,11 @@ val activeLeder = NarmesteLederRelasjonDTO(
     status = "INNMELDT_AKTIV",
 )
 
+val activeLederRelasjonWithInnbyggerAsLeder = activeLeder.copy(
+    arbeidstakerPersonIdentNumber = wrongLederIdent,
+    narmesteLederPersonIdentNumber = innbyggerIdent,
+)
+
 val inactiveLeder = NarmesteLederRelasjonDTO(
     uuid = "987",
     arbeidstakerPersonIdentNumber = innbyggerIdent,
@@ -61,3 +66,4 @@ val activeLederWrongVirksomhet = NarmesteLederRelasjonDTO(
 
 val lederListWithActiveLeder = listOf(inactiveLeder, activeLeder, activeLederWrongVirksomhet)
 val lederListWithoutActiveLeder = listOf(inactiveLeder, activeLederWrongVirksomhet)
+val listWithIdentAsBothLederAndAnsatt = listOf(inactiveLeder, activeLeder, activeLederWrongVirksomhet, activeLederRelasjonWithInnbyggerAsLeder)

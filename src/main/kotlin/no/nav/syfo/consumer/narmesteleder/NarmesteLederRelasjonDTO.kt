@@ -18,3 +18,9 @@ data class NarmesteLederRelasjonDTO(
     val timestamp: LocalDateTime,
     val status: String,
 )
+
+fun List<NarmesteLederRelasjonDTO>.relasjonerWhereIdentIsInnbygger(innbyggerIdent: String): List<NarmesteLederRelasjonDTO> {
+    return this.filter {
+        it.arbeidstakerPersonIdentNumber == innbyggerIdent
+    }
+}
