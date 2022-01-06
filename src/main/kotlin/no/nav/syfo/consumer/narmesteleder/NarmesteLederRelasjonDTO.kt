@@ -24,3 +24,9 @@ fun List<NarmesteLederRelasjonDTO>.relasjonerWhereIdentIsInnbygger(innbyggerIden
         it.arbeidstakerPersonIdentNumber == innbyggerIdent
     }
 }
+
+fun List<NarmesteLederRelasjonDTO>.relasjonerWhereIdentIsLeder(lederIdent: String): List<NarmesteLederRelasjonDTO> {
+    return this.filter {
+        it.narmesteLederPersonIdentNumber == lederIdent
+    }
+}

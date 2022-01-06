@@ -81,6 +81,12 @@ class NarmesteLederConsumer @Autowired constructor(
         return lederRelasjoner.relasjonerWhereIdentIsInnbygger(innbyggerIdent)
     }
 
+    fun getAnsatteUsingSystemToken(lederIdent: String): List<NarmesteLederRelasjonDTO> {
+        val lederRelasjoner = lederRelasjonerSystem(lederIdent)
+
+        return lederRelasjoner.relasjonerWhereIdentIsLeder(lederIdent)
+    }
+
     @Cacheable(
         value = [CACHENAME_ISNARMESTELEDER_LEDERRELASJONER],
         key = "#ident",
@@ -104,32 +110,6 @@ class NarmesteLederConsumer @Autowired constructor(
         } catch (e: RestClientResponseException) {
             LOG.error("Request to get lederRelasjoner from isnarmesteleder failed with status ${e.rawStatusCode}, CallId=$callId, and message ${e.responseBodyAsString}")
             metric.countEvent(CALL_ISNARMESTELEDER_LEDERE_FAIL)
-            throw e
-        }
-    }
-
-    @Cacheable(value = [CACHENAME_NARMESTELEDER_ANSATTE], key = "#aktorId", condition = "#aktorId != null")
-    fun narmestelederRelasjonerAnsatte(aktorId: String): List<NarmesteLederRelasjon> {
-        val callId = createCallId()
-        try {
-            val response: ResponseEntity<List<NarmesteLederRelasjon>> = restTemplate.exchange(
-                getAnsatteUrl(aktorId),
-                HttpMethod.GET,
-                entity(callId),
-                object : ParameterizedTypeReference<List<NarmesteLederRelasjon>>() {}
-            )
-
-            if (response.body == null) {
-                LOG.warn("Request to get Ansatte from Syfonarmesteleder was null, CallId=$callId, Response: $response")
-                return emptyList()
-            }
-
-            metric.countEvent(CALL_SYFONARMESTELEDER_ANSATTE_SUCCESS)
-
-            return response.body
-        } catch (e: RestClientResponseException) {
-            LOG.error("Request to get Ansatte from Syfonarmesteleder failed with status ${e.rawStatusCode}, CallId=$callId, message ${e.responseBodyAsString}")
-            metric.countEvent(CALL_SYFONARMESTELEDER_ANSATTE_FAIL)
             throw e
         }
     }
