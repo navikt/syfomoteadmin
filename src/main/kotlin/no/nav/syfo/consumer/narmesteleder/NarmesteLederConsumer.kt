@@ -5,9 +5,6 @@ import no.nav.syfo.api.auth.OIDCIssuer
 import no.nav.syfo.api.auth.OIDCUtil
 import no.nav.syfo.cache.CacheConfig.Companion.CACHENAME_ISNARMESTELEDER_LEDERE
 import no.nav.syfo.cache.CacheConfig.Companion.CACHENAME_ISNARMESTELEDER_LEDERRELASJONER
-import no.nav.syfo.cache.CacheConfig.Companion.CACHENAME_NARMESTELEDER_ANSATTE
-import no.nav.syfo.cache.CacheConfig.Companion.CACHENAME_NARMESTELEDER_LEDERE
-import no.nav.syfo.consumer.azuread.AzureAdTokenConsumer
 import no.nav.syfo.consumer.azuread.v2.AzureAdV2TokenConsumer
 import no.nav.syfo.metric.Metric
 import no.nav.syfo.util.*
@@ -24,23 +21,17 @@ import org.springframework.web.client.RestTemplate
 class NarmesteLederConsumer @Autowired constructor(
     @Value("\${isnarmesteleder.host}") private val isnarmestelederHost: String,
     @Value("\${isnarmesteleder.id}") private val isnarmestelederId: String,
-    @Value("\${syfonarmesteleder.url}") private val syfonarmestelederUrl: String,
-    @Value("\${syfonarmesteleder.id}") private val syfonarmestelederId: String,
-    private val azureAdTokenConsumer: AzureAdTokenConsumer,
     private val azureAdV2TokenConsumer: AzureAdV2TokenConsumer,
     private val metric: Metric,
-    private val restTemplate: RestTemplate,
     @Qualifier("restTemplateWithProxy") private val restTemplateWithProxy: RestTemplate,
     private val contextHolder: OIDCRequestContextHolder
 ) {
     private val isnarmestelederUrl: String
     private val isnarmestelederSystemUrl: String
-    private val syfonarmestelederBaseUrl: String
 
     init {
         this.isnarmestelederUrl = "$isnarmestelederHost/api/v1/narmestelederrelasjon"
         this.isnarmestelederSystemUrl = "$isnarmestelederHost/api/system/v1/narmestelederrelasjoner"
-        this.syfonarmestelederBaseUrl = "$syfonarmestelederUrl/syfonarmesteleder"
     }
 
     fun narmesteLeder(innbyggerIdent: String, virksomhetsnummer: String): NarmesteLederRelasjonDTO? {
@@ -75,14 +66,14 @@ class NarmesteLederConsumer @Autowired constructor(
         }
     }
 
-    fun ledereForInnbyggerSystem(innbyggerIdent: String): List<NarmesteLederRelasjonDTO> {
-        val lederRelasjoner = lederRelasjonerSystem(innbyggerIdent)
+    fun getLedereUsingSystemToken(innbyggerIdent: String): List<NarmesteLederRelasjonDTO> {
+        val lederRelasjoner = getNarmesteLederRelasjonerUsingSystemToken(innbyggerIdent)
 
         return lederRelasjoner.relasjonerWhereIdentIsInnbygger(innbyggerIdent)
     }
 
     fun getAnsatteUsingSystemToken(lederIdent: String): List<NarmesteLederRelasjonDTO> {
-        val lederRelasjoner = lederRelasjonerSystem(lederIdent)
+        val lederRelasjoner = getNarmesteLederRelasjonerUsingSystemToken(lederIdent)
 
         return lederRelasjoner.relasjonerWhereIdentIsLeder(lederIdent)
     }
@@ -92,7 +83,7 @@ class NarmesteLederConsumer @Autowired constructor(
         key = "#ident",
         condition = "#ident != null"
     )
-    fun lederRelasjonerSystem(ident: String): List<NarmesteLederRelasjonDTO> {
+    fun getNarmesteLederRelasjonerUsingSystemToken(ident: String): List<NarmesteLederRelasjonDTO> {
         val callId = createCallId()
         try {
             val response = restTemplateWithProxy.exchange(
@@ -114,42 +105,6 @@ class NarmesteLederConsumer @Autowired constructor(
         }
     }
 
-    @Cacheable(value = [CACHENAME_NARMESTELEDER_LEDERE], key = "#aktorId", condition = "#aktorId != null")
-    fun narmestelederRelasjonerLedere(aktorId: String): List<NarmesteLederRelasjon> {
-        val callId = createCallId()
-        try {
-            val response = restTemplate.exchange(
-                getLedereUrl(aktorId),
-                HttpMethod.GET,
-                entity(callId),
-                object : ParameterizedTypeReference<List<NarmesteLederRelasjon>>() {}
-            )
-
-            if (response.body == null) {
-                LOG.warn("Request to get Ledere from Syfonarmesteleder was null, CallId=$callId, Response=$response")
-                return emptyList()
-            }
-
-            metric.countEvent(CALL_SYFONARMESTELEDER_LEDERE_SUCCESS)
-
-            return response.body
-        } catch (e: RestClientResponseException) {
-            LOG.error("Request to get Ledere from Syfonarmesteleder failed with status ${e.rawStatusCode}, CallId=$callId, message ${e.responseBodyAsString}")
-            metric.countEvent(CALL_SYFONARMESTELEDER_LEDERE_FAIL)
-            throw e
-        }
-    }
-
-    private fun entity(callId: String): HttpEntity<*> {
-        val token = azureAdTokenConsumer.accessToken(syfonarmestelederId)
-        val headers = HttpHeaders()
-        headers[HttpHeaders.AUTHORIZATION] = bearerCredentials(token)
-        headers[NAV_CALL_ID_HEADER] = createCallId()
-        headers[SYFONARMESTELEDER_CALL_ID_HEADER] = createCallId()
-        headers[NAV_CONSUMER_ID_HEADER] = APP_CONSUMER_ID
-        return HttpEntity<Any>(headers)
-    }
-
     private fun entityWithOboToken(innbyggerIdent: String, callId: String): HttpEntity<*> {
         val veilederToken = OIDCUtil.tokenFraOIDC(contextHolder, OIDCIssuer.VEILEDER_AZURE_V2)
         val veilederId = OIDCUtil.getSubjectInternAzureV2(contextHolder)
@@ -160,49 +115,29 @@ class NarmesteLederConsumer @Autowired constructor(
             veilederId = veilederId,
             azp = azp,
         )
-        val headers = HttpHeaders()
-        headers[HttpHeaders.AUTHORIZATION] = bearerCredentials(oboToken)
-        headers[NAV_CALL_ID_HEADER] = callId
-        headers[SYFONARMESTELEDER_CALL_ID_HEADER] = callId
-        headers[NAV_PERSONIDENT_HEADER] = innbyggerIdent
-        headers[NAV_CONSUMER_ID_HEADER] = APP_CONSUMER_ID
-        return HttpEntity<Any>(headers)
+        return getEntity(innbyggerIdent, callId, oboToken)
     }
 
-    private fun entityAzureadV2SystemToken(innbyggerIdent: String, callId: String): HttpEntity<*> {
+    private fun entityAzureadV2SystemToken(ident: String, callId: String): HttpEntity<*> {
         val token = azureAdV2TokenConsumer.getSystemToken(isnarmestelederId)
+        return getEntity(ident, callId, token)
+    }
+
+    private fun getEntity(ident: String, callId: String, token: String): HttpEntity<*> {
         val headers = HttpHeaders()
         headers[HttpHeaders.AUTHORIZATION] = bearerCredentials(token)
         headers[NAV_CALL_ID_HEADER] = callId
-        headers[SYFONARMESTELEDER_CALL_ID_HEADER] = callId
-        headers[NAV_PERSONIDENT_HEADER] = innbyggerIdent
+        headers[NAV_PERSONIDENT_HEADER] = ident
         headers[NAV_CONSUMER_ID_HEADER] = APP_CONSUMER_ID
+
         return HttpEntity<Any>(headers)
-    }
-
-    private fun getAnsatteUrl(aktorId: String): String {
-        return "$syfonarmestelederBaseUrl/narmesteLeder/$aktorId"
-    }
-
-    private fun getLedereUrl(aktorId: String): String {
-        return "$syfonarmestelederBaseUrl/sykmeldt/$aktorId/narmesteledere"
     }
 
     companion object {
         private val LOG = LoggerFactory.getLogger(NarmesteLederConsumer::class.java)
 
-        private const val CALL_SYFONARMESTELEDER_ANSATTE_BASE = "call_syfonarmesteleder_ansatte"
-        private const val CALL_SYFONARMESTELEDER_ANSATTE_FAIL = "${CALL_SYFONARMESTELEDER_ANSATTE_BASE}_fail"
-        private const val CALL_SYFONARMESTELEDER_ANSATTE_SUCCESS = "${CALL_SYFONARMESTELEDER_ANSATTE_BASE}_success"
-
         private const val CALL_ISNARMESTELEDER_LEDERE_BASE = "call_isnarmesteleder_ledere"
         private const val CALL_ISNARMESTELEDER_LEDERE_FAIL = "${CALL_ISNARMESTELEDER_LEDERE_BASE}_fail"
         private const val CALL_ISNARMESTELEDER_LEDERE_SUCCESS = "${CALL_ISNARMESTELEDER_LEDERE_BASE}_success"
-
-        private const val CALL_SYFONARMESTELEDER_LEDERE_BASE = "call_syfonarmesteledere_leder"
-        private const val CALL_SYFONARMESTELEDER_LEDERE_FAIL = "${CALL_SYFONARMESTELEDER_LEDERE_BASE}_fail"
-        private const val CALL_SYFONARMESTELEDER_LEDERE_SUCCESS = "${CALL_SYFONARMESTELEDER_LEDERE_BASE}_success"
-
-        private const val SYFONARMESTELEDER_CALL_ID_HEADER = "Nav-Callid"
     }
 }

@@ -106,7 +106,7 @@ public class ArbeidsgiverVarselService {
             List<NarmesteLederRelasjonDTO> narmesteLedere;
 
             if (erSystemKall) {
-                narmesteLedere = narmesteLederConsumer.ledereForInnbyggerSystem(innbyggerFnr.getValue());
+                narmesteLedere = narmesteLederConsumer.getLedereUsingSystemToken(innbyggerFnr.getValue());
             } else {
                 narmesteLedere = narmesteLederConsumer.ledereForInnbygger(innbyggerFnr.getValue());
             }

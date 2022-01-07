@@ -19,20 +19,13 @@ import java.time.LocalDate
 
 internal class NarmesteLederConsumerTest {
 
-    private val syfonarmestelederUrl = "https://syfonarmesteleder.nav.no"
     private val isnarmestelederHost = "https://isnarmesteleder.nav.no"
-
-    @MockK
-    private lateinit var azureAdTokenConsumer: AzureAdTokenConsumer
 
     @MockK
     private lateinit var azureAdV2TokenConsumer: AzureAdV2TokenConsumer
 
     @MockK
     private lateinit var metric: Metric
-
-    @MockK
-    private lateinit var restTemplate: RestTemplate
 
     @MockK
     private lateinit var restTemplateWithProxy: RestTemplate
@@ -48,63 +41,11 @@ internal class NarmesteLederConsumerTest {
         consumer = NarmesteLederConsumer(
             isnarmestelederHost,
             "123",
-            syfonarmestelederUrl,
-            "123",
-            azureAdTokenConsumer,
             azureAdV2TokenConsumer,
             metric,
-            restTemplate,
             restTemplateWithProxy,
             contextHolder
         )
-    }
-
-    @Test
-    fun `should return empty list when response body is null`() {
-        every {
-            restTemplate.exchange(
-                "$syfonarmestelederUrl/syfonarmesteleder/sykmeldt/123/narmesteledere",
-                HttpMethod.GET,
-                any(),
-                object : ParameterizedTypeReference<List<NarmesteLederRelasjon>>() {}
-            )
-        } returns ResponseEntity(null, null, HttpStatus.OK)
-
-        val responseList: List<NarmesteLederRelasjon> = consumer.narmestelederRelasjonerLedere("123")
-
-        assertThat(responseList).isEmpty()
-    }
-
-    @Test
-    fun `should return list of relasjon when response body is not null`() {
-        every {
-            restTemplate.exchange(
-                "$syfonarmestelederUrl/syfonarmesteleder/sykmeldt/123/narmesteledere",
-                HttpMethod.GET,
-                any(),
-                object : ParameterizedTypeReference<List<NarmesteLederRelasjon>>() {}
-            )
-        } returns ResponseEntity(
-            listOf(
-                NarmesteLederRelasjon(
-                    aktorId = "999",
-                    orgnummer = "123",
-                    narmesteLederAktorId = "234",
-                    narmesteLederTelefonnummer = "99999999",
-                    narmesteLederEpost = "99999999@999.no",
-                    aktivFom = LocalDate.now().minusYears(1),
-                    aktivTom = LocalDate.now(),
-                    arbeidsgiverForskutterer = true,
-                    skrivetilgang = false,
-                    tilganger = listOf(Tilgang.MOTE),
-                    navn = "Lyr"
-                )
-            ), null, HttpStatus.OK
-        )
-
-        val responseList: List<NarmesteLederRelasjon> = consumer.narmestelederRelasjonerLedere("123")
-
-        assertThat(responseList).isNotEmpty
     }
 
     @Test
@@ -168,7 +109,7 @@ internal class NarmesteLederConsumerTest {
             )
         } returns ResponseEntity(lederListWithActiveLeder, null, HttpStatus.OK)
 
-        val actualLederList: List<NarmesteLederRelasjonDTO> = consumer.ledereForInnbyggerSystem(innbyggerIdent)
+        val actualLederList: List<NarmesteLederRelasjonDTO> = consumer.getLedereUsingSystemToken(innbyggerIdent)
 
         assertThat(actualLederList).usingRecursiveComparison().isEqualTo(lederListWithActiveLeder)
     }
@@ -185,7 +126,7 @@ internal class NarmesteLederConsumerTest {
             )
         } returns ResponseEntity(listWithIdentAsBothLederAndAnsatt, null, HttpStatus.OK)
 
-        val actualLederList: List<NarmesteLederRelasjonDTO> = consumer.ledereForInnbyggerSystem(innbyggerIdent)
+        val actualLederList: List<NarmesteLederRelasjonDTO> = consumer.getLedereUsingSystemToken(innbyggerIdent)
 
         assertThat(actualLederList).usingRecursiveComparison().isEqualTo(lederListWithActiveLeder)
     }
@@ -202,7 +143,7 @@ internal class NarmesteLederConsumerTest {
             )
         } returns ResponseEntity(emptyList(), null, HttpStatus.OK)
 
-        val actualLederList: List<NarmesteLederRelasjonDTO> = consumer.ledereForInnbyggerSystem(innbyggerIdent)
+        val actualLederList: List<NarmesteLederRelasjonDTO> = consumer.getLedereUsingSystemToken(innbyggerIdent)
 
         assertThat(actualLederList).isEmpty()
     }
@@ -219,7 +160,7 @@ internal class NarmesteLederConsumerTest {
             )
         } returns ResponseEntity(null, null, HttpStatus.OK)
 
-        consumer.ledereForInnbyggerSystem(innbyggerIdent)
+        consumer.getLedereUsingSystemToken(innbyggerIdent)
     }
 
     @Test

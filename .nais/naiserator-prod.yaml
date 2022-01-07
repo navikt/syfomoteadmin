@@ -140,10 +140,6 @@ spec:
       value: "https://syfobehandlendeenhet.intern.nav.no"
     - name: SYFOBRUKERTILGANG_URL
       value: https://syfobrukertilgang.nais.adeo.no
-    - name: SYFONARMESTELEDER_URL
-      value: "https://syfonarmesteleder.nais.adeo.no"
-    - name: SYFONARMESTELEDER_ID
-      value: ccf8c36f-27e6-4e76-8250-9a49939df7ef
     - name: ISNARMESTELEDER_HOST
       value: "https://isnarmesteleder.intern.nav.no"
     - name: ISNARMESTELEDER_ID
