@@ -1,6 +1,12 @@
 package no.nav.syfo.testhelper
 
 import no.nav.syfo.consumer.narmesteleder.NarmesteLederRelasjonDTO
+import no.nav.syfo.testhelper.UserConstants.ARBEIDSTAKER_FNR
+import no.nav.syfo.testhelper.UserConstants.LEDER_FNR
+import no.nav.syfo.testhelper.UserConstants.PERSON_EMAIL
+import no.nav.syfo.testhelper.UserConstants.PERSON_TLF
+import no.nav.syfo.testhelper.UserConstants.VIRKSOMHETSNUMMER
+import no.nav.syfo.testhelper.UserConstants.VIRKSOMHET_NAME1
 import java.time.LocalDate
 import java.time.LocalDateTime
 
@@ -64,6 +70,23 @@ val activeLederWrongVirksomhet = NarmesteLederRelasjonDTO(
     status = "INNMELDT_AKTIV",
 )
 
+val moterServiceMockRelasjon = NarmesteLederRelasjonDTO(
+    "951",
+    ARBEIDSTAKER_FNR,
+    VIRKSOMHET_NAME1,
+    VIRKSOMHETSNUMMER,
+    LEDER_FNR,
+    PERSON_TLF,
+    PERSON_EMAIL,
+    "Leder Navnesen",
+    LocalDate.of(2017, 3, 2),
+    LocalDate.of(2018, 3, 2),
+    false,
+    LocalDateTime.now(),
+    "INNMELDT_AKTIV",
+)
+
 val lederListWithActiveLeder = listOf(inactiveLeder, activeLeder, activeLederWrongVirksomhet)
 val lederListWithoutActiveLeder = listOf(inactiveLeder, activeLederWrongVirksomhet)
-val listWithIdentAsBothLederAndAnsatt = listOf(inactiveLeder, activeLeder, activeLederWrongVirksomhet, activeLederRelasjonWithInnbyggerAsLeder)
+val listWithIdentAsBothLederAndAnsatt =
+    listOf(inactiveLeder, activeLeder, activeLederWrongVirksomhet, activeLederRelasjonWithInnbyggerAsLeder)
