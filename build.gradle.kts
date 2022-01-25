@@ -29,6 +29,7 @@ val jaxRiVersion = "2.3.2"
 
 val flywayVersion = "5.1.4"
 val ojdbc8Version = "19.3.0.0"
+val h2Version = "2.1.210"
 val mockkVersion = "1.10.6"
 val byteBuddyVersion = "1.10.22"
 
@@ -114,7 +115,7 @@ dependencies {
 
     api("org.flywaydb:flyway-core:$flywayVersion")
     implementation("com.oracle.ojdbc:ojdbc8:$ojdbc8Version")
-    testImplementation("com.h2database:h2")
+    testImplementation("com.h2database:h2:$h2Version")
 
     testImplementation("io.mockk:mockk:$mockkVersion")
     testRuntimeOnly("net.bytebuddy:byte-buddy:$byteBuddyVersion")
