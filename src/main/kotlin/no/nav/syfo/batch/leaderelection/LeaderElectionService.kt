@@ -1,5 +1,6 @@
 package no.nav.syfo.batch.leaderelection
 
+import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import no.nav.syfo.metric.Metric
 import org.slf4j.LoggerFactory
@@ -14,12 +15,12 @@ import javax.inject.Inject
 class LeaderElectionService @Inject constructor(
     private val metric: Metric,
     private val restTemplate: RestTemplate,
-    @Value("\${elector.path}") private val electorpath: String
+    @Value("\${elector.path}") private val electorpath: String,
 ) {
     val isLeader: Boolean
         get() {
             metric.countEvent("isLeader_kalt")
-            val objectMapper = ObjectMapper()
+            val objectMapper = ObjectMapper().configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false)
             val url = "http://$electorpath"
             val response = restTemplate.getForObject(url, String::class.java)
             return try {
