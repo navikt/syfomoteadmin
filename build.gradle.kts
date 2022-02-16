@@ -97,8 +97,6 @@ dependencies {
     implementation("com.ibm.mq:com.ibm.mq.allclient:$mqVersion")
     implementation("no.nav.tjenestespesifikasjoner:varsel-inn:$tjenesteSpesifikasjonerVersion")
     implementation("no.nav.tjenestespesifikasjoner:nav-virksomhet-stoppReVarsel-v1-meldingsdefinisjon:$tjenesteSpesifikasjonerVersion")
-    implementation("no.nav.tjenestespesifikasjoner:nav-virksomhet-varselMedHandling-v1-meldingsdefinisjon:$tjenesteSpesifikasjonerVersion")
-    implementation("no.nav.tjenestespesifikasjoner:nav-virksomhet-opprettOppgavehenvendelse-v1-meldingsdefinisjon:$tjenesteSpesifikasjonerVersion")
     implementation("no.nav.tjenestespesifikasjoner:servicemeldingMedKontaktinformasjon-v1-tjenestespesifikasjon:$tjenesteSpesifikasjonerGithubVersion")
 
     implementation("io.micrometer:micrometer-registry-prometheus:$prometheusVersion")
