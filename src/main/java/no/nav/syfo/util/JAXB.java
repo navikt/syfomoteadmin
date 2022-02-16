@@ -1,7 +1,6 @@
 package no.nav.syfo.util;
 
 import no.nav.melding.virksomhet.servicemeldingmedkontaktinformasjon.v1.servicemeldingmedkontaktinformasjon.WSServicemeldingMedKontaktinformasjon;
-import no.nav.melding.virksomhet.stopprevarsel.v1.stopprevarsel.StoppReVarsel;
 import no.nav.melding.virksomhet.varsel.v1.varsel.XMLVarsel;
 import no.nav.melding.virksomhet.varsel.v1.varsel.XMLVarslingstyper;
 
@@ -18,7 +17,6 @@ import static javax.xml.bind.Marshaller.JAXB_FRAGMENT;
 
 public class JAXB {
 
-    public static final JAXBContext OPPGAVEVARSEL_CONTEXT;
     public static final JAXBContext TREDJEPARTS_SERVICEMELDING_CONTEXT;
     public static final JAXBContext VARSEL_CONTEXT;
 
@@ -27,9 +25,6 @@ public class JAXB {
             VARSEL_CONTEXT = newInstance(
                     XMLVarsel.class,
                     XMLVarslingstyper.class
-            );
-            OPPGAVEVARSEL_CONTEXT = newInstance(
-                    StoppReVarsel.class
             );
             TREDJEPARTS_SERVICEMELDING_CONTEXT = newInstance(
                     WSServicemeldingMedKontaktinformasjon.class
@@ -43,19 +38,6 @@ public class JAXB {
         try {
             StringWriter writer = new StringWriter();
             Marshaller marshaller = VARSEL_CONTEXT.createMarshaller();
-            marshaller.setProperty(JAXB_FORMATTED_OUTPUT, TRUE);
-            marshaller.setProperty(JAXB_FRAGMENT, true);
-            marshaller.marshal(element, new StreamResult(writer));
-            return writer.toString();
-        } catch (JAXBException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    public static String marshallOppgaveVarsel(Object element) {
-        try {
-            StringWriter writer = new StringWriter();
-            Marshaller marshaller = OPPGAVEVARSEL_CONTEXT.createMarshaller();
             marshaller.setProperty(JAXB_FORMATTED_OUTPUT, TRUE);
             marshaller.setProperty(JAXB_FRAGMENT, true);
             marshaller.marshal(element, new StreamResult(writer));

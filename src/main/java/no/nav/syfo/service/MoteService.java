@@ -8,9 +8,10 @@ import no.nav.syfo.consumer.dkif.DkifConsumer;
 import no.nav.syfo.domain.model.*;
 import no.nav.syfo.metric.Metric;
 import no.nav.syfo.oversikthendelse.OversikthendelseService;
-import no.nav.syfo.repository.dao.*;
+import no.nav.syfo.repository.dao.FeedDAO;
+import no.nav.syfo.repository.dao.MoteDAO;
+import no.nav.syfo.repository.dao.TidOgStedDAO;
 import no.nav.syfo.repository.model.PFeedHendelse;
-import no.nav.syfo.service.mq.MqStoppRevarslingService;
 import no.nav.syfo.service.varselinnhold.ArbeidsgiverVarselService;
 import no.nav.syfo.service.varselinnhold.SykmeldtVarselService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +20,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.ws.rs.ForbiddenException;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
+import java.util.UUID;
 import java.util.function.Predicate;
 
 import static java.time.LocalDateTime.now;
@@ -28,7 +31,6 @@ import static no.nav.syfo.domain.model.MoteStatus.*;
 import static no.nav.syfo.oversikthendelse.OversikthendelseType.MOTEPLANLEGGER_ALLE_SVAR_BEHANDLET;
 import static no.nav.syfo.oversikthendelse.OversikthendelseType.MOTEPLANLEGGER_ALLE_SVAR_MOTTATT;
 import static no.nav.syfo.repository.model.PFeedHendelse.FeedHendelseType.ALLE_SVAR_MOTTATT;
-import static no.nav.syfo.service.MotedeltakerService.finnAktoerIMote;
 import static no.nav.syfo.util.MoteUtilKt.moterAfterGivenDate;
 import static no.nav.syfo.util.MoterUtil.filtrerBortAlternativerSomAlleredeErLagret;
 import static no.nav.syfo.util.MoterUtil.hentSisteSvartidspunkt;
@@ -47,7 +49,6 @@ public class MoteService {
     private ArbeidsgiverVarselService arbeidsgiverVarselService;
     private DkifConsumer dkifConsumer;
     private SykmeldtVarselService sykmeldtVarselService;
-    private MqStoppRevarslingService mqStoppRevarslingService;
     private FeedService feedService;
 
     @Autowired
@@ -63,7 +64,6 @@ public class MoteService {
             ArbeidsgiverVarselService arbeidsgiverVarselService,
             DkifConsumer dkifConsumer,
             SykmeldtVarselService sykmeldtVarselService,
-            MqStoppRevarslingService mqStoppRevarslingService,
             FeedService feedService
     ) {
         this.moteDAO = moteDAO;
@@ -76,7 +76,6 @@ public class MoteService {
         this.arbeidsgiverVarselService = arbeidsgiverVarselService;
         this.sykmeldtVarselService = sykmeldtVarselService;
         this.axsysConsumer = axsysConsumer;
-        this.mqStoppRevarslingService = mqStoppRevarslingService;
         this.dkifConsumer = dkifConsumer;
         this.feedService = feedService;
     }
@@ -100,7 +99,6 @@ public class MoteService {
     @Transactional
     public void avbrytMote(String moteUuid, boolean varsle, String veilederIdent) {
         Mote mote = moteDAO.findMoteByUUID(moteUuid);
-        mqStoppRevarslingService.stoppReVarsel(finnAktoerIMote(mote).uuid);
         if (varsle) {
             Varseltype varseltype = mote.status.equals(MoteStatus.BEKREFTET) ? Varseltype.AVBRUTT_BEKREFTET : Varseltype.AVBRUTT;
             arbeidsgiverVarselService.sendVarsel(varseltype, mote, false, veilederIdent);
@@ -121,7 +119,7 @@ public class MoteService {
             Long tidOgStedId,
             Boolean varsle,
             String veilederIdent
-        ) {
+    ) {
         Mote mote = moteDAO.findMoteByUUID(moteUuid);
 
         metric.reportAntallDagerSiden(mote.opprettetTidspunkt, "antallDagerForSvar");
@@ -131,8 +129,6 @@ public class MoteService {
         mote.valgtTidOgSted(mote.alternativer.stream().filter(tidOgSted -> tidOgSted.id.equals(tidOgStedId)).findFirst().orElseThrow(() -> new RuntimeException("Fant ikke tidspunktet!")));
 
         hendelseService.moteStatusEndret(mote.status(BEKREFTET), veilederIdent);
-
-        mqStoppRevarslingService.stoppReVarsel(finnAktoerIMote(mote).uuid);
 
         if (varsle) {
             arbeidsgiverVarselService.sendVarsel(Varseltype.BEKREFTET, mote, false, veilederIdent);
@@ -231,7 +227,6 @@ public class MoteService {
                 .collect(toList());
 
         if ("Bruker".equals(brukerSomSvarte.motedeltakertype)) {
-            mqStoppRevarslingService.stoppReVarsel(brukerSomSvarte.uuid);
             metric.reportAntallDagerSiden(mote.opprettetTidspunkt, "antallDagerBrukerSvar");
         } else if ("arbeidsgiver".equals(brukerSomSvarte.motedeltakertype)) {
             metric.reportAntallDagerSiden(mote.opprettetTidspunkt, "antallDagerArbeidsgiverSvar");
@@ -247,10 +242,6 @@ public class MoteService {
                     .moteId(mote.id)
             );
         }
-    }
-
-    public Mote findMoteByUUID(UUID moteUuid) {
-        return moteDAO.findMoteByUUID(moteUuid.toString());
     }
 
     public List<Mote> findMoterByBrukerNavAnsatt(String navansatt) {

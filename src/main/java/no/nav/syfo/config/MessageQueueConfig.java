@@ -35,11 +35,6 @@ public class MessageQueueConfig {
     @Value("${srv.password}")
     private String serviceuserPassword;
 
-    @Bean(name = "stoppVarselDestination")
-    public Queue stoppVarselDestination(@Value("${stopprevarsel.queuename}") String stopprevarselQueueName) throws JMSException {
-        return new MQQueue(stopprevarselQueueName);
-    }
-
     @Bean(name = "serviceVarselDestination")
     public Queue serviceVarselDestination(@Value("${servicevarsel.queuename}") String servicevarselQueueName) throws JMSException {
         return new MQQueue(servicevarselQueueName);
@@ -48,17 +43,6 @@ public class MessageQueueConfig {
     @Bean(name = "tredjepartsvarselVarselDestination")
     public Queue tredjepartsVarselDestination(@Value("${tredjepartsvarsel.queuename}") String tredjepartsvarselQueueName) throws JMSException {
         return new MQQueue(tredjepartsvarselQueueName);
-    }
-
-    @Bean(name = "stoppvarselqueue")
-    public JmsTemplate stoppvarselqueue(
-            @Autowired @Qualifier("stoppVarselDestination") Queue stoppVarselDestination,
-            ConnectionFactory connectionFactory
-    ) {
-        JmsTemplate jmsTemplate = new JmsTemplate();
-        jmsTemplate.setDefaultDestination(stoppVarselDestination);
-        jmsTemplate.setConnectionFactory(connectionFactory);
-        return jmsTemplate;
     }
 
     @Bean(name = "servicevarselqueue")
