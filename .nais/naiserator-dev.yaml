@@ -58,8 +58,6 @@ spec:
   vault:
     enabled: true
     paths:
-      - kvPath: "/azuread/data/dev/creds/syfomoteadmin"
-        mountPath: "/secrets/azuread/syfomoteadmin"
       - kvPath: "/oracle/data/dev/creds/moteadmin_q1-user"
         mountPath: "/secrets/moteadmindb/credentials"
       - kvPath: "/oracle/data/dev/config/moteadmin_q1"
@@ -118,8 +116,6 @@ spec:
       value: https://security-token-service.nais.preprod.local/rest/v1/sts/.well-known/openid-configuration
     - name: NO_NAV_SECURITY_OIDC_ISSUER_STS_ACCEPTEDAUDIENCE
       value: srvsyfomotebehov,srvsyfoservice
-    - name: AD_ACCESSTOKEN_URL
-      value: https://login.microsoftonline.com/navq.onmicrosoft.com/oauth2/token
     - name: AXSYS_URL
       value: "https://axsys.nais.preprod.local"
     - name: DKIF_URL

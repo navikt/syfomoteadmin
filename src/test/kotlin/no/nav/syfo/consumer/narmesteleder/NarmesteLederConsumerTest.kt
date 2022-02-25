@@ -4,7 +4,6 @@ import io.mockk.MockKAnnotations
 import io.mockk.every
 import io.mockk.impl.annotations.MockK
 import no.nav.security.oidc.context.OIDCRequestContextHolder
-import no.nav.syfo.consumer.azuread.AzureAdTokenConsumer
 import no.nav.syfo.consumer.azuread.v2.AzureAdV2TokenConsumer
 import no.nav.syfo.metric.Metric
 import no.nav.syfo.testhelper.*
@@ -15,7 +14,6 @@ import org.junit.Test
 import org.springframework.core.ParameterizedTypeReference
 import org.springframework.http.*
 import org.springframework.web.client.RestTemplate
-import java.time.LocalDate
 
 internal class NarmesteLederConsumerTest {
 

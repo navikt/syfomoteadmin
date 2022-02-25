@@ -39,11 +39,8 @@ srv:
 nais.app.name: 'syfomoteadmin'
 kafka.env.name: 'local'
 
-client.id: "clientId"
-client.secret: "clientSecret"
 isnarmesteleder.id: "isnarmestelederID"
 
-ad.accesstoken.url: 'http://aadaccesstoken'
 syfobrukertilgang.url: "http://syfobrukertilgang"
 
 azure:
