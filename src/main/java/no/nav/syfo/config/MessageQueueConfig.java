@@ -1,11 +1,9 @@
 package no.nav.syfo.config;
 
 import com.ibm.mq.jms.MQQueue;
-import com.ibm.mq.jms.MQXAConnectionFactory;
 import com.ibm.msg.client.jms.JmsConnectionFactory;
 import com.ibm.msg.client.jms.JmsFactoryFactory;
 import org.springframework.beans.factory.annotation.*;
-import org.springframework.boot.jms.XAConnectionFactoryWrapper;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.*;
 import org.springframework.jms.annotation.EnableJms;
@@ -37,32 +35,6 @@ public class MessageQueueConfig {
     @Value("${srv.password}")
     private String serviceuserPassword;
 
-    @Bean(name = "opprettOppgaveHenvendelseDestination")
-    public Queue opprettOppgaveHenvendelseDestination(@Value("${henvendelseoppgavevarsel.queuename}") String henvendelseoppgaveQueueName) throws JMSException {
-        return new MQQueue(henvendelseoppgaveQueueName);
-    }
-
-    @Bean(name = "oppgavehenvendelsequeue")
-    public JmsTemplate oppgaveHenvendelseQueue(
-            @Autowired @Qualifier("opprettOppgaveHenvendelseDestination") Queue opprettOppgaveHenvendelseDestination,
-            ConnectionFactory connectionFactory
-    ) {
-        JmsTemplate jmsTemplate = new JmsTemplate();
-        jmsTemplate.setDefaultDestination(opprettOppgaveHenvendelseDestination);
-        jmsTemplate.setConnectionFactory(connectionFactory);
-        return jmsTemplate;
-    }
-
-    @Bean(name = "oppgaveVarselDestination")
-    public Queue oppgaveVarselDestination(@Value("${bestvarselmhandling.queuename}") String bestvarselmhandlingQueueName) throws JMSException {
-        return new MQQueue(bestvarselmhandlingQueueName);
-    }
-
-    @Bean(name = "stoppVarselDestination")
-    public Queue stoppVarselDestination(@Value("${stopprevarsel.queuename}") String stopprevarselQueueName) throws JMSException {
-        return new MQQueue(stopprevarselQueueName);
-    }
-
     @Bean(name = "serviceVarselDestination")
     public Queue serviceVarselDestination(@Value("${servicevarsel.queuename}") String servicevarselQueueName) throws JMSException {
         return new MQQueue(servicevarselQueueName);
@@ -71,28 +43,6 @@ public class MessageQueueConfig {
     @Bean(name = "tredjepartsvarselVarselDestination")
     public Queue tredjepartsVarselDestination(@Value("${tredjepartsvarsel.queuename}") String tredjepartsvarselQueueName) throws JMSException {
         return new MQQueue(tredjepartsvarselQueueName);
-    }
-
-    @Bean(name = "opprettVarselQueue")
-    public JmsTemplate opprettVarselQueue(
-            @Autowired @Qualifier("oppgaveVarselDestination") Queue oppgaveVarselDestination,
-            ConnectionFactory connectionFactory
-    ) {
-        JmsTemplate jmsTemplate = new JmsTemplate();
-        jmsTemplate.setDefaultDestination(oppgaveVarselDestination);
-        jmsTemplate.setConnectionFactory(connectionFactory);
-        return jmsTemplate;
-    }
-
-    @Bean(name = "stoppvarselqueue")
-    public JmsTemplate stoppvarselqueue(
-            @Autowired @Qualifier("stoppVarselDestination") Queue stoppVarselDestination,
-            ConnectionFactory connectionFactory
-    ) {
-        JmsTemplate jmsTemplate = new JmsTemplate();
-        jmsTemplate.setDefaultDestination(stoppVarselDestination);
-        jmsTemplate.setConnectionFactory(connectionFactory);
-        return jmsTemplate;
     }
 
     @Bean(name = "servicevarselqueue")

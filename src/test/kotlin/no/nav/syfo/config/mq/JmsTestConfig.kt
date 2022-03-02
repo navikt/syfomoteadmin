@@ -9,21 +9,6 @@ import org.springframework.jms.core.JmsTemplate
 @EnableJms
 @Profile("local")
 class JmsTestConfig {
-    @Bean(name = ["oppgavehenvendelsequeue"])
-    fun oppgaveHenvendelseQueue(): JmsTemplate {
-        return JmsTemplateMock("oppgaveHenvendelseQueue")
-    }
-
-    @Bean(name = ["opprettVarselQueue"])
-    fun opprettvarselqueue(): JmsTemplate {
-        return JmsTemplateMock("opprettvarselqueue")
-    }
-
-    @Bean(name = ["stoppvarselqueue"])
-    fun stoppvarselqueue(): JmsTemplate {
-        return JmsTemplateMock("stoppvarselqueue")
-    }
-
     @Bean(name = ["servicevarselqueue"])
     fun servicevarselqueue(): JmsTemplate {
         return JmsTemplateMock("servicevarselqueue")
