@@ -204,42 +204,7 @@ public class MoterInternControllerV2 {
     public void opprett(
             @RequestBody RSNyttMoteRequest nyttMoteRequest
     ) {
-        if (pdlConsumer.isKode6Or7(nyttMoteRequest.fnr) || !tilgangService.hasVeilederAccessToPersonWithAzureOBO(new Fodselsnummer(nyttMoteRequest.fnr))) {
-            throw new ForbiddenException();
-        } else {
-            NarmesteLederRelasjonDTO currentLeder = Optional.ofNullable(narmesteLederConsumer.narmesteLeder(nyttMoteRequest.fnr, nyttMoteRequest.orgnummer))
-                    .orElseThrow(() -> new RuntimeException("Fant ikke nærmeste leder"));
-
-            String aktorId = pdlConsumer.aktorId(new Fodselsnummer(nyttMoteRequest.fnr)).getValue();
-            String lederNavn = pdlConsumer.fullName(currentLeder.getNarmesteLederPersonIdentNumber());
-
-            nyttMoteRequest.navn(lederNavn);
-            nyttMoteRequest.epost(currentLeder.getNarmesteLederEpost());
-            nyttMoteRequest.navEnhet(behandlendeEnhetConsumer.getBehandlendeEnhet(null, nyttMoteRequest.fnr).getEnhetId());
-
-            Mote nyttMote = map(nyttMoteRequest, opprett2Mote);
-            String innloggetIdent = getSubjectInternAzureV2(contextHolder);
-            nyttMote.opprettetAv(innloggetIdent);
-            nyttMote.eier(innloggetIdent);
-            Mote mote = opprettNyttMote(
-                    nyttMote,
-                    nyttMoteRequest,
-                    new PMotedeltakerAktorId()
-                            .aktorId(aktorId)
-                            .motedeltakertype("Bruker")
-                            .status(SENDT.name()),
-                    new PMotedeltakerArbeidsgiver()
-                            .navn(lederNavn)
-                            .orgnummer(currentLeder.getVirksomhetsnummer())
-                            .epost(currentLeder.getNarmesteLederEpost())
-                            .motedeltakertype("arbeidsgiver")
-                            .status(SENDT.name())
-            );
-            arbeidsgiverVarselService.sendVarsel(OPPRETTET, mote, false, innloggetIdent);
-            sykmeldtVarselService.sendVarsel(OPPRETTET, mote);
-
-            metric.tellEndepunktKall("opprettet_mote");
-        }
+        throw new RuntimeException("Creating new Mote in Moteplanlegger is not allowed");
     }
 
     @Transactional(rollbackFor = Exception.class)
