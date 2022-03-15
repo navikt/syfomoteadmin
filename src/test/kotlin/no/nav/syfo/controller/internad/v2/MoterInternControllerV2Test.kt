@@ -47,6 +47,7 @@ import java.util.*
 import java.util.function.Consumer
 import javax.inject.Inject
 import javax.ws.rs.ForbiddenException
+import kotlin.test.assertEquals
 
 @RunWith(SpringRunner::class)
 @SpringBootTest(classes = [LocalApplication::class])
@@ -307,25 +308,14 @@ class MoterInternControllerV2Test : AbstractRessursTilgangTest() {
         Mockito.verify(pdlConsumer).isKode6Or7(FNR_2)
     }
 
-    @Test(expected = ForbiddenException::class)
-    fun opprettMoter_ikke_tilgang_pga_skjermet_bruker() {
+    fun `opprettMoter kaster RuntimeException`() {
         Mockito.`when`(tilgangService.hasVeilederAccessToPersonWithAzureOBO(Fodselsnummer(ARBEIDSTAKER_FNR))).thenReturn(true)
         Mockito.`when`(pdlConsumer.isKode6Or7(ARBEIDSTAKER_FNR)).thenReturn(true)
-        moterController.opprett(RSNyttMoteRequest().fnr(ARBEIDSTAKER_FNR))
-    }
 
-    @Test(expected = ForbiddenException::class)
-    fun opprettMoter_ikke_tilgang_pga_rolle() {
-        Mockito.`when`(tilgangService.hasVeilederAccessToPersonWithAzureOBO(Fodselsnummer(ARBEIDSTAKER_FNR))).thenReturn(false)
-        Mockito.`when`(pdlConsumer.isKode6Or7(ARBEIDSTAKER_FNR)).thenReturn(false)
-        moterController.opprett(RSNyttMoteRequest().fnr(ARBEIDSTAKER_FNR))
-    }
-
-    @Test(expected = RuntimeException::class)
-    fun opprettMoter_annen_tilgangsfeil() {
-        Mockito.doThrow(RuntimeException()).`when`(tilgangService).hasVeilederAccessToPersonWithAzureOBO(Fodselsnummer(ARBEIDSTAKER_FNR))
-        Mockito.`when`(pdlConsumer.isKode6Or7(ARBEIDSTAKER_FNR)).thenReturn(false)
-        moterController.opprett(RSNyttMoteRequest().fnr(ARBEIDSTAKER_FNR))
+        val exception: RuntimeException = Assert.assertThrows(ForbiddenException::class.java) {
+            moterController.opprett(RSNyttMoteRequest().fnr(ARBEIDSTAKER_FNR))
+        }
+        assertEquals(exception.message, "Creating new Mote in Moteplanlegger is not allowed")
     }
 
     private fun mockSTS() {
