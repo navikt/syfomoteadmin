@@ -38,8 +38,8 @@ plugins {
     id("io.freefair.lombok") version "5.1.0"
     id("org.jetbrains.kotlin.plugin.allopen") version "1.5.31"
     id("java")
-    id("com.github.johnrengelman.shadow") version "6.0.0"
-    id("org.springframework.boot") version "2.4.12"
+    id("com.github.johnrengelman.shadow") version "7.1.1"
+    id("org.springframework.boot") version "2.6.6"
     id("io.spring.dependency-management") version "1.0.11.RELEASE"
 }
 
