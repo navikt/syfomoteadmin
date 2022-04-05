@@ -16,7 +16,7 @@ val tjenesteSpesifikasjonerGithubVersion = "1.2020.06.11-19.53-1cad83414166"
 
 val apacheHttpClientVersion = "4.5.13"
 val prometheusVersion = "1.7.5"
-val logstashLogbackEncoderVersion = "6.3"
+val logstashLogbackEncoderVersion = "7.0.1"
 val slf4jVersion = "1.7.25"
 val javaxWsRsVersion = "2.0.1"
 val javaxInjectVersion = "1"
