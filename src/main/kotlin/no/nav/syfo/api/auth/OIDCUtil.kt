@@ -7,6 +7,8 @@ import java.text.ParseException
 import java.util.*
 
 object OIDCUtil {
+    private val JWT_CLAIM_PID = "pid"
+
     private fun context(contextHolder: OIDCRequestContextHolder): OIDCValidationContext {
         return Optional.ofNullable(contextHolder.oidcValidationContext)
             .orElse(null)
@@ -26,9 +28,10 @@ object OIDCUtil {
 
     @JvmStatic
     fun getSubjectEkstern(contextHolder: OIDCRequestContextHolder): String? {
-        return Optional.ofNullable(claimSet(contextHolder, OIDCIssuer.EKSTERN))
-            .map { obj: JWTClaimsSet -> obj.subject }
-            .orElse(null)
+        return claimSet(contextHolder, OIDCIssuer.EKSTERN).let { claimsSet ->
+            val subjectFromPid = claimsSet.getStringClaim(JWT_CLAIM_PID)
+            subjectFromPid ?: claimsSet.subject
+        }
     }
 
     @JvmStatic
