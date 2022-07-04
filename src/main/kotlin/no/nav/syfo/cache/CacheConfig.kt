@@ -18,7 +18,6 @@ class CacheConfig {
             ConcurrentMapCache(CACHENAME_AXSYS_ENHETER),
             ConcurrentMapCache(CACHENAME_BEHANDLENDEENHET_FNR),
             ConcurrentMapCache(CACHENAME_DKIF_IDENT),
-            ConcurrentMapCache(CACHENAME_EREG_VIRKSOMHETSNAVN),
             ConcurrentMapCache(CACHENAME_LDAP_VEILEDER_NAVN),
             ConcurrentMapCache(CACHENAME_NARMESTELEDER_ANSATTE),
             ConcurrentMapCache(CACHENAME_NARMESTELEDER_LEDER),
@@ -33,7 +32,6 @@ class CacheConfig {
     companion object {
         const val CACHENAME_BEHANDLENDEENHET_FNR = "behandlendeenhetfnr"
         const val CACHENAME_DKIF_IDENT = "dkifident"
-        const val CACHENAME_EREG_VIRKSOMHETSNAVN = "virksomhetsnavn"
         const val CACHENAME_LDAP_VEILEDER_NAVN = "ldapveiledernavn"
         const val CACHENAME_AXSYS_ENHETER = "axsysenheter"
         const val CACHENAME_NARMESTELEDER_ANSATTE = "ansatte"
