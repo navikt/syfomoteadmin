@@ -106,8 +106,6 @@ spec:
       value: "https://axsys.nais.adeo.no"
     - name: DKIF_URL
       value: "https://dkif.nais.adeo.no"
-    - name: EREG_BASEURL
-      value: https://modapp.adeo.no
     - name: PDL_URL
       value: https://pdl-api.nais.adeo.no/graphql
     - name: SYFOTILGANGSKONTROLL_CLIENT_ID

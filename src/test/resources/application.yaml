@@ -29,7 +29,6 @@ server:
   servlet:
     context-path: /syfomoteadmin
 
-ereg.baseurl: "ereg.url"
 pdl.url: "https://pdl"
 securitytokenservice.url: "sts.url"
 srv:
